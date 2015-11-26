@@ -32,6 +32,7 @@ package org.fenixedu.ulisboa.specifications.domain;
 enum org.fenixedu.ulisboa.specifications.domain.serviceRequests.UIComponentType as UIComponentType;
 
 external class .org.fenixedu.academic.domain.CompetenceCourse;
+external class .org.fenixedu.academic.domain.EvaluationSeason;
 external class .org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 external class .org.fenixedu.academic.domain.curricularRules.AnyCurricularCourseExceptions;
 external class .org.fenixedu.academic.domain.student.StatuteType;
@@ -529,6 +530,41 @@ relation AnyCurricularCourseExceptionsCompetenceCourse {
 }
 
 // ==================== END: CurricularRule Executor Logics ====================
+
+// ==================== BEGIN: Evaluations ====================
+
+class evaluation.EvaluationSeasonInformation {
+	Integer seasonOrder;
+	Boolean active;
+	Boolean requiresEnrolmentEvaluation;
+}
+
+relation EvaluationSeasonInformationRelation {
+    evaluation.EvaluationSeasonInformation playsRole information {
+        multiplicity 1..1;
+    }
+
+    .org.fenixedu.academic.domain.EvaluationSeason playsRole season {
+        multiplicity 1..1;
+    }
+}
+
+class evaluation.EvaluationSeasonRule {
+	LocalizedString name;
+}
+
+
+relation EvaluationSeasonRuleRelation {
+    evaluation.EvaluationSeasonRule playsRole rules {
+        multiplicity 1..1;
+    }
+
+    .org.fenixedu.academic.domain.EvaluationSeason playsRole season {
+        multiplicity *;
+    }
+}
+
+// ==================== END: Evaluations ====================
 
 // ==================== Parishes as domain objects
 class Parish{
