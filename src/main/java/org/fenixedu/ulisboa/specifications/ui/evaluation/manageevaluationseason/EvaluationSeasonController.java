@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.EvaluationSeasonServices;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.EvaluationSeasonBean;
@@ -46,8 +47,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import pt.ist.fenixframework.Atomic;
 
 @SpringFunctionality(app = FenixeduUlisboaSpecificationsController.class, title = "label.title.evaluation.manageEvaluationSeason",
         accessGroup = "logged")
@@ -85,38 +84,24 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         model.addAttribute("evaluationSeason", evaluationSeason);
     }
 
-    @Atomic
-    public void deleteEvaluationSeason(final EvaluationSeason evaluationSeason) {
-        // CHANGE_ME: Do the processing for deleting the evaluationSeason
-        // Do not catch any exception here
-
-        // evaluationSeason.delete();
-    }
-
     private static final String _SEARCH_URI = "/";
     public static final String SEARCH_URL = CONTROLLER_URL + _SEARCH_URI;
 
     @RequestMapping(value = _SEARCH_URI)
     public String search(@RequestParam(value = "name", required = false) LocalizedString name,
-            @RequestParam(value = "active", required = false) Boolean active, final Model model) {
-        List<EvaluationSeason> searchevaluationseasonResultsDataSet = filterSearchEvaluationSeason(name, active);
+            @RequestParam(value = "active", required = false) boolean active, final Model model) {
+        List<EvaluationSeason> searchevaluationseasonResultsDataSet = filterSearchEvaluationSeason();
 
         model.addAttribute("searchevaluationseasonResultsDataSet", searchevaluationseasonResultsDataSet);
         return jspPage("search");
     }
 
     private Stream<EvaluationSeason> getSearchUniverseSearchEvaluationSeasonDataSet() {
-        return EvaluationSeason.all();
+        return EvaluationSeason.all().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR);
     }
 
-    private List<EvaluationSeason> filterSearchEvaluationSeason(LocalizedString name, Boolean active) {
-
-        return getSearchUniverseSearchEvaluationSeasonDataSet()
-                .filter(evaluationSeason -> name == null || name.isEmpty() || name.getLocales().stream()
-                        .allMatch(locale -> evaluationSeason.getName().getContent(locale) != null && evaluationSeason.getName()
-                                .getContent(locale).toLowerCase().contains(name.getContent(locale).toLowerCase())))
-                                .filter(evaluationSeason -> active == null || active.equals(evaluationSeason.getInformation().getActive()))
-                .collect(Collectors.toList());
+    private List<EvaluationSeason> filterSearchEvaluationSeason() {
+        return getSearchUniverseSearchEvaluationSeasonDataSet().collect(Collectors.toList());
     }
 
     private static final String _SEARCH_TO_VIEW_ACTION_URI = "/search/view/";
@@ -148,7 +133,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
 
         setEvaluationSeason(evaluationSeason, model);
         try {
-            deleteEvaluationSeason(evaluationSeason);
+            EvaluationSeasonServices.delete(evaluationSeason);
 
             addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete") + " EvaluationSeason", model);
             return redirect(CONTROLLER_URL, model, redirectAttributes);
@@ -164,10 +149,8 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
     public String processReadToReadRules(@PathVariable("oid") final EvaluationSeason evaluationSeason, final Model model,
             final RedirectAttributes redirectAttributes) {
         setEvaluationSeason(evaluationSeason, model);
-//
-        /* Put here the logic for processing Event readRules 	*/
-        //doSomething();
 
+        // TODO
         // Now choose what is the Exit Screen	 
         return redirect("/fenixedu-ulisboa-specifications/evaluation/manageevaluationseasonrule/evaluationseasonrule//"
                 + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
@@ -179,7 +162,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
     @RequestMapping(value = _UPDATE_URI + "{oid}", method = RequestMethod.GET)
     public String update(@PathVariable("oid") final EvaluationSeason evaluationSeason, final Model model) {
         setEvaluationSeason(evaluationSeason, model);
-        
+
         final EvaluationSeasonBean bean = new EvaluationSeasonBean(evaluationSeason);
         this.setEvaluationSeasonBean(bean, model);
 
@@ -195,10 +178,6 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
     public @ResponseBody ResponseEntity<String> updatepostback(@PathVariable("oid") final EvaluationSeason evaluationSeason,
             @RequestParam(value = "bean", required = false) final EvaluationSeasonBean bean, final Model model) {
 
-        // Do validation logic ?!?!
-        //if (something_wrong){
-        //                 return new ResponseEntity<String>(<MESSAGE_FROM_BUNDLE>,HttpStatus.BAD_REQUEST);
-        //}
         this.setEvaluationSeasonBean(bean, model);
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
@@ -210,25 +189,12 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         setEvaluationSeason(evaluationSeason, model);
 
         try {
-            /*
-            *  UpdateLogic here
-            */
-
-            //	updateEvaluationSeason( .. get fields from bean..., model);
-
-            /*Succes Update */
+            EvaluationSeasonServices.edit(evaluationSeason, bean.getCode(), bean.getAcronym(), bean.getName(), bean.getNormal(),
+                    bean.getImprovement(), bean.getSpecial(), bean.getSpecialAuthorization(), bean.getActive(),
+                    bean.getRequiresEnrolmentEvaluation());
 
             return redirect(READ_URL + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
-
-            /*
-            * If there is any error in validation 
-            *
-            * Add a error / warning message
-            * 
-            * addErrorMessage(ULisboaSpecificationsUtil.bundle( "label.error.update") + de.getLocalizedMessage(),model);
-            * addWarningMessage(ULisboaSpecificationsUtil.bundle( "label.error.update")  + de.getLocalizedMessage(),model);
-            */
 
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + de.getLocalizedMessage(), model);
             setEvaluationSeason(evaluationSeason, model);
@@ -238,37 +204,6 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         }
     }
 
-    @Atomic
-    public void updateEvaluationSeason(LocalizedString name, String code, LocalizedString acronym, Boolean active, boolean normal,
-            boolean improvement, boolean special, boolean specialAuthorization, Boolean requiresEnrolmentEvaluation,
-            final Model model) {
-
-        // @formatter: off				
-        /*
-         * Modify the update code here if you do not want to update
-         * the object with the default setter for each field
-         */
-
-        // CHANGE_ME It's RECOMMENDED to use "Edit service" in DomainObject
-        //getEvaluationSeason(model).edit(fields_to_edit);
-
-        //Instead, use individual SETTERS and validate "CheckRules" in the end
-        // @formatter: on
-        
-        getEvaluationSeason(model).setName(name);
-        getEvaluationSeason(model).setCode(code);
-        getEvaluationSeason(model).setAcronym(acronym);
-        //TODO:
-//        getEvaluationSeason(model).setActive(active);
-        getEvaluationSeason(model).setNormal(normal);
-        getEvaluationSeason(model).setImprovement(improvement);
-        getEvaluationSeason(model).setSpecial(special);
-        getEvaluationSeason(model).setSpecialAuthorization(specialAuthorization);
-        //TODO:
-//        getEvaluationSeason(model).setRequiresEnrolmentEvaluation(requiresEnrolmentEvaluation);
-    }
-
-//				
     private static final String _CREATE_URI = "/create";
     public static final String CREATE_URL = CONTROLLER_URL + _CREATE_URI;
 
@@ -288,86 +223,29 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
     public @ResponseBody ResponseEntity<String> createpostback(
             @RequestParam(value = "bean", required = false) final EvaluationSeasonBean bean, final Model model) {
 
-        // Do validation logic ?!?!
-        //if (something_wrong){
-        //                 return new ResponseEntity<String>(<MESSAGE_FROM_BUNDLE>,HttpStatus.BAD_REQUEST);
-        //}
         this.setEvaluationSeasonBean(bean, model);
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
     @RequestMapping(value = _CREATE_URI, method = RequestMethod.POST)
-    public String create(@RequestParam(value = "name", required = false) LocalizedString name,
-            @RequestParam(value = "code", required = false) String code,
-            @RequestParam(value = "acronym", required = false) LocalizedString acronym,
-            @RequestParam(value = "active", required = false) Boolean active,
-            @RequestParam(value = "normal", required = false) boolean normal,
-            @RequestParam(value = "improvement", required = false) boolean improvement,
-            @RequestParam(value = "special", required = false) boolean special,
-            @RequestParam(value = "specialauthorization", required = false) boolean specialAuthorization,
-            @RequestParam(value = "requiresenrolmentevaluation", required = false) Boolean requiresEnrolmentEvaluation,
-            final Model model, final RedirectAttributes redirectAttributes) {
+    public String create(@RequestParam(value = "bean", required = false) EvaluationSeasonBean bean, Model model,
+            RedirectAttributes redirectAttributes) {
 
         try {
 
-            final EvaluationSeason evaluationSeason = createEvaluationSeason(name, code, acronym, active, normal, improvement,
-                    special, specialAuthorization, requiresEnrolmentEvaluation);
+            final EvaluationSeason evaluationSeason = EvaluationSeasonServices.create(bean.getCode(), bean.getAcronym(),
+                    bean.getName(), bean.getNormal(), bean.getImprovement(), bean.getSpecial(), bean.getSpecialAuthorization(),
+                    bean.getActive(), bean.getRequiresEnrolmentEvaluation());
 
-            //Success Validation
-            //Add the bean to be used in the View
             model.addAttribute("evaluationSeason", evaluationSeason);
-            return redirect(jspPage("read/") + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
+            return redirect(READ_URL + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            // @formatter: off
-            /*
-             * If there is any error in validation 
-             *
-             * Add a error / warning message
-             * 
-             * addErrorMessage(ULisboaSpecificationsUtil.bundle( "label.error.create") + de.getLocalizedMessage(),model);
-             * addWarningMessage(ULisboaSpecificationsUtil.bundle( "label.error.create") + de.getLocalizedMessage(),model); */
-            // @formatter: on
-
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
+            this.setEvaluationSeasonBean(bean, model);
             return create(model);
+
         }
-    }
-
-    @Atomic
-    public EvaluationSeason createEvaluationSeason(LocalizedString name, String code, LocalizedString acronym, Boolean active,
-            boolean normal, boolean improvement, boolean special, boolean specialAuthorization,
-            Boolean requiresEnrolmentEvaluation) {
-
-        // @formatter: off
-
-        /*
-         * Modify the creation code here if you do not want to create
-         * the object with the default constructor and use the setter
-         * for each field
-         * 
-         */
-
-        // CHANGE_ME It's RECOMMENDED to use "Create service" in DomainObject
-        //final EvaluationSeason evaluationSeason = evaluationSeason.create(fields_to_create);
-
-        //Instead, use individual SETTERS and validate "CheckRules" in the end
-        // @formatter: on
-
-        final EvaluationSeason evaluationSeason = new EvaluationSeason();
-        evaluationSeason.setName(name);
-        evaluationSeason.setCode(code);
-        evaluationSeason.setAcronym(acronym);
-        //TODO:
-        //evaluationSeason.setActive(active);
-        evaluationSeason.setNormal(normal);
-        evaluationSeason.setImprovement(improvement);
-        evaluationSeason.setSpecial(special);
-        evaluationSeason.setSpecialAuthorization(specialAuthorization);
-        //TODO:
-        //evaluationSeason.setRequiresEnrolmentEvaluation(requiresEnrolmentEvaluation);
-
-        return evaluationSeason;
     }
 
 }

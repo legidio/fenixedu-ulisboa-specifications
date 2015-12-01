@@ -35,6 +35,7 @@ import org.fenixedu.academic.domain.Attends;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EvaluationConfiguration;
+import org.fenixedu.academic.domain.EvaluationSeasonServices;
 import org.fenixedu.academic.domain.GradeScale;
 import org.fenixedu.academic.domain.GradeScale.GradeScaleLogic;
 import org.fenixedu.academic.domain.SchoolClass;
@@ -101,6 +102,7 @@ public class FenixeduUlisboaSpecificationsInitializer implements ServletContextL
         RegistrationRegimeVerifierInitializer.init();
         EnrolmentPredicateInitializer.init();
         EnrolmentManagerFactoryInitializer.init();
+        EvaluationSeasonServices.initialize();
         StudentCurricularPlanLayout.register();
         configureEnrolmentEvaluationComparator();
 

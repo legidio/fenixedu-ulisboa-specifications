@@ -193,8 +193,8 @@ ${portal.angularToolkit()}
 
 				<div class="col-sm-2">
 					<select id="evaluationSeason_requiresEnrolmentEvaluation"
-						name="requiresenrolmentevaluation" class="form-control"
-						ng-model="object.requiresenrolmentevaluation"
+						name="requiresEnrolmentEvaluation" class="form-control"
+						ng-model="object.requiresEnrolmentEvaluation"
 						ng-options="bvalue.value as bvalue.name for bvalue in booleanvalues">
 					</select>
 				</div>
@@ -242,8 +242,8 @@ ${portal.angularToolkit()}
 
 				<div class="col-sm-2">
 					<select id="evaluationSeason_specialAuthorization"
-						name="specialauthorization" class="form-control"
-						ng-model="object.specialauthorization"
+						name="specialAuthorization" class="form-control"
+						ng-model="object.specialAuthorization"
 						ng-options="bvalue.value as bvalue.name for bvalue in booleanvalues">
 					</select>
 				</div>

@@ -535,8 +535,8 @@ relation AnyCurricularCourseExceptionsCompetenceCourse {
 
 class evaluation.EvaluationSeasonInformation {
 	Integer seasonOrder;
-	Boolean active;
-	Boolean requiresEnrolmentEvaluation;
+	boolean active;
+	boolean requiresEnrolmentEvaluation;
 }
 
 relation EvaluationSeasonInformationRelation {
@@ -556,11 +556,11 @@ class evaluation.EvaluationSeasonRule {
 
 relation EvaluationSeasonRuleRelation {
     evaluation.EvaluationSeasonRule playsRole rules {
-        multiplicity 1..1;
+        multiplicity *;
     }
 
     .org.fenixedu.academic.domain.EvaluationSeason playsRole season {
-        multiplicity *;
+        multiplicity 1;
     }
 }
 

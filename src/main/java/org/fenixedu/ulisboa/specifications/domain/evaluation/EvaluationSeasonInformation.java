@@ -30,6 +30,7 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation;
 import java.util.Collection;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 
 import pt.ist.fenixframework.Atomic;
@@ -40,10 +41,10 @@ public class EvaluationSeasonInformation extends EvaluationSeasonInformation_Bas
         super();
     }
 
-    protected void init(final EvaluationSeason evaluationSeason, final Integer seasonOrder, final Boolean active,
-            final Boolean requiresEnrolmentEvaluation) {
+    protected void init(final EvaluationSeason evaluationSeason, final boolean active,
+            final boolean requiresEnrolmentEvaluation) {
         setSeason(evaluationSeason);
-        setSeasonOrder(seasonOrder);
+        setSeasonOrder(EvaluationSeasonServices.maxOrder() + 1);
         setActive(active);
         setRequiresEnrolmentEvaluation(requiresEnrolmentEvaluation);
         checkRules();
@@ -53,13 +54,14 @@ public class EvaluationSeasonInformation extends EvaluationSeasonInformation_Bas
         if (getSeason() == null) {
             throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonInformation.evaluationSeason.required");
         }
+
+        if (getSeasonOrder() == null) {
+            throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonInformation.order.required");
+        }
     }
 
     @Atomic
-    public void edit(final EvaluationSeason evaluationSeason, final Integer seasonOrder, final Boolean active,
-            final Boolean requiresEnrolmentEvaluation) {
-        setSeason(evaluationSeason);
-        setSeasonOrder(seasonOrder);
+    public void edit(final boolean active, final boolean requiresEnrolmentEvaluation) {
         setActive(active);
         setRequiresEnrolmentEvaluation(requiresEnrolmentEvaluation);
         checkRules();
@@ -77,17 +79,11 @@ public class EvaluationSeasonInformation extends EvaluationSeasonInformation_Bas
     }
 
     @Atomic
-    public static EvaluationSeasonInformation create(final EvaluationSeason evaluationSeason, final Integer seasonOrder,
-            final Boolean active, final Boolean requiresEnrolmentEvaluation) {
-        EvaluationSeasonInformation evaluationSeasonInformation = new EvaluationSeasonInformation();
-        evaluationSeasonInformation.init(evaluationSeason, seasonOrder, active, requiresEnrolmentEvaluation);
+    public static EvaluationSeasonInformation create(final EvaluationSeason evaluationSeason, final boolean active,
+            final boolean requiresEnrolmentEvaluation) {
+        final EvaluationSeasonInformation evaluationSeasonInformation = new EvaluationSeasonInformation();
+        evaluationSeasonInformation.init(evaluationSeason, active, requiresEnrolmentEvaluation);
         return evaluationSeasonInformation;
     }
-
-    // @formatter: off
-    /************
-     * SERVICES *
-     ************/
-    // @formatter: on
 
 }

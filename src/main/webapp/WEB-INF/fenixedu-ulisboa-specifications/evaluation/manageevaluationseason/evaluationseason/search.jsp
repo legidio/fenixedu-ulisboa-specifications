@@ -164,10 +164,7 @@ ${portal.angularToolkit()}
 							</c:if></td>
 						<td><a class="btn btn-default btn-xs"
 							href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/search/view/${evaluationSeason.externalId}"><spring:message
-									code='label.view' /></a>&nbsp;&nbsp;<a
-							class="btn btn-default btn-xs"
-							href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/delete/${evaluationSeason.externalId}"><spring:message
-									code='label.delete' /></td>
+									code='label.view' /></a></td>
 
 					</tr>
 				</c:forEach>
