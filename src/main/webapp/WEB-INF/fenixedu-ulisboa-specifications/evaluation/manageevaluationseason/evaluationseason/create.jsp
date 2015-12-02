@@ -1,3 +1,5 @@
+<%@page
+	import="org.fenixedu.ulisboa.specifications.ui.evaluation.manageevaluationseason.EvaluationSeasonController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
@@ -63,7 +65,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a
 		class=""
-		href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/"><spring:message
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonController.CONTROLLER_URL%>"><spring:message
 			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -134,10 +136,10 @@ ${portal.angularToolkit()}
 <form name='form' method="post" class="form-horizontal"
 	ng-app="angularAppEvaluationSeason"
 	ng-controller="EvaluationSeasonController"
-	action='${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/create'>
+	action='${pageContext.request.contextPath}<%=EvaluationSeasonController.CREATE_URL%>'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/createpostback' />
+		value='${pageContext.request.contextPath}<%=EvaluationSeasonController.CREATEPOSTBACK_URL%>' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 	<div class="panel panel-default">

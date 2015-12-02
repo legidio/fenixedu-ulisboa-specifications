@@ -1,3 +1,5 @@
+<%@page
+	import="org.fenixedu.ulisboa.specifications.ui.evaluation.manageevaluationseason.EvaluationSeasonController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
@@ -62,7 +64,7 @@ ${portal.angularToolkit()}
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<form id="deleteForm"
-				action="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/delete/${evaluationSeason.externalId}"
+				action="${pageContext.request.contextPath}<%=EvaluationSeasonController.DELETE_URL%>${evaluationSeason.externalId}"
 				method="POST">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"
@@ -98,18 +100,18 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a
 		class=""
-		href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/"><spring:message
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonController.CONTROLLER_URL%>"><spring:message
 			code="label.event.back" /></a> |&nbsp;&nbsp; <span
 		class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a
 		class="" href="#" data-toggle="modal" data-target="#deleteModal"><spring:message
 			code="label.event.delete" /></a> |&nbsp;&nbsp; <span
 		class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;<a
 		class=""
-		href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/update/${evaluationSeason.externalId}"><spring:message
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonController.UPDATE_URL%>${evaluationSeason.externalId}"><spring:message
 			code="label.event.update" /></a> |&nbsp;&nbsp; <span
 		class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a
 		class=""
-		href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/read/${evaluationSeason.externalId}/readrules"><spring:message
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonController.READ_URL%>${evaluationSeason.externalId}/readrules"><spring:message
 			code="label.event.evaluation.manageEvaluationSeason.readRules" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -189,7 +191,8 @@ ${portal.angularToolkit()}
 						<td><c:if
 								test="${evaluationSeason.information.requiresEnrolmentEvaluation}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.information.requiresEnrolmentEvaluation}">
+							</c:if> <c:if
+								test="${not evaluationSeason.information.requiresEnrolmentEvaluation}">
 								<spring:message code="label.false" />
 							</c:if></td>
 					</tr>

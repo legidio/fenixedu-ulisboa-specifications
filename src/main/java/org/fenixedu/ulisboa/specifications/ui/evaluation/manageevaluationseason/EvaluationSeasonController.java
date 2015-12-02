@@ -31,9 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
-import org.fenixedu.academic.domain.EvaluationSeasonServices;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.EvaluationSeasonBean;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
@@ -88,8 +87,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
     public static final String SEARCH_URL = CONTROLLER_URL + _SEARCH_URI;
 
     @RequestMapping(value = _SEARCH_URI)
-    public String search(@RequestParam(value = "name", required = false) LocalizedString name,
-            @RequestParam(value = "active", required = false) boolean active, final Model model) {
+    public String search(final Model model) {
         List<EvaluationSeason> searchevaluationseasonResultsDataSet = filterSearchEvaluationSeason();
 
         model.addAttribute("searchevaluationseasonResultsDataSet", searchevaluationseasonResultsDataSet);
@@ -102,6 +100,28 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
 
     private List<EvaluationSeason> filterSearchEvaluationSeason() {
         return getSearchUniverseSearchEvaluationSeasonDataSet().collect(Collectors.toList());
+    }
+
+    private static final String _SEARCH_TO_ORDER_UP_ACTION_URI = "/search/";
+    public static final String SEARCH_TO_ORDER_UP_ACTION_URL = CONTROLLER_URL + _SEARCH_TO_ORDER_UP_ACTION_URI;
+
+    @RequestMapping(value = _SEARCH_TO_ORDER_UP_ACTION_URI + "{oid}" + "/orderup", method = RequestMethod.POST)
+    public String processSearchToOrderUpAction(@PathVariable("oid") final EvaluationSeason evaluationSeason, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        EvaluationSeasonServices.orderUp(evaluationSeason);
+        return search(model);
+    }
+
+    private static final String _SEARCH_TO_ORDER_DOWN_ACTION_URI = "/search/";
+    public static final String SEARCH_TO_ORDER_DOWN_ACTION_URL = CONTROLLER_URL + _SEARCH_TO_ORDER_DOWN_ACTION_URI;
+
+    @RequestMapping(value = _SEARCH_TO_ORDER_DOWN_ACTION_URI + "{oid}" + "/orderdown", method = RequestMethod.POST)
+    public String processSearchToOrderDownAction(@PathVariable("oid") final EvaluationSeason evaluationSeason, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        EvaluationSeasonServices.orderDown(evaluationSeason);
+        return search(model);
     }
 
     private static final String _SEARCH_TO_VIEW_ACTION_URI = "/search/view/";

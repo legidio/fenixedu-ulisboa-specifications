@@ -30,7 +30,6 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation;
 import java.util.Collection;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
-import org.fenixedu.academic.domain.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 
 import pt.ist.fenixframework.Atomic;

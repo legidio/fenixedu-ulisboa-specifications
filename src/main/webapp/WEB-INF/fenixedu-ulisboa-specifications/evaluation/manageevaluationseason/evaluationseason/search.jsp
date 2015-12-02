@@ -1,3 +1,5 @@
+<%@page
+	import="org.fenixedu.ulisboa.specifications.ui.evaluation.manageevaluationseason.EvaluationSeasonController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jstl/fmt"%>
@@ -62,7 +64,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;<a
 		class=""
-		href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/create"><spring:message
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonController.CREATE_URL%>"><spring:message
 			code="label.event.create" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -163,8 +165,20 @@ ${portal.angularToolkit()}
 								<spring:message code="label.false" />
 							</c:if></td>
 						<td><a class="btn btn-default btn-xs"
-							href="${pageContext.request.contextPath}/fenixedu-ulisboa-specifications/evaluation/manageevaluationseason/evaluationseason/search/view/${evaluationSeason.externalId}"><spring:message
-									code='label.view' /></a></td>
+							href="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_VIEW_ACTION_URL%>${evaluationSeason.externalId}"><spring:message
+									code='label.view' /></a>&nbsp;&nbsp;
+							<form method="post"
+								action="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_ORDER_UP_ACTION_URL%>${evaluationSeason.externalId}/orderup">
+								<button type="submit" class="btn btn-default btn-xs">
+									<spring:message code="label.EvaluationSeason.order.up" />
+								</button>
+							</form>&nbsp;&nbsp;
+							<form method="post"
+								action="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_ORDER_DOWN_ACTION_URL%>${evaluationSeason.externalId}/orderdown">
+								<button type="submit" class="btn btn-default btn-xs">
+									<spring:message code="label.EvaluationSeason.order.down" />
+								</button>
+							</form></td>
 
 					</tr>
 				</c:forEach>
@@ -173,7 +187,7 @@ ${portal.angularToolkit()}
 		<script type="text/javascript">
 	    createDataTables('searchEvaluationSeasonTable',
 		    true /*filterable*/, false /*show tools*/,
-		    true /*paging*/, "${pageContext.request.contextPath}",
+		    false /*paging*/, false /* sortable */, "${pageContext.request.contextPath}",
 		    "${datatablesI18NUrl}");
 	</script>
 	</c:when>

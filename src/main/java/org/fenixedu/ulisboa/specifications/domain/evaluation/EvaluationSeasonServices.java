@@ -25,11 +25,12 @@
  * along with FenixEdu Specifications.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.fenixedu.academic.domain;
+package org.fenixedu.ulisboa.specifications.domain.evaluation;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,7 +43,6 @@ import org.fenixedu.academic.domain.curriculum.EnrolmentEvaluationContext;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.util.LocalizedStringUtil;
-import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonInformation;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Strings;
 
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.core.AbstractDomainObjectServices;
 
 abstract public class EvaluationSeasonServices {
 
@@ -433,7 +434,10 @@ abstract public class EvaluationSeasonServices {
     }
 
     static public Integer getSeasonOrder(final EvaluationSeason input) {
-        return input.getInformation().getSeasonOrder();
+        final EvaluationSeasonInformation information = input.getInformation();
+
+        // bulletproof in order to be bootstrap-safe
+        return information == null || information.getSeasonOrder() == null ? 0 : information.getSeasonOrder();
     }
 
     static public void setSeasonOrder(final EvaluationSeason evaluationSeason, final Integer order) {
@@ -470,8 +474,7 @@ abstract public class EvaluationSeasonServices {
             throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.not.empty.to.delete");
         }
 
-// TODO
-//        evaluationSeason.deleteDomainObject();
+        AbstractDomainObjectServices.deleteDomainObject(evaluationSeason);
     }
 
     private enum EnrolmentEvaluationType {
@@ -507,22 +510,31 @@ abstract public class EvaluationSeasonServices {
 
         @Override
         public int compare(EvaluationSeason o1, EvaluationSeason o2) {
-            if (getEnrolmentEvaluationType(o1) == getEnrolmentEvaluationType(o2)) {
-                return getSeasonOrder(o1).compareTo(getSeasonOrder(o2));
+            int result = getEnrolmentEvaluationTypePrecedence(o1).compareTo(getEnrolmentEvaluationTypePrecedence(o2));
+
+            if (result == 0) {
+                result = getSeasonOrder(o1).compareTo(getSeasonOrder(o2));
             }
 
-            final int precedenceCompare =
-                    getEnrolmentEvaluationTypePrecedence(o1).compareTo(getEnrolmentEvaluationTypePrecedence(o2));
-            return precedenceCompare != 0 ? precedenceCompare : getSeasonOrder(o1).compareTo(getSeasonOrder(o2));
+            if (result == 0) {
+                result = o1.compareTo(o2);
+            }
+
+            return result;
         }
     };
 
     @Atomic
     static public void initialize() {
-        for (final EvaluationSeason iter : EvaluationSeason.all().collect(Collectors.toSet())) {
+        final List<EvaluationSeason> seasons =
+                EvaluationSeason.all().sorted(SEASON_ORDER_COMPARATOR).collect(Collectors.toList());
+
+        for (int i = 0; i < seasons.size(); i++) {
+            final EvaluationSeason iter = seasons.get(i);
+
             if (iter.getInformation() == null) {
                 logger.info("Init " + iter.getName().getContent());
-                EvaluationSeasonInformation.create(iter, true, false);
+                EvaluationSeasonInformation.create(iter, true, false).setSeasonOrder(i);
             }
         }
     }
@@ -531,13 +543,9 @@ abstract public class EvaluationSeasonServices {
         int result = 0;
 
         for (final EvaluationSeason iter : EvaluationSeason.all().collect(Collectors.toSet())) {
-            final EvaluationSeasonInformation information = iter.getInformation();
-
-            // bulletproof in order to be bootstrap-safe
-            if (information != null && information.getSeasonOrder() != null) {
-                if (information.getSeasonOrder() > result) {
-                    result = information.getSeasonOrder();
-                }
+            final Integer order = getSeasonOrder(iter);
+            if (order > result) {
+                result = order;
             }
         }
 
