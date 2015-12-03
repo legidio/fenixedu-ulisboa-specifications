@@ -36,6 +36,7 @@ import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonSer
 import org.fenixedu.ulisboa.specifications.dto.evaluation.EvaluationSeasonBean;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
+import org.fenixedu.ulisboa.specifications.ui.evaluation.manageevaluationseasonrule.EvaluationSeasonRuleController;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -170,10 +171,8 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
             final RedirectAttributes redirectAttributes) {
         setEvaluationSeason(evaluationSeason, model);
 
-        // TODO
-        // Now choose what is the Exit Screen	 
-        return redirect("/fenixedu-ulisboa-specifications/evaluation/manageevaluationseasonrule/evaluationseasonrule//"
-                + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
+        return redirect(EvaluationSeasonRuleController.SEARCH_URL + getEvaluationSeason(model).getExternalId(), model,
+                redirectAttributes);
     }
 
     private static final String _UPDATE_URI = "/update/";
@@ -187,7 +186,6 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         this.setEvaluationSeasonBean(bean, model);
 
         return jspPage("update");
-
     }
 
     private static final String _UPDATEPOSTBACK_URI = "/updatepostback/";
@@ -224,7 +222,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         }
     }
 
-    private static final String _CREATE_URI = "/create";
+    private static final String _CREATE_URI = "/create/";
     public static final String CREATE_URL = CONTROLLER_URL + _CREATE_URI;
 
     @RequestMapping(value = _CREATE_URI, method = RequestMethod.GET)
@@ -236,7 +234,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         return jspPage("create");
     }
 
-    private static final String _CREATEPOSTBACK_URI = "/createpostback";
+    private static final String _CREATEPOSTBACK_URI = "/createpostback/";
     public static final String CREATEPOSTBACK_URL = CONTROLLER_URL + _CREATEPOSTBACK_URI;
 
     @RequestMapping(value = _CREATEPOSTBACK_URI, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -249,7 +247,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
 
     @RequestMapping(value = _CREATE_URI, method = RequestMethod.POST)
     public String create(@RequestParam(value = "bean", required = false) EvaluationSeasonBean bean, Model model,
-            RedirectAttributes redirectAttributes) {
+            final RedirectAttributes redirectAttributes) {
 
         try {
 
@@ -263,8 +261,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
 
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
             this.setEvaluationSeasonBean(bean, model);
-            return create(model);
-
+            return jspPage("create");
         }
     }
 

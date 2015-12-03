@@ -44,6 +44,7 @@ import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.util.LocalizedStringUtil;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
+import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +166,19 @@ abstract public class EvaluationSeasonServices {
 
     static public Stream<EvaluationSeason> findByRequiresEnrolmentEvaluation(final boolean requiresEnrolmentEvaluation) {
         return EvaluationSeason.all().filter(i -> requiresEnrolmentEvaluation == getRequiresEnrolmentEvaluation(i));
+    }
+
+    static public LocalizedString getDescriptionI18N(final EvaluationSeason input) {
+        LocalizedString result = new LocalizedString();
+
+        if (input != null) {
+            result = result.append(input.getName());
+            result = result.append(" [");
+            result = result.append(getEnrolmentEvaluationType(input).getDescriptionI18N());
+            result = result.append("]");
+        }
+
+        return result;
     }
 
     static public Set<Enrolment> getEnrolmentsForGradeSubmission(final CurricularCourse curricularCourse,
@@ -477,15 +491,25 @@ abstract public class EvaluationSeasonServices {
         AbstractDomainObjectServices.deleteDomainObject(evaluationSeason);
     }
 
-    private enum EnrolmentEvaluationType {
+    static private enum EnrolmentEvaluationType {
 
-        NORMAL,
+        NORMAL("label.EvaluationSeason.normal"),
 
-        SPECIAL_SEASON,
+        SPECIAL_SEASON("label.EvaluationSeason.special"),
 
-        IMPROVEMENT,
+        IMPROVEMENT("label.EvaluationSeason.improvement"),
 
-        SPECIAL_AUTHORIZATION;
+        SPECIAL_AUTHORIZATION("label.EvaluationSeason.specialAuthorization");
+
+        private String descriptionKey;
+
+        private EnrolmentEvaluationType(final String descriptionKey) {
+            this.descriptionKey = descriptionKey;
+        }
+
+        public LocalizedString getDescriptionI18N() {
+            return ULisboaSpecificationsUtil.bundleI18N(this.descriptionKey);
+        }
     }
 
     static private EnrolmentEvaluationType getEnrolmentEvaluationType(final EvaluationSeason input) {

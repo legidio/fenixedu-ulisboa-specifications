@@ -81,6 +81,11 @@ public class EvaluationSeasonRule extends EvaluationSeasonRule_Base {
         return evaluationSeasonRule;
     }
 
+    public static void edit() {
+        // TODO Auto-generated method stub
+        
+    }
+
     // @formatter: off
     /************
      * SERVICES *
