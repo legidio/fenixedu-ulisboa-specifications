@@ -106,7 +106,7 @@ ${portal.angularToolkit()}
 
 <c:choose>
 	<c:when test="${not empty searchevaluationseasonResultsDataSet}">
-		<table id="searchEvaluationSeasonTable"
+		<table id="searchevaluationseasonTable"
 			class="table responsive table-bordered table-hover" width="100%">
 			<thead>
 				<tr>
@@ -117,8 +117,8 @@ ${portal.angularToolkit()}
 					<th><spring:message
 							code="label.EvaluationSeason.requiresEnrolmentEvaluation" /></th>
 					<th><spring:message code="label.EvaluationSeason.normal" /></th>
-					<th><spring:message code="label.EvaluationSeason.improvement" /></th>
 					<th><spring:message code="label.EvaluationSeason.special" /></th>
+					<th><spring:message code="label.EvaluationSeason.improvement" /></th>
 					<th><spring:message
 							code="label.EvaluationSeason.specialAuthorization" /></th>
 					<%-- Operations Column --%>
@@ -126,55 +126,55 @@ ${portal.angularToolkit()}
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="evaluationSeason"
+				<c:forEach var="var"
 					items="${searchevaluationseasonResultsDataSet}">
 					<tr>
-						<td><c:out value="${evaluationSeason.name.content}"></c:out></td>
-						<td><c:out value="${evaluationSeason.acronym.content}"></c:out></td>
-						<td><c:out value="${evaluationSeason.code}"></c:out></td>
-						<td><c:if test="${evaluationSeason.information.active}">
+						<td><c:out value="${var.name.content}"></c:out></td>
+						<td><c:out value="${var.acronym.content}"></c:out></td>
+						<td><c:out value="${var.code}"></c:out></td>
+						<td><c:if test="${var.information.active}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.information.active}">
+							</c:if> <c:if test="${not var.information.active}">
 								<spring:message code="label.false" />
 							</c:if></td>
 						<td><c:if
-								test="${evaluationSeason.information.requiresEnrolmentEvaluation}">
+								test="${var.information.requiresEnrolmentEvaluation}">
 								<spring:message code="label.true" />
 							</c:if> <c:if
-								test="${not evaluationSeason.information.requiresEnrolmentEvaluation}">
+								test="${not var.information.requiresEnrolmentEvaluation}">
 								<spring:message code="label.false" />
 							</c:if></td>
-						<td><c:if test="${evaluationSeason.normal}">
+						<td><c:if test="${var.normal}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.normal}">
+							</c:if> <c:if test="${not var.normal}">
 								<spring:message code="label.false" />
 							</c:if></td>
-						<td><c:if test="${evaluationSeason.improvement}">
+						<td><c:if test="${var.special}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.improvement}">
+							</c:if> <c:if test="${not var.special}">
 								<spring:message code="label.false" />
 							</c:if></td>
-						<td><c:if test="${evaluationSeason.special}">
+						<td><c:if test="${var.improvement}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.special}">
+							</c:if> <c:if test="${not var.improvement}">
 								<spring:message code="label.false" />
 							</c:if></td>
-						<td><c:if test="${evaluationSeason.specialAuthorization}">
+						<td><c:if test="${var.specialAuthorization}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.specialAuthorization}">
+							</c:if> <c:if test="${not var.specialAuthorization}">
 								<spring:message code="label.false" />
 							</c:if></td>
 						<td><a class="btn btn-default btn-xs"
-							href="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_VIEW_ACTION_URL%>${evaluationSeason.externalId}"><spring:message
+							href="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_VIEW_ACTION_URL%>${var.externalId}"><spring:message
 									code='label.view' /></a>&nbsp;&nbsp;
 							<form method="post"
-								action="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_ORDER_UP_ACTION_URL%>${evaluationSeason.externalId}/orderup">
+								action="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_ORDER_UP_ACTION_URL%>${var.externalId}/orderup">
 								<button type="submit" class="btn btn-default btn-xs">
 									<spring:message code="label.EvaluationSeason.order.up" />
 								</button>
 							</form>&nbsp;&nbsp;
 							<form method="post"
-								action="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_ORDER_DOWN_ACTION_URL%>${evaluationSeason.externalId}/orderdown">
+								action="${pageContext.request.contextPath}<%=EvaluationSeasonController.SEARCH_TO_ORDER_DOWN_ACTION_URL%>${var.externalId}/orderdown">
 								<button type="submit" class="btn btn-default btn-xs">
 									<spring:message code="label.EvaluationSeason.order.down" />
 								</button>
@@ -185,7 +185,7 @@ ${portal.angularToolkit()}
 			</tbody>
 		</table>
 		<script type="text/javascript">
-	    createDataTables('searchEvaluationSeasonTable',
+	    createDataTables('searchevaluationseasonTable',
 		    true /*filterable*/, false /*show tools*/,
 		    false /*paging*/, false /* sortable */, "${pageContext.request.contextPath}",
 		    "${datatablesI18NUrl}");

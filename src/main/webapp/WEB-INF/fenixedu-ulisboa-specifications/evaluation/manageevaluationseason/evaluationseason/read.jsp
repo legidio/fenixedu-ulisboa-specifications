@@ -207,19 +207,19 @@ ${portal.angularToolkit()}
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message
-								code="label.EvaluationSeason.improvement" /></th>
-						<td><c:if test="${evaluationSeason.improvement}">
+								code="label.EvaluationSeason.special" /></th>
+						<td><c:if test="${evaluationSeason.special}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.improvement}">
+							</c:if> <c:if test="${not evaluationSeason.special}">
 								<spring:message code="label.false" />
 							</c:if></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message
-								code="label.EvaluationSeason.special" /></th>
-						<td><c:if test="${evaluationSeason.special}">
+								code="label.EvaluationSeason.improvement" /></th>
+						<td><c:if test="${evaluationSeason.improvement}">
 								<spring:message code="label.true" />
-							</c:if> <c:if test="${not evaluationSeason.special}">
+							</c:if> <c:if test="${not evaluationSeason.improvement}">
 								<spring:message code="label.false" />
 							</c:if></td>
 					</tr>

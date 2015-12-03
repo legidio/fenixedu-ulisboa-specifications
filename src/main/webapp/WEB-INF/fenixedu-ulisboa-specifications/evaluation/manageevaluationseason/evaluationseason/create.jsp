@@ -214,24 +214,24 @@ ${portal.angularToolkit()}
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeason.improvement" />
-				</div>
-
-				<div class="col-sm-2">
-					<select id="evaluationSeason_improvement" name="improvement"
-						class="form-control" ng-model="object.improvement"
-						ng-options="bvalue.value as bvalue.name for bvalue in booleanvalues">
-					</select>
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
 					<spring:message code="label.EvaluationSeason.special" />
 				</div>
 
 				<div class="col-sm-2">
 					<select id="evaluationSeason_special" name="special"
 						class="form-control" ng-model="object.special"
+						ng-options="bvalue.value as bvalue.name for bvalue in booleanvalues">
+					</select>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-sm-2 control-label">
+					<spring:message code="label.EvaluationSeason.improvement" />
+				</div>
+
+				<div class="col-sm-2">
+					<select id="evaluationSeason_improvement" name="improvement"
+						class="form-control" ng-model="object.improvement"
 						ng-options="bvalue.value as bvalue.name for bvalue in booleanvalues">
 					</select>
 				</div>
