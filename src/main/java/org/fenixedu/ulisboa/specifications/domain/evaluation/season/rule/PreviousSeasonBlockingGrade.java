@@ -30,8 +30,6 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.commons.i18n.LocalizedString.Builder;
-import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -58,17 +56,20 @@ public class PreviousSeasonBlockingGrade extends PreviousSeasonBlockingGrade_Bas
     private void checkRules() {
         checkRules(getBlocking());
     }
-    
+
     @Atomic
     public void edit(final Grade grade) {
         init(getSeason(), grade);
     }
 
     @Override
+    public boolean isUpdatable() {
+        return true;
+    }
+    
+    @Override
     public LocalizedString getDescriptionI18N() {
-        final Builder builder = ULisboaSpecificationsUtil.bundleI18N(getClass().getSimpleName()).builder();
-        builder.append(getBlocking().getExtendedValue(), ": ");
-        return builder.build();
+        return getDescriptionI18N(getClass(), getBlocking());
     }
 
 }

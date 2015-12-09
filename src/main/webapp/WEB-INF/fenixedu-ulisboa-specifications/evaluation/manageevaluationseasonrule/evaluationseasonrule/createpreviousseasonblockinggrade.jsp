@@ -133,6 +133,34 @@ ${portal.angularToolkit()}
 			    } ]);
 </script>
 
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			<spring:message code="label.details" />
+		</h3>
+	</div>
+	<div class="panel-body">
+		<form method="post" class="form-horizontal">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message
+								code="EvaluationSeason" /></th>
+						<td><c:out
+								value='${evaluationSeasonRuleBean.seasonDescriptionI18N.content}' /></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message
+								code="EvaluationSeasonRule" /></th>
+						<td><c:out
+								value='${evaluationSeasonRuleBean.descriptionI18N.content}' /></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+</div>
+
 <form name='form' method="post" class="form-horizontal"
 	ng-app="angularAppEvaluationSeasonRule"
 	ng-controller="EvaluationSeasonRuleController"
@@ -142,25 +170,26 @@ ${portal.angularToolkit()}
 		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONBLOCKINGGRADEPOSTBACK_URL%>' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
+
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
-					<spring:message code="label.LooseEvaluationBean.grade" />
+					<spring:message code="label.grade" />
 				</div>
 
 				<div class="col-sm-1">
-					<input id="grade" class="form-control"
-						type="text" ng-model="object.grade" name="grade" />
+					<input id="gradeValue" class="form-control" type="text"
+						ng-model="object.gradeValue" name="gradeValue" />
 				</div>
-				
+
 				<div class="col-sm-2">
-					<ui-select	id="gradescale" name="gradescale" ng-model="$object.gradeScale" theme="bootstrap">
-						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
-						<ui-select-choices	repeat="iterator.id as iterator in object.gradeScaleDataSource | filter: $select.search">
-							<span ng-bind-html="iterator.text | highlight: $select.search"></span>
-						</ui-select-choices> 
-					</ui-select>
+					<ui-select id="gradeScale" name="gradeScale"
+						ng-model="object.gradeScale" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
+					<ui-select-choices
+						repeat="iterator.id as iterator in object.gradeScaleDataSource | filter: $select.search">
+					<span ng-bind-html="iterator.text | highlight: $select.search"></span>
+					</ui-select-choices> </ui-select>
 				</div>
 			</div>
 		</div>

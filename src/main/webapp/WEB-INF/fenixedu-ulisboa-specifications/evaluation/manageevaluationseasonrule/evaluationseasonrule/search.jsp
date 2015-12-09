@@ -64,11 +64,13 @@ ${portal.angularToolkit()}
 </div>
 
 <script type="text/javascript">
+//<![CDATA[
   function processDelete(externalId) {
     url = '${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.SEARCH_TO_DELETE_URL%>' + externalId;
 	$("#deleteForm").attr("action", url);
 	$('#deleteModal').modal('toggle')
     }
+    //]]>
 </script>
 
 <div class="modal fade" id="deleteModal">
@@ -133,14 +135,12 @@ ${portal.angularToolkit()}
 						<spring:message code="PreviousSeasonBlockingGrade" />
 					</button>
 				</form></li>
-			<%--
 			<li><form method="get"
 					action="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONMINIMUMGRADE_URL%>${evaluationSeasonRuleBean.season.externalId}">
 					<button type="submit" class="btn btn-default btn-xs">
 						<spring:message code="PreviousSeasonMinimumGrade" />
 					</button>
 				</form></li>
-			--%>
 		</ul>
 	</div>
 </div>
@@ -184,8 +184,7 @@ ${portal.angularToolkit()}
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">
-			<spring:message
-				code="label.evaluation.manageEvaluationSeason.readEvaluationSeason" />
+			<spring:message code="label.details" />
 		</h3>
 	</div>
 	<div class="panel-body">
@@ -194,9 +193,9 @@ ${portal.angularToolkit()}
 				<tbody>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message
-								code="label.EvaluationSeason.name" /></th>
+								code="EvaluationSeason" /></th>
 						<td><c:out
-								value='${evaluationSeasonRuleBean.seasonLocalizedStringI18N.content}' /></td>
+								value='${evaluationSeasonRuleBean.seasonDescriptionI18N.content}' /></td>
 					</tr>
 				</tbody>
 			</table>
@@ -221,14 +220,15 @@ ${portal.angularToolkit()}
 					items="${searchevaluationseasonruleResultsDataSet}">
 					<tr>
 						<td><c:out value="${var.descriptionI18N.content}"></c:out></td>
-						<td><a class="btn btn-default btn-xs"
-							href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController._TO_UPDATE_URL%>${var.externalId}"><spring:message
-									code="label.event.update" /></a>&nbsp;&nbsp; <a
-							class="btn btn-xs btn-danger" href="#"
+						<td><a class="btn btn-xs btn-danger" href="#"
 							onClick="javascript:processDelete('${var.externalId}')"> <span
 								class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<spring:message
 									code='label.event.delete' />
-						</a></td>
+						</a> <c:if test="${var.updatable}">
+						&nbsp;&nbsp;<a class="btn btn-default btn-xs"
+									href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.SEARCH_TO_UPDATE_URL%>${var.externalId}"><spring:message
+										code="label.event.update" /></a>
+							</c:if></td>
 					</tr>
 				</c:forEach>
 			</tbody>

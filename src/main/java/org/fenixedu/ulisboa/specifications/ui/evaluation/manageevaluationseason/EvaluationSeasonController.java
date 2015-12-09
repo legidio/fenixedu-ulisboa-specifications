@@ -156,7 +156,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
         try {
             EvaluationSeasonServices.delete(evaluationSeason);
 
-            addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete") + " EvaluationSeason", model);
+            addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete"), model);
             return redirect(CONTROLLER_URL, model, redirectAttributes);
 
         } catch (Exception ex) {
@@ -214,7 +214,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
             return redirect(READ_URL + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + de.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"", model);
             setEvaluationSeason(evaluationSeason, model);
             this.setEvaluationSeasonBean(bean, model);
 

@@ -56,7 +56,7 @@ ${portal.angularToolkit()}
 <div class="page-header">
 	<h1>
 		<spring:message
-			code="label.evaluation.manageEvaluationSeasonRule.updateEvaluationSeasonRule" />
+			code="label.evaluation.manageEvaluationSeasonRule.createEvaluationSeasonRule" />
 		<small></small>
 	</h1>
 </div>
@@ -164,10 +164,10 @@ ${portal.angularToolkit()}
 <form name='form' method="post" class="form-horizontal"
 	ng-app="angularAppEvaluationSeasonRule"
 	ng-controller="EvaluationSeasonRuleController"
-	action='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPREVIOUSSEASONBLOCKINGGRADE_URL%>${evaluationSeasonRule.externalId}'>
+	action='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONMINIMUMGRADE_URL%>'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPREVIOUSSEASONBLOCKINGGRADEPOSTBACK_URL%>${evaluationSeasonRule.externalId}' />
+		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URL%>' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 
@@ -184,12 +184,12 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-2">
-					<ui-select	id="gradescale" name="gradescale" ng-model="$parent.object.gradeScale" theme="bootstrap">
-						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
-						<ui-select-choices	repeat="iterator.id as iterator in object.gradeScaleDataSource | filter: $select.search">
-							<span ng-bind-html="iterator.text | highlight: $select.search"></span>
-						</ui-select-choices> 
-					</ui-select>
+					<ui-select id="gradeScale" name="gradeScale"
+						ng-model="object.gradeScale" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
+					<ui-select-choices
+						repeat="iterator.id as iterator in object.gradeScaleDataSource | filter: $select.search">
+					<span ng-bind-html="iterator.text | highlight: $select.search"></span>
+					</ui-select-choices> </ui-select>
 				</div>
 			</div>
 		</div>

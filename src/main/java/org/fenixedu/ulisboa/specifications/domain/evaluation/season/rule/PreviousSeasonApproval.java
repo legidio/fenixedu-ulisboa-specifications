@@ -47,6 +47,11 @@ public class PreviousSeasonApproval extends PreviousSeasonApproval_Base {
     }
 
     @Override
+    public boolean isUpdatable() {
+        return false;
+    }
+    
+    @Override
     public LocalizedString getDescriptionI18N() {
         return ULisboaSpecificationsUtil.bundleI18N(getClass().getSimpleName());
     }

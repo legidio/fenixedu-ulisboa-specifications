@@ -49,6 +49,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.google.common.collect.Lists;
+
 @BennuSpringController(value = EvaluationSeasonController.class)
 @RequestMapping(EvaluationSeasonRuleController.CONTROLLER_URL)
 public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecificationsBaseController {
@@ -89,7 +91,7 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
 
     @RequestMapping(value = _SEARCH_URI + "{oid}")
     public String search(@PathVariable("oid") final EvaluationSeason evaluationSeason, final Model model) {
-        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(evaluationSeason);
+        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(evaluationSeason, null);
         this.setEvaluationSeasonRuleBean(bean, model);
 
         List<EvaluationSeasonRule> searchevaluationseasonruleResultsDataSet = filterSearchEvaluationSeasonRule(evaluationSeason);
@@ -99,21 +101,22 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
     }
 
     private List<EvaluationSeasonRule> filterSearchEvaluationSeasonRule(final EvaluationSeason evaluationSeason) {
-        return evaluationSeason.getRulesSet().stream().collect(Collectors.toList());
+        return evaluationSeason == null ? Lists.newArrayList() : evaluationSeason.getRulesSet().stream()
+                .collect(Collectors.toList());
     }
 
     private static final String _SEARCH_TO_DELETE_URI = "/search/delete/";
     public static final String SEARCH_TO_DELETE_URL = CONTROLLER_URL + _SEARCH_TO_DELETE_URI;
 
     @RequestMapping(value = _SEARCH_TO_DELETE_URI + "{oid}", method = RequestMethod.POST)
-    public String processSearchToDeleteAction(@PathVariable("oid") final EvaluationSeasonRule rule, final Model model,
+    public String processSearchToDelete(@PathVariable("oid") final EvaluationSeasonRule rule, final Model model,
             final RedirectAttributes redirectAttributes) {
 
         final EvaluationSeason season = rule.getSeason();
 
         try {
             rule.delete();
-            addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete") + " EvaluationSeasonRule", model);
+            addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete"), model);
 
         } catch (Exception ex) {
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + ex.getLocalizedMessage(), model);
@@ -123,7 +126,7 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
     }
 
     private static final String _SEARCH_TO_UPDATE_URI = "/search/update/";
-    public static final String _TO_UPDATE_URL = CONTROLLER_URL + _SEARCH_TO_UPDATE_URI;
+    public static final String SEARCH_TO_UPDATE_URL = CONTROLLER_URL + _SEARCH_TO_UPDATE_URI;
 
     @RequestMapping(value = _SEARCH_TO_UPDATE_URI + "{oid}", method = RequestMethod.GET)
     public String processSearchToUpdateRule(@PathVariable("oid") final EvaluationSeasonRule rule, final Model model,
@@ -134,10 +137,24 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
         if (clazz.equals(PreviousSeasonBlockingGrade.class)) {
             updateRedirect = UPDATEPREVIOUSSEASONBLOCKINGGRADE_URL;
         } else if (clazz.equals(PreviousSeasonMinimumGrade.class)) {
-            // TODO updateRedirect = UPDATEPREVIOUSSEASONMINIMUMGRADE_URL;
+            updateRedirect = UPDATEPREVIOUSSEASONMINIMUMGRADE_URL;
         }
 
         return redirect(updateRedirect + rule.getExternalId(), model, redirectAttributes);
+    }
+
+    private static final String _UPDATEPREVIOUSSEASONBLOCKINGGRADE_URI = "/updatepreviousseasonblockinggrade/";
+    public static final String UPDATEPREVIOUSSEASONBLOCKINGGRADE_URL = CONTROLLER_URL + _UPDATEPREVIOUSSEASONBLOCKINGGRADE_URI;
+
+    @RequestMapping(value = _UPDATEPREVIOUSSEASONBLOCKINGGRADE_URI + "{oid}", method = RequestMethod.GET)
+    public String updatePreviousSeasonBlockingGrade(@PathVariable("oid") final PreviousSeasonBlockingGrade rule,
+            final Model model) {
+        setEvaluationSeasonRule(rule, model);
+
+        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(rule);
+        this.setEvaluationSeasonRuleBean(bean, model);
+
+        return jspPage("updatepreviousseasonblockinggrade");
     }
 
     private static final String _UPDATEPREVIOUSSEASONBLOCKINGGRADEPOSTBACK_URI = "/updatepreviousseasonblockinggradepostback/";
@@ -154,25 +171,69 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
-    private static final String _UPDATEPREVIOUSSEASONBLOCKINGGRADE_URI = "/updatepreviousseasonblockinggrade/";
-    public static final String UPDATEPREVIOUSSEASONBLOCKINGGRADE_URL = CONTROLLER_URL + _UPDATEPREVIOUSSEASONBLOCKINGGRADE_URI;
-
     @RequestMapping(value = _UPDATEPREVIOUSSEASONBLOCKINGGRADE_URI + "{oid}", method = RequestMethod.POST)
-    public String updatePreviousSeasonBlockingGrade(@PathVariable("oid") final EvaluationSeasonRule rule,
+    public String updatePreviousSeasonBlockingGrade(@PathVariable("oid") final PreviousSeasonBlockingGrade rule,
             @RequestParam(value = "bean", required = false) final EvaluationSeasonRuleBean bean, final Model model,
             final RedirectAttributes redirectAttributes) {
         setEvaluationSeasonRule(rule, model);
 
         try {
-            ((PreviousSeasonBlockingGrade) rule).edit(bean.getGrade());
+            rule.edit(bean.getGrade());
             return redirect(SEARCH_URL + rule.getSeason().getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + de.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"", model);
             setEvaluationSeasonRule(rule, model);
             this.setEvaluationSeasonRuleBean(bean, model);
 
-            return jspPage("update");
+            return jspPage("updatepreviousseasonblockinggrade");
+        }
+    }
+
+    private static final String _UPDATEPREVIOUSSEASONMINIMUMGRADE_URI = "/updatepreviousseasonminimumgrade/";
+    public static final String UPDATEPREVIOUSSEASONMINIMUMGRADE_URL = CONTROLLER_URL + _UPDATEPREVIOUSSEASONMINIMUMGRADE_URI;
+
+    @RequestMapping(value = _UPDATEPREVIOUSSEASONMINIMUMGRADE_URI + "{oid}", method = RequestMethod.GET)
+    public String updatePreviousSeasonMinimumGrade(@PathVariable("oid") final PreviousSeasonMinimumGrade rule,
+            final Model model) {
+        setEvaluationSeasonRule(rule, model);
+
+        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(rule);
+        this.setEvaluationSeasonRuleBean(bean, model);
+
+        return jspPage("updatepreviousseasonminimumgrade");
+    }
+
+    private static final String _UPDATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URI = "/updatepreviousseasonminimumgradepostback/";
+    public static final String UPDATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URL =
+            CONTROLLER_URL + _UPDATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URI;
+
+    @RequestMapping(value = _UPDATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URI + "{oid}", method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8")
+    public @ResponseBody ResponseEntity<String> updatePreviousSeasonMinimumGradepostback(
+            @PathVariable("oid") final EvaluationSeasonRule rule,
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonRuleBean bean, final Model model) {
+
+        this.setEvaluationSeasonRuleBean(bean, model);
+        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = _UPDATEPREVIOUSSEASONMINIMUMGRADE_URI + "{oid}", method = RequestMethod.POST)
+    public String updatePreviousSeasonMinimumGrade(@PathVariable("oid") final PreviousSeasonMinimumGrade rule,
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonRuleBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
+        setEvaluationSeasonRule(rule, model);
+
+        try {
+            rule.edit(bean.getGrade());
+            return redirect(SEARCH_URL + rule.getSeason().getExternalId(), model, redirectAttributes);
+        } catch (Exception de) {
+
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"", model);
+            setEvaluationSeasonRule(rule, model);
+            this.setEvaluationSeasonRuleBean(bean, model);
+
+            return jspPage("updatepreviousseasonminimumgrade");
         }
     }
 
@@ -194,14 +255,14 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
         return redirect(SEARCH_URL + season.getExternalId(), model, redirectAttributes);
     }
 
-    private static final String _CREATEPREVIOUSSEASONBLOCKINGGRADE_URI = "/create/";
+    private static final String _CREATEPREVIOUSSEASONBLOCKINGGRADE_URI = "/createpreviousseasonblockinggrade/";
     public static final String CREATEPREVIOUSSEASONBLOCKINGGRADE_URL = CONTROLLER_URL + _CREATEPREVIOUSSEASONBLOCKINGGRADE_URI;
 
     @RequestMapping(value = _CREATEPREVIOUSSEASONBLOCKINGGRADE_URI + "{oid}", method = RequestMethod.GET)
     public String createPreviousSeasonBlockingGrade(@PathVariable("oid") final EvaluationSeason evaluationSeason,
             final Model model) {
 
-        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(evaluationSeason);
+        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(evaluationSeason, PreviousSeasonBlockingGrade.class);
         this.setEvaluationSeasonRuleBean(bean, model);
 
         return jspPage("createpreviousseasonblockinggrade");
@@ -229,12 +290,56 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
 
             final EvaluationSeasonRule rule = PreviousSeasonBlockingGrade.create(bean.getSeason(), bean.getGrade());
             model.addAttribute("evaluationSeasonRule", rule);
-            return redirect(SEARCH_URL + getEvaluationSeasonRule(model).getExternalId(), model, redirectAttributes);
+            return redirect(SEARCH_URL + getEvaluationSeasonRule(model).getSeason().getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
             this.setEvaluationSeasonRuleBean(bean, model);
             return jspPage("createpreviousseasonblockinggrade");
+        }
+    }
+
+    private static final String _CREATEPREVIOUSSEASONMINIMUMGRADE_URI = "/createpreviousseasonminimumgrade/";
+    public static final String CREATEPREVIOUSSEASONMINIMUMGRADE_URL = CONTROLLER_URL + _CREATEPREVIOUSSEASONMINIMUMGRADE_URI;
+
+    @RequestMapping(value = _CREATEPREVIOUSSEASONMINIMUMGRADE_URI + "{oid}", method = RequestMethod.GET)
+    public String createPreviousSeasonMinimumGrade(@PathVariable("oid") final EvaluationSeason evaluationSeason,
+            final Model model) {
+
+        final EvaluationSeasonRuleBean bean = new EvaluationSeasonRuleBean(evaluationSeason, PreviousSeasonMinimumGrade.class);
+        this.setEvaluationSeasonRuleBean(bean, model);
+
+        return jspPage("createpreviousseasonminimumgrade");
+    }
+
+    private static final String _CREATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URI = "/createpreviousseasonminimumgradepostback/";
+    public static final String CREATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URL =
+            CONTROLLER_URL + _CREATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URI;
+
+    @RequestMapping(value = _CREATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URI, method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8")
+    public @ResponseBody ResponseEntity<String> createPreviousSeasonMinimumGradepostback(
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonRuleBean bean, final Model model) {
+
+        this.setEvaluationSeasonRuleBean(bean, model);
+        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = _CREATEPREVIOUSSEASONMINIMUMGRADE_URI, method = RequestMethod.POST)
+    public String createPreviousSeasonMinimumGrade(
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonRuleBean bean, final Model model,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+
+            final EvaluationSeasonRule rule = PreviousSeasonMinimumGrade.create(bean.getSeason(), bean.getGrade());
+            model.addAttribute("evaluationSeasonRule", rule);
+            return redirect(SEARCH_URL + getEvaluationSeasonRule(model).getSeason().getExternalId(), model, redirectAttributes);
+        } catch (Exception de) {
+
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
+            this.setEvaluationSeasonRuleBean(bean, model);
+            return jspPage("createpreviousseasonminimumgrade");
         }
     }
 

@@ -32,7 +32,9 @@ import java.util.Collection;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.commons.i18n.LocalizedString.Builder;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
+import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -58,7 +60,7 @@ abstract public class EvaluationSeasonRule extends EvaluationSeasonRule_Base {
             throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonRule.duplicated");
         }
     }
-    
+
     static protected void checkRules(final Grade grade) {
         if (grade == null || grade.isEmpty()) {
             throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonRule.grade.required");
@@ -77,6 +79,17 @@ abstract public class EvaluationSeasonRule extends EvaluationSeasonRule_Base {
         deleteDomainObject();
     }
 
+    abstract public boolean isUpdatable();
+
     abstract public LocalizedString getDescriptionI18N();
+
+    static protected LocalizedString getDescriptionI18N(final Class<? extends EvaluationSeasonRule> clazz, final Grade grade) {
+        final Builder builder = ULisboaSpecificationsUtil.bundleI18N(clazz.getSimpleName()).builder();
+        builder.append(grade.getExtendedValue(), ": ");
+        builder.append(grade.getValue(), " [");
+        builder.append(grade.getGradeScale().getDescription(), ", ");
+        builder.append("]");
+        return builder.build();
+    }
 
 }

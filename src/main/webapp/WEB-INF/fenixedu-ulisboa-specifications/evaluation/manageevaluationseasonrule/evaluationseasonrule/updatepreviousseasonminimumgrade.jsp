@@ -164,10 +164,10 @@ ${portal.angularToolkit()}
 <form name='form' method="post" class="form-horizontal"
 	ng-app="angularAppEvaluationSeasonRule"
 	ng-controller="EvaluationSeasonRuleController"
-	action='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPREVIOUSSEASONBLOCKINGGRADE_URL%>${evaluationSeasonRule.externalId}'>
+	action='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPREVIOUSSEASONMINIMUMGRADE_URL%>${evaluationSeasonRule.externalId}'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPREVIOUSSEASONBLOCKINGGRADEPOSTBACK_URL%>${evaluationSeasonRule.externalId}' />
+		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPREVIOUSSEASONMINIMUMGRADEPOSTBACK_URL%>${evaluationSeasonRule.externalId}' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 

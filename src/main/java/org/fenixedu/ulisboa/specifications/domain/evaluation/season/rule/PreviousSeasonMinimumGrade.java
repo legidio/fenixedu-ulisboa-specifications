@@ -30,8 +30,6 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.commons.i18n.LocalizedString.Builder;
-import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -58,18 +56,20 @@ public class PreviousSeasonMinimumGrade extends PreviousSeasonMinimumGrade_Base 
     private void checkRules() {
         checkRules(getMinimum());
     }
-    
-    
+
     @Atomic
     public void edit(final Grade grade) {
         init(getSeason(), grade);
     }
 
     @Override
+    public boolean isUpdatable() {
+        return true;
+    }
+
+    @Override
     public LocalizedString getDescriptionI18N() {
-        final Builder builder = ULisboaSpecificationsUtil.bundleI18N(getClass().getSimpleName()).builder();
-        builder.append(getMinimum().getExtendedValue(), ": ");
-        return builder.build();
+        return getDescriptionI18N(getClass(), getMinimum());
     }
 
 }

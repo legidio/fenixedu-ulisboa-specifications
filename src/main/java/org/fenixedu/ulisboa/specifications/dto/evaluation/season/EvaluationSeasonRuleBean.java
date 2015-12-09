@@ -39,14 +39,21 @@ import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.EvaluationSeasonRule;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.PreviousSeasonBlockingGrade;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.PreviousSeasonMinimumGrade;
+import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
 public class EvaluationSeasonRuleBean implements IBean {
 
     private EvaluationSeason season;
 
+    String evaluationSeasonRuleSubclass;
+
     private String gradeValue;
 
     private GradeScale gradeScale;
+
+    private List<TupleDataSourceBean> gradeScaleDataSource;
 
     public EvaluationSeason getSeason() {
         return season;
@@ -54,6 +61,14 @@ public class EvaluationSeasonRuleBean implements IBean {
 
     public void setSeason(EvaluationSeason evaluationSeason) {
         season = evaluationSeason;
+    }
+
+    public String getEvaluationSeasonRuleSubclass() {
+        return this.evaluationSeasonRuleSubclass;
+    }
+
+    public void setEvaluationSeasonRuleSubclass(final String input) {
+        this.evaluationSeasonRuleSubclass = input;
     }
 
     public String getGradeValue() {
@@ -72,30 +87,67 @@ public class EvaluationSeasonRuleBean implements IBean {
         this.gradeScale = gradeScale;
     }
 
-    public EvaluationSeasonRuleBean() {
-
-    }
-
-    public EvaluationSeasonRuleBean(EvaluationSeasonRule evaluationSeasonRule) {
-        this.setSeason(evaluationSeasonRule.getSeason());
-    }
-
-    public EvaluationSeasonRuleBean(EvaluationSeason evaluationSeason) {
-        this.setSeason(evaluationSeason);
-    }
-
     public List<TupleDataSourceBean> getGradeScaleDataSource() {
-        return Arrays.<GradeScale> asList(GradeScale.values()).stream()
+        return gradeScaleDataSource;
+    }
+
+    public void setGradeScaleDataSource(List<TupleDataSourceBean> gradeScaleDataSource) {
+        this.gradeScaleDataSource = gradeScaleDataSource;
+    }
+
+    public EvaluationSeasonRuleBean() {
+        init();
+    }
+
+    public EvaluationSeasonRuleBean(final EvaluationSeason season, final Class<? extends EvaluationSeasonRule> clazz) {
+        this();
+        this.setSeason(season);
+        this.setEvaluationSeasonRuleSubclass(clazz == null ? null : clazz.getSimpleName());
+    }
+
+    public EvaluationSeasonRuleBean(final EvaluationSeasonRule input) {
+        this(input.getSeason(), input.getClass());
+    }
+
+    public EvaluationSeasonRuleBean(final PreviousSeasonBlockingGrade input) {
+        this((EvaluationSeasonRule) input);
+
+        init(input.getBlocking());
+    }
+
+    public EvaluationSeasonRuleBean(final PreviousSeasonMinimumGrade input) {
+        this((EvaluationSeasonRule) input);
+
+        init(input.getMinimum());
+    }
+
+    private void init(final Grade grade) {
+        if (grade != null) {
+            setGradeValue(grade.getValue());
+            setGradeScale(grade.getGradeScale());
+        }
+    }
+
+    private void init() {
+        this.gradeScaleDataSource = Arrays.<GradeScale> asList(GradeScale.values()).stream()
                 .map(l -> new TupleDataSourceBean(((GradeScale) l).name(), ((GradeScale) l).getDescription()))
                 .collect(Collectors.<TupleDataSourceBean> toList());
     }
 
-    public LocalizedString getSeasonLocalizedStringI18N() {
+    public LocalizedString getDescriptionI18N() {
+        return ULisboaSpecificationsUtil.bundleI18N(getEvaluationSeasonRuleSubclass());
+    }
+
+    public LocalizedString getSeasonDescriptionI18N() {
         return EvaluationSeasonServices.getDescriptionI18N(getSeason());
     }
 
     public Grade getGrade() {
-        return Grade.createGrade(getGradeValue(), getGradeScale());
+        try {
+            return Grade.createGrade(getGradeValue(), getGradeScale());
+        } catch (final Throwable t) {
+            return Grade.createEmptyGrade();
+        }
     }
 
 }
