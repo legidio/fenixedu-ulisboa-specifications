@@ -62,12 +62,19 @@ ${portal.angularToolkit()}
 		<small></small>
 	</h1>
 </div>
+
+<script type="text/javascript">
+  function processDelete(externalId) {
+    url = '${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.SEARCH_TO_DELETE_URL%>' + externalId;
+	$("#deleteForm").attr("action", url);
+	$('#deleteModal').modal('toggle')
+    }
+</script>
+
 <div class="modal fade" id="deleteModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form id="deleteForm"
-				action="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.DELETE_URL%>${evaluationSeason.externalId}"
-				method="POST">
+			<form id="deleteForm" action="" method="POST">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"
 						aria-label="Close">
@@ -216,9 +223,12 @@ ${portal.angularToolkit()}
 						<td><c:out value="${var.descriptionI18N.content}"></c:out></td>
 						<td><a class="btn btn-default btn-xs"
 							href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController._TO_UPDATE_URL%>${var.externalId}"><spring:message
-									code="label.event.update" /></a>&nbsp;&nbsp;<a class="btn btn-default btn-xs" href="#"
-							data-toggle="modal" data-target="#deleteModal"><spring:message
-									code="label.event.delete" /></a></td>
+									code="label.event.update" /></a>&nbsp;&nbsp; <a
+							class="btn btn-xs btn-danger" href="#"
+							onClick="javascript:processDelete('${var.externalId}')"> <span
+								class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<spring:message
+									code='label.event.delete' />
+						</a></td>
 					</tr>
 				</c:forEach>
 			</tbody>

@@ -102,11 +102,11 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
         return evaluationSeason.getRulesSet().stream().collect(Collectors.toList());
     }
 
-    private static final String _DELETE_URI = "/search/delete/";
-    public static final String DELETE_URL = CONTROLLER_URL + _DELETE_URI;
+    private static final String _SEARCH_TO_DELETE_URI = "/search/delete/";
+    public static final String SEARCH_TO_DELETE_URL = CONTROLLER_URL + _SEARCH_TO_DELETE_URI;
 
-    @RequestMapping(value = _DELETE_URI + "{oid}", method = RequestMethod.POST)
-    public String delete(@PathVariable("oid") final EvaluationSeasonRule rule, final Model model,
+    @RequestMapping(value = _SEARCH_TO_DELETE_URI + "{oid}", method = RequestMethod.POST)
+    public String processSearchToDeleteAction(@PathVariable("oid") final EvaluationSeasonRule rule, final Model model,
             final RedirectAttributes redirectAttributes) {
 
         final EvaluationSeason season = rule.getSeason();
