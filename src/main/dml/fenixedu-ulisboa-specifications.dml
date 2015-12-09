@@ -533,14 +533,14 @@ relation AnyCurricularCourseExceptionsCompetenceCourse {
 
 // ==================== BEGIN: Evaluations ====================
 
-class evaluation.EvaluationSeasonInformation {
+class evaluation.season.EvaluationSeasonInformation {
 	Integer seasonOrder;
 	boolean active;
 	boolean requiresEnrolmentEvaluation;
 }
 
 relation EvaluationSeasonInformationRelation {
-    evaluation.EvaluationSeasonInformation playsRole information {
+    evaluation.season.EvaluationSeasonInformation playsRole information {
         multiplicity 1..1;
     }
 
@@ -549,13 +549,22 @@ relation EvaluationSeasonInformationRelation {
     }
 }
 
-class evaluation.EvaluationSeasonRule {
-	LocalizedString name;
+class evaluation.season.rule.EvaluationSeasonRule {
 }
 
+	class evaluation.season.rule.PreviousSeasonApproval extends evaluation.season.rule.EvaluationSeasonRule {
+	}
+
+	class evaluation.season.rule.PreviousSeasonMinimumGrade extends evaluation.season.rule.EvaluationSeasonRule {
+		Grade minimum;
+	}
+
+	class evaluation.season.rule.PreviousSeasonBlockingGrade extends evaluation.season.rule.EvaluationSeasonRule {
+		Grade blocking;
+	}
 
 relation EvaluationSeasonRuleRelation {
-    evaluation.EvaluationSeasonRule playsRole rules {
+    evaluation.season.rule.EvaluationSeasonRule playsRole rules {
         multiplicity *;
     }
 

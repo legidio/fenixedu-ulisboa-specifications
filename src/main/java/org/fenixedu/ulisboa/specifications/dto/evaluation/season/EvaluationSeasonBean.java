@@ -25,22 +25,16 @@
  * along with FenixEdu Specifications.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.fenixedu.ulisboa.specifications.dto.evaluation;
+package org.fenixedu.ulisboa.specifications.dto.evaluation.season;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.fenixedu.academic.domain.EvaluationConfiguration;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.bennu.IBean;
-import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonInformation;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonInformation;
 
 public class EvaluationSeasonBean implements IBean {
 
     private EvaluationSeasonInformation evaluationSeasonInformation;
-    private List<TupleDataSourceBean> evaluationSeasonInformationDataSource;
     private String code;
     private LocalizedString acronym;
     private LocalizedString name;
@@ -58,19 +52,6 @@ public class EvaluationSeasonBean implements IBean {
 
     public void setInformation(EvaluationSeasonInformation value) {
         evaluationSeasonInformation = value;
-    }
-
-    public List<TupleDataSourceBean> getEvaluationSeasonInformationDataSource() {
-        return evaluationSeasonInformationDataSource;
-    }
-
-    public void setInformationDataSource(List<EvaluationSeasonInformation> value) {
-        this.evaluationSeasonInformationDataSource = value.stream().map(x -> {
-            TupleDataSourceBean tuple = new TupleDataSourceBean();
-            tuple.setId(x.getExternalId()); //CHANGE_ME
-            tuple.setText(x.toString()); //CHANGE_ME
-            return tuple;
-        }).collect(Collectors.toList());
     }
 
     public String getCode() {

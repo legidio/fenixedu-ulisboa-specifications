@@ -25,7 +25,7 @@
  * along with FenixEdu Specifications.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.fenixedu.ulisboa.specifications.domain.evaluation;
+package org.fenixedu.ulisboa.specifications.domain.evaluation.season;
 
 import java.util.Collection;
 

@@ -62,24 +62,80 @@ ${portal.angularToolkit()}
 		<small></small>
 	</h1>
 </div>
+<div class="modal fade" id="deleteModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="deleteForm"
+				action="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.DELETE_URL%>${evaluationSeason.externalId}"
+				method="POST">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<spring:message code="label.confirmation" />
+					</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						<spring:message
+							code="label.evaluation.manageEvaluationSeasonRule.searchEvaluationSeasonRule.confirmDelete" />
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<spring:message code="label.close" />
+					</button>
+					<button id="deleteButton" class="btn btn-danger" type="submit">
+						<spring:message code="label.delete" />
+					</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a
 		class=""
 		href="${pageContext.request.contextPath}<%=EvaluationSeasonController.READ_URL%>${evaluationSeasonRuleBean.season.externalId}"><spring:message
-			code="label.event.back" /></a> &nbsp;&nbsp;|&nbsp;&nbsp; <span
-		class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;<a
-		class=""
-		href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATE_URL%>${evaluationSeasonRuleBean.season.externalId}"><spring:message
-			code="label.event.create" /></a> &nbsp;&nbsp;|&nbsp;&nbsp; <span
-		class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a
-		class=""
-		href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController._TO_UPDATERULE_URL%>"><spring:message
-			code="label.event.update" /></a> &nbsp;&nbsp;|&nbsp;&nbsp; <span
-		class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a
-		class=""
-		href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController._TO_DELETERULE_URL%>"><spring:message
-			code="label.event.delete" /></a>
+			code="label.event.back" /></a> &nbsp;&nbsp;|&nbsp;&nbsp;
+
+	<div class="btn-group">
+		<button type="button" class=" btn-default dropdown-toggle"
+			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;
+			<spring:message code="label.event.create" />
+			<span class="caret"></span>
+		</button>
+
+		<ul class="dropdown-menu">
+			<li><form method="post"
+					action="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONAPPROVAL_URL%>${evaluationSeasonRuleBean.season.externalId}">
+					<button type="submit" class="btn btn-default btn-xs">
+						<spring:message code="PreviousSeasonApproval" />
+					</button>
+				</form></li>
+			<li><form method="get"
+					action="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONBLOCKINGGRADE_URL%>${evaluationSeasonRuleBean.season.externalId}">
+					<button type="submit" class="btn btn-default btn-xs">
+						<spring:message code="PreviousSeasonBlockingGrade" />
+					</button>
+				</form></li>
+			<%--
+			<li><form method="get"
+					action="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONMINIMUMGRADE_URL%>${evaluationSeasonRuleBean.season.externalId}">
+					<button type="submit" class="btn btn-default btn-xs">
+						<spring:message code="PreviousSeasonMinimumGrade" />
+					</button>
+				</form></li>
+			--%>
+		</ul>
+	</div>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -121,7 +177,8 @@ ${portal.angularToolkit()}
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<h3 class="panel-title">
-			<spring:message code="label.evaluation.manageEvaluationSeason.readEvaluationSeason" />
+			<spring:message
+				code="label.evaluation.manageEvaluationSeason.readEvaluationSeason" />
 		</h3>
 	</div>
 	<div class="panel-body">
@@ -131,7 +188,8 @@ ${portal.angularToolkit()}
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message
 								code="label.EvaluationSeason.name" /></th>
-						<td><c:out value='${evaluationSeasonRuleBean.seasonLocalizedStringI18N.content}' /></td>
+						<td><c:out
+								value='${evaluationSeasonRuleBean.seasonLocalizedStringI18N.content}' /></td>
 					</tr>
 				</tbody>
 			</table>
@@ -145,7 +203,8 @@ ${portal.angularToolkit()}
 			class="table responsive table-bordered table-hover" width="100%">
 			<thead>
 				<tr>
-					<th><spring:message code="label.EvaluationSeasonRule.name" /></th>
+					<th><spring:message
+							code="label.evaluation.manageEvaluationSeasonRule.searchEvaluationSeasonRule" /></th>
 					<%-- Operations Column --%>
 					<th></th>
 				</tr>
@@ -154,15 +213,21 @@ ${portal.angularToolkit()}
 				<c:forEach var="var"
 					items="${searchevaluationseasonruleResultsDataSet}">
 					<tr>
-						<td><c:out value="${var.name.content}"></c:out></td>
+						<td><c:out value="${var.descriptionI18N.content}"></c:out></td>
+						<td><a class="btn btn-default btn-xs"
+							href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController._TO_UPDATE_URL%>${var.externalId}"><spring:message
+									code="label.event.update" /></a>&nbsp;&nbsp;<a class="btn btn-default btn-xs" href="#"
+							data-toggle="modal" data-target="#deleteModal"><spring:message
+									code="label.event.delete" /></a></td>
 					</tr>
 				</c:forEach>
 			</tbody>
 		</table>
 		<script type="text/javascript">
 	    createDataTables('searchevaluationseasonruleTable',
-		    true /*filterable*/, false /*show tools*/,
-		    true /*paging*/, "${pageContext.request.contextPath}",
+		    false /*filterable*/, false /*show tools*/,
+		    false /*paging*/, false /*sorting*/,
+		    "${pageContext.request.contextPath}",
 		    "${datatablesI18NUrl}");
 	</script>
 	</c:when>

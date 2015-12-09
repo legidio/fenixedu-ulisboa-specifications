@@ -56,7 +56,7 @@ ${portal.angularToolkit()}
 <div class="page-header">
 	<h1>
 		<spring:message
-			code="label.evaluation.manageEvaluationSeasonRule.updateEvaluationSeasonRule" />
+			code="label.evaluation.manageEvaluationSeasonRule.createEvaluationSeasonRule" />
 		<small></small>
 	</h1>
 </div>
@@ -65,7 +65,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a
 		class=""
-		href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.SEARCH_URL%>${evaluationSeason.externalId}"><spring:message
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.SEARCH_URL%>${evaluationSeasonRuleBean.season.externalId}"><spring:message
 			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -136,33 +136,31 @@ ${portal.angularToolkit()}
 <form name='form' method="post" class="form-horizontal"
 	ng-app="angularAppEvaluationSeasonRule"
 	ng-controller="EvaluationSeasonRuleController"
-	action='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATE_URL%>${evaluationSeasonRule.externalId}'>
+	action='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONBLOCKINGGRADE_URL%>'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.UPDATEPOSTBACK_URL%>${evaluationSeasonRule.externalId}' />
+		value='${pageContext.request.contextPath}<%=EvaluationSeasonRuleController.CREATEPREVIOUSSEASONBLOCKINGGRADEPOSTBACK_URL%>' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
-
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonRule.type" />
+					<spring:message code="label.LooseEvaluationBean.grade" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="evaluationSeasonRule_type" class="form-control"
-						type="text" ng-model="object.type" name="type" />
+				<div class="col-sm-1">
+					<input id="grade" class="form-control"
+						type="text" ng-model="object.grade" name="grade" />
 				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonRule.config" />
-				</div>
-
-				<div class="col-sm-10">
-					<input id="evaluationSeasonRule_config" class="form-control"
-						type="text" ng-model="object.config" name="config" />
+				
+				<div class="col-sm-2">
+					<ui-select	id="gradescale" name="gradescale" ng-model="$object.gradeScale" theme="bootstrap">
+						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="iterator.id as iterator in object.gradeScaleDataSource | filter: $select.search">
+							<span ng-bind-html="iterator.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 		</div>

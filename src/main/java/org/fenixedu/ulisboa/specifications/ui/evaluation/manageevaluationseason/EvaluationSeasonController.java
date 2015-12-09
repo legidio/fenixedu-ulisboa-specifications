@@ -32,8 +32,8 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonServices;
-import org.fenixedu.ulisboa.specifications.dto.evaluation.EvaluationSeasonBean;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
+import org.fenixedu.ulisboa.specifications.dto.evaluation.season.EvaluationSeasonBean;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
 import org.fenixedu.ulisboa.specifications.ui.evaluation.manageevaluationseasonrule.EvaluationSeasonRuleController;

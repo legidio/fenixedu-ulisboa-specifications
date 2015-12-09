@@ -25,42 +25,44 @@
  * along with FenixEdu Specifications.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.fenixedu.ulisboa.specifications.domain.evaluation;
+package org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule;
 
 import java.util.Collection;
 
+import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 
 import pt.ist.fenixframework.Atomic;
 
-public class EvaluationSeasonRule extends EvaluationSeasonRule_Base {
+abstract public class EvaluationSeasonRule extends EvaluationSeasonRule_Base {
 
     protected EvaluationSeasonRule() {
         super();
     }
 
-    protected void init(final LocalizedString name) {
-        setName(name);
+    protected void init(final EvaluationSeason season) {
+        setSeason(season);
         checkRules();
     }
 
     private void checkRules() {
-        //
-        //CHANGE_ME add more busines validations
-        //
+        final EvaluationSeason season = getSeason();
 
-        //CHANGE_ME In order to validate UNIQUE restrictions
-        //if (findByName(getName().count()>1)
-        //{
-        //	throw new TreasuryDomainException("error.EvaluationSeasonRule.name.duplicated");
-        //}	
+        if (season == null) {
+            throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonRule.evaluationSeason.required");
+        }
+
+        if (season.getRulesSet().stream().anyMatch(i -> i != this && i.getClass().equals(this.getClass()))) {
+            throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonRule.duplicated");
+        }
     }
-
-    @Atomic
-    public void edit(final LocalizedString name) {
-        setName(name);
-        checkRules();
+    
+    static protected void checkRules(final Grade grade) {
+        if (grade == null || grade.isEmpty()) {
+            throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonRule.grade.required");
+        }
     }
 
     @Override
@@ -71,25 +73,10 @@ public class EvaluationSeasonRule extends EvaluationSeasonRule_Base {
     @Atomic
     public void delete() {
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
+        setSeason(null);
         deleteDomainObject();
     }
 
-    @Atomic
-    public static EvaluationSeasonRule create(final LocalizedString name) {
-        EvaluationSeasonRule evaluationSeasonRule = new EvaluationSeasonRule();
-        evaluationSeasonRule.init(name);
-        return evaluationSeasonRule;
-    }
-
-    public static void edit() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    // @formatter: off
-    /************
-     * SERVICES *
-     ************/
-    // @formatter: on
+    abstract public LocalizedString getDescriptionI18N();
 
 }

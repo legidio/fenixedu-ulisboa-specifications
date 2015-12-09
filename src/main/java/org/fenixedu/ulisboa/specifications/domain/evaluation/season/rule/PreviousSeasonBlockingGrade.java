@@ -6,7 +6,7 @@
  *  - Copyright © 2015 Quorum Born IT (until any Go-Live phase)
  *  - Copyright © 2015 Universidade de Lisboa (after any Go-Live phase)
  *
- * Contributors: xpto@qub-it.com
+ * Contributors: luis.egidio@qub-it.com
  *
  * 
  * This file is part of FenixEdu Specifications.
@@ -25,52 +25,50 @@
  * along with FenixEdu Specifications.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.fenixedu.ulisboa.specifications.dto.evaluation;
+package org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
-import org.fenixedu.bennu.IBean;
+import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonRule;
-import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationSeasonServices;
+import org.fenixedu.commons.i18n.LocalizedString.Builder;
+import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
-public class EvaluationSeasonRuleBean implements IBean {
+import pt.ist.fenixframework.Atomic;
 
-    private LocalizedString name;
+public class PreviousSeasonBlockingGrade extends PreviousSeasonBlockingGrade_Base {
 
-    private EvaluationSeason season;
-
-    public LocalizedString getName() {
-        return name;
+    public PreviousSeasonBlockingGrade() {
+        super();
     }
 
-    public void setName(LocalizedString value) {
-        name = value;
+    @Atomic
+    static public EvaluationSeasonRule create(final EvaluationSeason season, final Grade blocking) {
+        final PreviousSeasonBlockingGrade result = new PreviousSeasonBlockingGrade();
+        result.init(season, blocking);
+        return result;
     }
 
-    public EvaluationSeason getSeason() {
-        return season;
+    private void init(final EvaluationSeason season, final Grade blocking) {
+        super.init(season);
+        setBlocking(blocking);
+
+        checkRules();
     }
 
-    public void setSeason(EvaluationSeason evaluationSeason) {
-        season = evaluationSeason;
+    private void checkRules() {
+        checkRules(getBlocking());
+    }
+    
+    @Atomic
+    public void edit(final Grade grade) {
+        init(getSeason(), grade);
     }
 
-    public EvaluationSeasonRuleBean() {
-
-    }
-
-    public EvaluationSeasonRuleBean(EvaluationSeasonRule evaluationSeasonRule) {
-        this.setName(evaluationSeasonRule.getName());
-        this.setSeason(evaluationSeasonRule.getSeason());
-        this.setName(evaluationSeasonRule.getName());
-    }
-
-    public EvaluationSeasonRuleBean(EvaluationSeason evaluationSeason) {
-        this.setSeason(evaluationSeason);
-    }
-
-    public LocalizedString getSeasonLocalizedStringI18N() {
-        return EvaluationSeasonServices.getDescriptionI18N(getSeason());
+    @Override
+    public LocalizedString getDescriptionI18N() {
+        final Builder builder = ULisboaSpecificationsUtil.bundleI18N(getClass().getSimpleName()).builder();
+        builder.append(getBlocking().getExtendedValue(), ": ");
+        return builder.build();
     }
 
 }
