@@ -33,6 +33,8 @@ enum org.fenixedu.ulisboa.specifications.domain.serviceRequests.UIComponentType 
 
 external class .org.fenixedu.academic.domain.CompetenceCourse;
 external class .org.fenixedu.academic.domain.EvaluationSeason;
+external class .org.fenixedu.academic.domain.ExecutionSemester;
+external class .org.fenixedu.academic.domain.OccupationPeriod;
 external class .org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 external class .org.fenixedu.academic.domain.curricularRules.AnyCurricularCourseExceptions;
 external class .org.fenixedu.academic.domain.student.StatuteType;
@@ -532,6 +534,39 @@ relation AnyCurricularCourseExceptionsCompetenceCourse {
 // ==================== END: CurricularRule Executor Logics ====================
 
 // ==================== BEGIN: Evaluations ====================
+
+class evaluation.season.EvaluationSeasonPeriod {
+}
+
+relation EvaluationSeasonPeriodRelation {
+    protected evaluation.season.EvaluationSeasonPeriod playsRole evaluationSeasonPeriod {
+        multiplicity *;
+    }
+
+    .org.fenixedu.academic.domain.EvaluationSeason playsRole season {
+        multiplicity 1;
+    }
+}
+
+relation EvaluationSeasonOccupationPeriod {
+    protected evaluation.season.EvaluationSeasonPeriod playsRole evaluationSeasonPeriod {
+        multiplicity *;
+    }
+
+    protected .org.fenixedu.academic.domain.OccupationPeriod playsRole occupationPeriod {
+        multiplicity 1;
+    }
+}
+
+relation EvaluationSeasonPeriodExecutionSemester {
+    evaluation.season.EvaluationSeasonPeriod playsRole evaluationSeasonPeriod {
+        multiplicity *;
+    }
+
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester {
+        multiplicity 1;
+    }
+}
 
 class evaluation.season.EvaluationSeasonInformation {
 	Integer seasonOrder;
