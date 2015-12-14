@@ -80,9 +80,9 @@ public class EvaluationSeasonInformation extends EvaluationSeasonInformation_Bas
     @Atomic
     public static EvaluationSeasonInformation create(final EvaluationSeason evaluationSeason, final boolean active,
             final boolean requiresEnrolmentEvaluation) {
-        final EvaluationSeasonInformation evaluationSeasonInformation = new EvaluationSeasonInformation();
-        evaluationSeasonInformation.init(evaluationSeason, active, requiresEnrolmentEvaluation);
-        return evaluationSeasonInformation;
+        final EvaluationSeasonInformation result = new EvaluationSeasonInformation();
+        result.init(evaluationSeason, active, requiresEnrolmentEvaluation);
+        return result;
     }
 
 }

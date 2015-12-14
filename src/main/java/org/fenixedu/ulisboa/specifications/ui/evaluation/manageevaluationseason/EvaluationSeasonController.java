@@ -214,7 +214,8 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
             return redirect(READ_URL + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"", model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
             setEvaluationSeason(evaluationSeason, model);
             this.setEvaluationSeasonBean(bean, model);
 
@@ -259,7 +260,8 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
             return redirect(READ_URL + getEvaluationSeason(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
             this.setEvaluationSeasonBean(bean, model);
             return jspPage("create");
         }
