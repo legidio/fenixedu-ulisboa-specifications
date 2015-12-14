@@ -189,14 +189,15 @@ public class EvaluationSeasonPeriodBean implements IBean {
     }
 
     private void init() {
-        final List<ExecutionYear> years = ExecutionYear.readOpenExecutionYears().stream()
+        // years
+        final List<ExecutionYear> years = ExecutionYear.readNotClosedExecutionYears().stream()
                 .filter(i -> !i.getExecutionDegreesSet().isEmpty()).sorted().collect(Collectors.toList());
         Collections.sort(years, Collections.reverseOrder());
-
         setExecutionYearDataSource(years.stream()
                 .map(l -> new TupleDataSourceBean(((ExecutionYear) l).getExternalId(), ((ExecutionYear) l).getQualifiedName()))
                 .collect(Collectors.<TupleDataSourceBean> toList()));
 
+        // semesters
         final List<TupleDataSourceBean> semesters = Lists.newArrayList();
         for (ExecutionYear executionYear : years) {
             for (ExecutionSemester semester : executionYear.getExecutionPeriodsSet()) {
@@ -205,16 +206,19 @@ public class EvaluationSeasonPeriodBean implements IBean {
         }
         setExecutionSemesterDataSource(semesters);
 
+        // period types
         setPeriodTypeDataSource(Arrays.<EvaluationSeasonPeriodType> asList(EvaluationSeasonPeriodType.values()).stream()
                 .map(l -> new TupleDataSourceBean(((EvaluationSeasonPeriodType) l).name(),
                         ((EvaluationSeasonPeriodType) l).getDescriptionI18N().getContent()))
                 .collect(Collectors.<TupleDataSourceBean> toList()));
 
+        // seasons
         setSeasonDataSource(EvaluationSeason.all().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR)
                 .map(l -> new TupleDataSourceBean(((EvaluationSeason) l).getExternalId(),
                         EvaluationSeasonServices.getDescriptionI18N((EvaluationSeason) l).getContent()))
                 .collect(Collectors.<TupleDataSourceBean> toList()));
 
+        // degree types
         setDegreeTypesDataSource(DegreeType.all().sorted()
                 .map(l -> new TupleDataSourceBean(((DegreeType) l).getExternalId(), ((DegreeType) l).getName().getContent()))
                 .collect(Collectors.<TupleDataSourceBean> toList()));

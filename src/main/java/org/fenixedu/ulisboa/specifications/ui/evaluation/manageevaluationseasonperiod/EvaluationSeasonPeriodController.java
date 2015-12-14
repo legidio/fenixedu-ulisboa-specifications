@@ -64,12 +64,8 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
     }
 
     @RequestMapping
-    public String home(final Model model) {
-
-        final EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean();
-        this.setBean(bean, model);
-
-        return "forward:" + CONTROLLER_URL + "/";
+    public String home(final Model model, final RedirectAttributes redirectAttributes) {
+        return redirect(CONTROLLER_URL + "/search", model, redirectAttributes);
     }
 
     private EvaluationSeasonPeriodBean getBean(final Model model) {
@@ -89,17 +85,27 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
         model.addAttribute("period", period);
     }
 
-    private static final String _SEARCH_URI = "/";
+    private static final String _SEARCH_URI = "/search";
     public static final String SEARCH_URL = CONTROLLER_URL + _SEARCH_URI;
 
+    @RequestMapping(value = _SEARCH_URI)
+    public String search(final Model model, final RedirectAttributes redirectAttributes) {
+
+        final EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean();
+        this.setBean(bean, model);
+
+        return jspPage("search");
+    }
+
     @RequestMapping(value = _SEARCH_URI, method = RequestMethod.POST)
-    public String search(@RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean,
-            final Model model) {
+    public String search(@RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
 
         final List<EvaluationSeasonPeriod> searchResultsDataSet =
                 filterSearch(bean.getExecutionYear(), bean.getPeriodType(), bean.getSeason());
 
         model.addAttribute("searchResultsDataSet", searchResultsDataSet);
+        this.setBean(bean, model);
 
         return jspPage("search");
     }
@@ -112,8 +118,8 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
     private List<EvaluationSeasonPeriod> filterSearch(final ExecutionYear executionYear,
             final EvaluationSeasonPeriodType periodType, final EvaluationSeason season) {
 
-        return getSearchUniverseSearchDataSet(executionYear, periodType).filter(i -> season == null || i.isSeason(season))
-                .collect(Collectors.toList());
+        return getSearchUniverseSearchDataSet(executionYear, periodType).filter(i -> season == null || season == i.getSeason())
+                .sorted().collect(Collectors.toList());
     }
 
     private static final String _SEARCH_TO_VIEW_ACTION_URI = "/searchEvaluationSeasonPeriod/view/";

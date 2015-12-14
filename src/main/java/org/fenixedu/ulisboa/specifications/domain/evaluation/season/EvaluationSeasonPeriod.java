@@ -15,17 +15,22 @@ import org.fenixedu.academic.domain.OccupationPeriodReference;
 import org.fenixedu.academic.domain.OccupationPeriodType;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.util.date.IntervalTools;
+import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.commons.i18n.LocalizedString.Builder;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 
 import pt.ist.fenixframework.Atomic;
 
-public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base {
+public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implements Comparable<EvaluationSeasonPeriod> {
 
     protected EvaluationSeasonPeriod() {
         super();
@@ -218,8 +223,67 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base {
         return getExecutionSemester().getExecutionYear();
     }
 
-    public boolean isSeason(final EvaluationSeason season) {
-        return season != null && season == getSeason();
+    public LocalizedString getIntervalsDescriptionI18N() {
+        final Builder result = new LocalizedString.Builder();
+
+        final DateTimeFormatter formatter = DateTimeFormat.forPattern("dd MMM").withLocale(I18N.getLocale());
+
+        final List<Interval> intervals = getOccupationPeriod().getIntervals();
+        for (final Iterator<Interval> iterator = intervals.iterator(); iterator.hasNext();) {
+            final Interval interval = iterator.next();
+
+            result.append(formatter.print(interval.getStart()));
+            result.append(" - ");
+            result.append(formatter.print(interval.getEnd()));
+
+            if (iterator.hasNext()) {
+                result.append(", ");
+            }
+        }
+
+        return result.build();
+    }
+
+    @Override
+    public int compareTo(final EvaluationSeasonPeriod other) {
+        final OccupationPeriod o1 = this.getOccupationPeriod();
+        final OccupationPeriod o2 = other.getOccupationPeriod();
+
+        return ComparisonChain.start().compare(o1.getPeriodInterval().getStartMillis(), o2.getPeriodInterval().getStartMillis())
+                .compare(o1.getExecutionDegreesSet().size(), o2.getExecutionDegreesSet().size()).result();
+    }
+
+    public LocalizedString getDegreesDescriptionI18N() {
+        final Builder result = new LocalizedString.Builder();
+        
+        for (final ExecutionDegree executionDegree : getExecutionDegrees()) {
+            
+        } 
+
+        for (final Iterator<ExecutionDegree> iterator = getExecutionDegrees().iterator(); iterator.hasNext();) {
+            final ExecutionDegree executionDegree = iterator.next();
+
+//            result.append(formatter.print(interval.getStart()));
+//            result.append(" - ");
+//            result.append(formatter.print(interval.getEnd()));
+//
+//            if (iterator.hasNext()) {
+//                result.append(", ");
+//            }
+        }
+
+        return result.build();
+    }
+
+    private Set<ExecutionDegree> getExecutionDegrees() {
+        final Set<ExecutionDegree> result =
+                Sets.<ExecutionDegree> newTreeSet(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME);
+
+        for (final OccupationPeriodReference iter : getOccupationPeriod().getExecutionDegreesSet()) {
+            result.add(iter.getExecutionDegree());
+        }
+
+        return result;
     }
 
 }

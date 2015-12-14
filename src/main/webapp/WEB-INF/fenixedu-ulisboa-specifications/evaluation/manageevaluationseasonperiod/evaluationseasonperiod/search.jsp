@@ -43,7 +43,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.CREATE_URL%>"><spring:message
-			code="label.event.create" /></a> |&nbsp;&nbsp;
+			code="label.event.create" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -80,48 +80,39 @@ ${portal.angularToolkit()}
 </c:if>
 
 <script>
-    angular
-	    .module('angularAppEvaluationSeasonPeriod',
-		    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ])
-	    .controller(
-		    'EvaluationSeasonPeriodController',
-		    [
-			    '$scope',
-			    function($scope) {
-				$scope.booleanvalues = [
-					{
-					    name : '<spring:message code="label.no"/>',
-					    value : false
-					},
-					{
-					    name : '<spring:message code="label.yes"/>',
-					    value : true
-					} ];
+    angular.module('angularAppEvaluationSeasonPeriod',
+	    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ]).controller(
+	    'EvaluationSeasonPeriodController', [ '$scope', function($scope) {
+		$scope.booleanvalues = [ {
+		    name : '<spring:message code="label.no"/>',
+		    value : false
+		}, {
+		    name : '<spring:message code="label.yes"/>',
+		    value : true
+		} ];
 
-				$scope.object = angular
-					.fromJson('${beanJson}');
+		$scope.object = angular.fromJson('${beanJson}');
 
-				//Begin here of Custom Screen business JS - code
+		//Begin here of Custom Screen business JS - code
 
-			    } ]);
+	    } ]);
 </script>
 
 
 <div class="panel panel-default">
-	<form name='form' method="post" class="form-horizontal"
-	ng-app="angularAppEvaluationSeasonPeriod"
-	ng-controller="EvaluationSeasonPeriodController"
-	action='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.CONTROLLER_URL%>'>
-	
-	<input name="bean" type="hidden" value="{{ object }}" />
-	
+	<form name='form' method="post" class="form-horizontal" ng-app="angularAppEvaluationSeasonPeriod"
+		ng-controller="EvaluationSeasonPeriodController"
+		action='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.SEARCH_URL%>'>
+
+		<input name="bean" type="hidden" value="{{ object }}" />
+
 		<div class="panel-body">
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.EvaluationSeasonPeriod.executionYear" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-4">
 					<ui-select id="executionYear" name="executionYear" ng-model="object.executionYear" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
 					<ui-select-choices repeat="iterator.id as iterator in object.executionYearDataSource | filter: $select.search">
 					<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
@@ -132,7 +123,7 @@ ${portal.angularToolkit()}
 					<spring:message code="label.EvaluationSeasonPeriod.periodType" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-4">
 					<ui-select id="periodType" name="periodType" ng-model="object.periodType" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
 					<ui-select-choices repeat="iterator.id as iterator in object.periodTypeDataSource | filter: $select.search">
 					<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
@@ -165,14 +156,22 @@ ${portal.angularToolkit()}
 					<th><spring:message code="label.EvaluationSeasonPeriod.executionSemester" /></th>
 					<th><spring:message code="label.EvaluationSeasonPeriod.periodType" /></th>
 					<th><spring:message code="label.EvaluationSeasonPeriod.season" /></th>
-					<th><spring:message code="label.EvaluationSeasonPeriod.start" /></th>
-					<th><spring:message code="label.EvaluationSeasonPeriod.end" /></th>
+					<%--
+					<th><spring:message code="label.EvaluationSeasonPeriod.intervals" /></th>
+					<th><spring:message code="label.EvaluationSeasonPeriod.degrees" /></th>
+					 --%>
 				</tr>
 			</thead>
 			<tbody>
-				<c:forEach var="var" items="${items}">
+				<c:forEach var="var" items="${searchResultsDataSet}">
 					<tr>
-						<td><c:out value="${var.property}"></c:out></td>
+						<td><c:out value="${var.executionSemester.qualifiedName}"></c:out></td>
+						<td><c:out value="${var.periodType.descriptionI18N.content}"></c:out></td>
+						<td><c:out value="${var.season.name.content}"></c:out></td>
+					<%--
+						<td><c:out value="${var.intervalsDescriptionI18N.content}"></c:out></td>
+						<td><c:out value="${var.degreesDescriptionI18N.content}"></c:out></td>
+						--%>
 					</tr>
 				</c:forEach>
 			</tbody>
