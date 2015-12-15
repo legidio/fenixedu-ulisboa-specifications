@@ -98,7 +98,6 @@ ${portal.angularToolkit()}
 	    } ]);
 </script>
 
-
 <div class="panel panel-default">
 	<form name='form' method="post" class="form-horizontal" ng-app="angularAppEvaluationSeasonPeriod"
 		ng-controller="EvaluationSeasonPeriodController"
@@ -156,10 +155,9 @@ ${portal.angularToolkit()}
 					<th><spring:message code="label.EvaluationSeasonPeriod.executionSemester" /></th>
 					<th><spring:message code="label.EvaluationSeasonPeriod.periodType" /></th>
 					<th><spring:message code="label.EvaluationSeasonPeriod.season" /></th>
-					<%--
 					<th><spring:message code="label.EvaluationSeasonPeriod.intervals" /></th>
 					<th><spring:message code="label.EvaluationSeasonPeriod.degrees" /></th>
-					 --%>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -168,17 +166,23 @@ ${portal.angularToolkit()}
 						<td><c:out value="${var.executionSemester.qualifiedName}"></c:out></td>
 						<td><c:out value="${var.periodType.descriptionI18N.content}"></c:out></td>
 						<td><c:out value="${var.season.name.content}"></c:out></td>
-					<%--
-						<td><c:out value="${var.intervalsDescriptionI18N.content}"></c:out></td>
-						<td><c:out value="${var.degreesDescriptionI18N.content}"></c:out></td>
-						--%>
+						<td><c:out value="${var.intervalsDescription}"></c:out></td>
+						<td><c:out value="${var.degreesDescription}"></c:out></td>
+						<td>
+							<a class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${var.externalId}">
+								<spring:message	code='label.event.evaluation.manageEvaluationSeasonRule.updateDegrees' />
+							</a>&nbsp;&nbsp;
+							<a class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEINTERVALS_URL%>${var.externalId}">
+								<spring:message	code='label.event.evaluation.manageEvaluationSeasonRule.updateIntervals' />
+							</a>&nbsp;&nbsp;
+						</td>
 					</tr>
 				</c:forEach>
 			</tbody>
 		</table>
 		<script type="text/javascript">
 	    createDataTables('searchTable', true /*filterable*/,
-		    false /*show tools*/, true /*paging*/,
+		    false /*show tools*/, false /*paging*/, 
 		    "${pageContext.request.contextPath}",
 		    "${datatablesI18NUrl}");
 	</script>

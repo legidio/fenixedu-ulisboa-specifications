@@ -96,7 +96,7 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
     }
 
     private Stream<EvaluationSeason> getSearchUniverseSearchEvaluationSeasonDataSet() {
-        return EvaluationSeason.all().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR);
+        return EvaluationSeasonServices.findAll().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR);
     }
 
     private List<EvaluationSeason> filterSearchEvaluationSeason() {

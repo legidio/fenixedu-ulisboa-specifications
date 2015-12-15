@@ -234,7 +234,7 @@ ${portal.angularToolkit()}
 			</tbody>
 		</table>
 		<script type="text/javascript">
-	    createDataTables('searchevaluationseasonruleTable',
+		createDataTablesWithSortSwitch('searchevaluationseasonruleTable',
 		    false /*filterable*/, false /*show tools*/,
 		    false /*paging*/, false /*sorting*/,
 		    "${pageContext.request.contextPath}",

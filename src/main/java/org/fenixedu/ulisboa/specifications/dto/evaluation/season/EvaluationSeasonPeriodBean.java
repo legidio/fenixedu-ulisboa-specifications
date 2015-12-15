@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -41,6 +42,7 @@ import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod.EvaluationSeasonPeriodType;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Lists;
@@ -74,6 +76,12 @@ public class EvaluationSeasonPeriodBean implements IBean {
     private LocalDate start;
 
     private LocalDate end;
+
+    private Interval interval;
+
+    private ExecutionDegree executionDegree;
+
+    private List<TupleDataSourceBean> executionDegreesDataSource;
 
     public EvaluationSeasonPeriod getPeriod() {
         return period;
@@ -179,6 +187,30 @@ public class EvaluationSeasonPeriodBean implements IBean {
         this.end = input;
     }
 
+    public Interval getInterval() {
+        return interval;
+    }
+
+    public void setInterval(Interval interval) {
+        this.interval = interval;
+    }
+
+    public ExecutionDegree getExecutionDegree() {
+        return executionDegree;
+    }
+
+    public void setExecutionDegree(ExecutionDegree executionDegree) {
+        this.executionDegree = executionDegree;
+    }
+
+    public List<TupleDataSourceBean> getExecutionDegreesDataSource() {
+        return executionDegreesDataSource;
+    }
+
+    public void setExecutionDegreesDataSource(List<TupleDataSourceBean> executionDegreesDataSource) {
+        this.executionDegreesDataSource = executionDegreesDataSource;
+    }
+
     public EvaluationSeasonPeriodBean() {
         init();
     }
@@ -186,6 +218,7 @@ public class EvaluationSeasonPeriodBean implements IBean {
     public EvaluationSeasonPeriodBean(final EvaluationSeasonPeriod period) {
         this();
         setPeriod(period);
+        init();
     }
 
     private void init() {
@@ -213,7 +246,7 @@ public class EvaluationSeasonPeriodBean implements IBean {
                 .collect(Collectors.<TupleDataSourceBean> toList()));
 
         // seasons
-        setSeasonDataSource(EvaluationSeason.all().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR)
+        setSeasonDataSource(EvaluationSeasonServices.findByActive(true).sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR)
                 .map(l -> new TupleDataSourceBean(((EvaluationSeason) l).getExternalId(),
                         EvaluationSeasonServices.getDescriptionI18N((EvaluationSeason) l).getContent()))
                 .collect(Collectors.<TupleDataSourceBean> toList()));
@@ -222,6 +255,21 @@ public class EvaluationSeasonPeriodBean implements IBean {
         setDegreeTypesDataSource(DegreeType.all().sorted()
                 .map(l -> new TupleDataSourceBean(((DegreeType) l).getExternalId(), ((DegreeType) l).getName().getContent()))
                 .collect(Collectors.<TupleDataSourceBean> toList()));
+
+        // degrees
+        if (period != null) {
+            setExecutionDegreesDataSource(period.getExecutionSemester().getExecutionYear().getExecutionDegreesSet().stream()
+                    .sorted(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME).map(i -> {
+
+                        final TupleDataSourceBean tuple = new TupleDataSourceBean();
+                        tuple.setId(i.getExternalId());
+                        tuple.setText("[" + i.getDegree().getCode() + "] "
+                                + i.getPresentationName().replace("'", "").replace("\"", " "));
+
+                        return tuple;
+
+                    }).collect(Collectors.<TupleDataSourceBean> toList()));
+        }
     }
 
 }

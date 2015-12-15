@@ -144,28 +144,32 @@ abstract public class EvaluationSeasonServices {
         return evaluationSeason;
     }
 
+    static public Stream<EvaluationSeason> findAll() {
+        return EvaluationSeason.all();
+    }
+
     static public Stream<EvaluationSeason> findByCode(final String code) {
-        return EvaluationSeason.all().filter(i -> code.equalsIgnoreCase(i.getCode()));
+        return findAll().filter(i -> code.equalsIgnoreCase(i.getCode()));
     }
 
     static public Stream<EvaluationSeason> findByAcronym(final LocalizedString acronym) {
-        return EvaluationSeason.all().filter(i -> acronym.equals(i.getAcronym()));
+        return findAll().filter(i -> acronym.equals(i.getAcronym()));
     }
 
     static public Stream<EvaluationSeason> findByName(final LocalizedString name) {
-        return EvaluationSeason.all().filter(i -> name.equals(i.getName()));
+        return findAll().filter(i -> name.equals(i.getName()));
     }
 
     static public Stream<EvaluationSeason> findBySeasonOrder(final Integer seasonOrder) {
-        return EvaluationSeason.all().filter(i -> seasonOrder.equals(getSeasonOrder(i)));
+        return findAll().filter(i -> seasonOrder.equals(getSeasonOrder(i)));
     }
 
     static public Stream<EvaluationSeason> findByActive(final boolean active) {
-        return EvaluationSeason.all().sorted(SEASON_ORDER_COMPARATOR).filter(i -> active == getActive(i));
+        return findAll().filter(i -> active == getActive(i));
     }
 
     static public Stream<EvaluationSeason> findByRequiresEnrolmentEvaluation(final boolean requiresEnrolmentEvaluation) {
-        return EvaluationSeason.all().filter(i -> requiresEnrolmentEvaluation == getRequiresEnrolmentEvaluation(i));
+        return findAll().filter(i -> requiresEnrolmentEvaluation == getRequiresEnrolmentEvaluation(i));
     }
 
     static public LocalizedString getDescriptionI18N(final EvaluationSeason input) {
@@ -370,7 +374,7 @@ abstract public class EvaluationSeasonServices {
     static public EvaluationSeason getPreviousSeason(final EvaluationSeason input) {
         EvaluationSeason result = null;
 
-        for (final EvaluationSeason iter : EvaluationSeason.all().collect(Collectors.toSet())) {
+        for (final EvaluationSeason iter : findByActive(true).collect(Collectors.toSet())) {
             if (iter == input) {
                 continue;
             }
@@ -396,7 +400,7 @@ abstract public class EvaluationSeasonServices {
     static public EvaluationSeason getNextSeason(final EvaluationSeason input) {
         EvaluationSeason result = null;
 
-        for (final EvaluationSeason iter : EvaluationSeason.all().collect(Collectors.toSet())) {
+        for (final EvaluationSeason iter : findByActive(true).collect(Collectors.toSet())) {
             if (iter == input) {
                 continue;
             }
@@ -550,8 +554,7 @@ abstract public class EvaluationSeasonServices {
 
     @Atomic
     static public void initialize() {
-        final List<EvaluationSeason> seasons =
-                EvaluationSeason.all().sorted(SEASON_ORDER_COMPARATOR).collect(Collectors.toList());
+        final List<EvaluationSeason> seasons = findAll().sorted(SEASON_ORDER_COMPARATOR).collect(Collectors.toList());
 
         for (int i = 0; i < seasons.size(); i++) {
             final EvaluationSeason iter = seasons.get(i);
@@ -566,7 +569,7 @@ abstract public class EvaluationSeasonServices {
     static public Integer maxOrder() {
         int result = 0;
 
-        for (final EvaluationSeason iter : EvaluationSeason.all().collect(Collectors.toSet())) {
+        for (final EvaluationSeason iter : findAll().collect(Collectors.toSet())) {
             final Integer order = getSeasonOrder(iter);
             if (order > result) {
                 result = order;

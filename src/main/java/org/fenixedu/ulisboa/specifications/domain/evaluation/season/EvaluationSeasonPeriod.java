@@ -1,8 +1,12 @@
 package org.fenixedu.ulisboa.specifications.domain.evaluation.season;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.CurricularYearList;
@@ -17,7 +21,6 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.util.date.IntervalTools;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.commons.i18n.LocalizedString.Builder;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.joda.time.Interval;
@@ -26,6 +29,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import pt.ist.fenixframework.Atomic;
@@ -77,6 +81,7 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
 
     private void checkRules() {
         checkConsistencySeason();
+        checkConsistencyExecutionYear();
         checkDuplicates();
     }
 
@@ -94,6 +99,17 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
     }
 
     /**
+     * All OccupationPeriodReference must have ExecutionDegrees of exactly one ExecutionYear
+     */
+    private void checkConsistencyExecutionYear() {
+        for (final OccupationPeriodReference reference : getOccupationPeriod().getExecutionDegreesSet()) {
+            if (reference.getExecutionDegree().getExecutionYear() != getExecutionYear()) {
+                throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.evaluationSeason.inconsistent");
+            }
+        }
+    }
+
+    /**
      * For a given ExecutionYear and EvaluationSeasonPeriodType, one OccupationPeriod (considering all of it's Intervals) can only
      * be duplicated if the EvaluationSeason is different
      */
@@ -106,6 +122,20 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
                 }
             }
         }
+    }
+
+    @Atomic
+    public void addDegree(final ExecutionDegree input) {
+        final Set<ExecutionDegree> changed = getExecutionDegrees();
+        changed.add(input);
+        editDegrees(changed);
+    }
+
+    @Atomic
+    public void removeDegree(final ExecutionDegree input) {
+        final Set<ExecutionDegree> changed = getExecutionDegrees();
+        changed.remove(input);
+        editDegrees(changed);
     }
 
     @Atomic
@@ -137,8 +167,47 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
     }
 
     @Atomic
-    public void editIntervals(final Iterator<Interval> intervals) {
-        getOccupationPeriod().editDates(intervals);
+    public void addInterval(final LocalDate start, final LocalDate end) {
+        final List<Interval> changed = getOccupationPeriod().getIntervals();
+        changed.add(IntervalTools.getInterval(start, end));
+        editIntervals(changed);
+    }
+
+    @Atomic
+    public void removeInterval(final LocalDate start, final LocalDate end) {
+        final List<Interval> changed = getOccupationPeriod().getIntervals();
+
+        for (final Iterator<Interval> iterator = changed.iterator(); iterator.hasNext();) {
+            final Interval interval = iterator.next();
+
+            if (interval.getStart().equals(start) && interval.getEnd().equals(end)) {
+                iterator.remove();
+            }
+        }
+
+        if (changed.size() == getOccupationPeriod().getIntervals().size()) {
+            throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.interval.not.found");
+        }
+
+        editIntervals(changed);
+    }
+
+    @Atomic
+    private void editIntervals(final List<Interval> input) {
+        for (final Interval interval : input) {
+            if (interval.getStart().equals(input)) {
+                throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.interval.duplicate.start");
+            }
+        }
+
+        Collections.sort(input, new Comparator<Interval>() {
+            @Override
+            public int compare(Interval x, Interval y) {
+                return x.getStart().compareTo(y.getStart());
+            }
+        });
+
+        getOccupationPeriod().editDates(input.iterator());
         checkRules();
     }
 
@@ -223,8 +292,8 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         return getExecutionSemester().getExecutionYear();
     }
 
-    public LocalizedString getIntervalsDescriptionI18N() {
-        final Builder result = new LocalizedString.Builder();
+    public String getIntervalsDescription() {
+        final StringBuilder result = new StringBuilder();
 
         final DateTimeFormatter formatter = DateTimeFormat.forPattern("dd MMM").withLocale(I18N.getLocale());
 
@@ -241,7 +310,7 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
             }
         }
 
-        return result.build();
+        return result.toString();
     }
 
     @Override
@@ -250,40 +319,56 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         final OccupationPeriod o2 = other.getOccupationPeriod();
 
         return ComparisonChain.start().compare(o1.getPeriodInterval().getStartMillis(), o2.getPeriodInterval().getStartMillis())
-                .compare(o1.getExecutionDegreesSet().size(), o2.getExecutionDegreesSet().size()).result();
+                .compare(o1.getExecutionDegreesSet().size(), o2.getExecutionDegreesSet().size())
+                .compare(o1.getExternalId(), o2.getExternalId()).result();
     }
 
-    public LocalizedString getDegreesDescriptionI18N() {
-        final Builder result = new LocalizedString.Builder();
-        
-        for (final ExecutionDegree executionDegree : getExecutionDegrees()) {
-            
-        } 
+    public String getDegreesDescription() {
+        final StringBuilder result = new StringBuilder();
 
-        for (final Iterator<ExecutionDegree> iterator = getExecutionDegrees().iterator(); iterator.hasNext();) {
-            final ExecutionDegree executionDegree = iterator.next();
+        final Map<DegreeType, Set<ExecutionDegree>> mapped = Maps.<DegreeType, Set<ExecutionDegree>> newLinkedHashMap();
+        getExecutionDegrees().stream()
+                .sorted(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME_AND_EXECUTION_YEAR).forEach(i -> {
 
-//            result.append(formatter.print(interval.getStart()));
-//            result.append(" - ");
-//            result.append(formatter.print(interval.getEnd()));
-//
-//            if (iterator.hasNext()) {
-//                result.append(", ");
-//            }
+                    final DegreeType key = i.getDegreeType();
+                    if (!mapped.containsKey(key)) {
+                        mapped.put(key, Sets.<ExecutionDegree> newLinkedHashSet());
+                    }
+
+                    mapped.get(key).add(i);
+                });
+
+        for (final Iterator<Entry<DegreeType, Set<ExecutionDegree>>> iterator = mapped.entrySet().iterator(); iterator
+                .hasNext();) {
+            final Entry<DegreeType, Set<ExecutionDegree>> entry = iterator.next();
+
+            int size = entry.getValue().size();
+            if (size != 0) {
+                result.append(size);
+                result.append(" - ");
+                result.append(entry.getKey().getName().getContent());
+
+                if (iterator.hasNext()) {
+                    result.append(", ");
+                }
+            }
         }
 
-        return result.build();
+        return result.toString();
     }
 
-    private Set<ExecutionDegree> getExecutionDegrees() {
-        final Set<ExecutionDegree> result =
-                Sets.<ExecutionDegree> newTreeSet(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME);
+    public Set<ExecutionDegree> getExecutionDegrees() {
+        final Set<ExecutionDegree> result = Sets.<ExecutionDegree> newHashSet();
 
         for (final OccupationPeriodReference iter : getOccupationPeriod().getExecutionDegreesSet()) {
             result.add(iter.getExecutionDegree());
         }
 
         return result;
+    }
+
+    public List<Interval> getIntervals() {
+        return getOccupationPeriod().getIntervals();
     }
 
 }

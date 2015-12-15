@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.util.date.IntervalTools;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod.EvaluationSeasonPeriodType;
@@ -91,7 +92,7 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
     @RequestMapping(value = _SEARCH_URI)
     public String search(final Model model, final RedirectAttributes redirectAttributes) {
 
-        final EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean();
+        EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean(); 
         this.setBean(bean, model);
 
         return jspPage("search");
@@ -162,42 +163,29 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
         return jspPage("read/") + getPeriod(model).getExternalId();
     }
 
-    private static final String _UPDATE_URI = "/update/";
-    public static final String UPDATE_URL = CONTROLLER_URL + _UPDATE_URI;
+    private static final String _UPDATEINTERVALS_URI = "/updateintervals/";
+    public static final String UPDATEINTERVALS_URL = CONTROLLER_URL + _UPDATEINTERVALS_URI;
 
-    @RequestMapping(value = _UPDATE_URI + "{oid}", method = RequestMethod.GET)
-    public String update(@PathVariable("oid") final EvaluationSeasonPeriod period, final Model model) {
+    @RequestMapping(value = _UPDATEINTERVALS_URI + "{oid}", method = RequestMethod.GET)
+    public String updateIntervals(@PathVariable("oid") final EvaluationSeasonPeriod period, final Model model) {
         setPeriod(period, model);
 
         final EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean(period);
         this.setBean(bean, model);
 
-        return jspPage("update");
+        return jspPage("updateintervals");
     }
 
-    private static final String _UPDATEPOSTBACK_URI = "/updatepostback/";
-    public static final String UPDATEPOSTBACK_URL = CONTROLLER_URL + _UPDATEPOSTBACK_URI;
-
-    @RequestMapping(value = _UPDATEPOSTBACK_URI + "{oid}", method = RequestMethod.POST,
-            produces = "application/json;charset=UTF-8")
-    public @ResponseBody ResponseEntity<String> updatepostback(@PathVariable("oid") final EvaluationSeasonPeriod period,
-            @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model) {
-
-        this.setBean(bean, model);
-        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = _UPDATE_URI + "{oid}", method = RequestMethod.POST)
-    public String update(@PathVariable("oid") final EvaluationSeasonPeriod period,
+    @RequestMapping(value = _UPDATEINTERVALS_URI + "{oid}/add", method = RequestMethod.POST)
+    public String addInterval(@PathVariable("oid") final EvaluationSeasonPeriod period,
             @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
             final RedirectAttributes redirectAttributes) {
         setPeriod(period, model);
 
         try {
-            // TODO legidio
-            period.editDegrees(null);
+            period.addInterval(bean.getStart(), bean.getEnd());
 
-            return redirect(READ_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
+            return redirect(UPDATEINTERVALS_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
@@ -205,7 +193,80 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
             setPeriod(period, model);
             this.setBean(bean, model);
 
-            return jspPage("update");
+            return jspPage("updateintervals");
+        }
+    }
+
+    @RequestMapping(value = _UPDATEINTERVALS_URI + "{oid}/remove", method = RequestMethod.POST)
+    public String removeInterval(@PathVariable("oid") final EvaluationSeasonPeriod period,
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
+        setPeriod(period, model);
+
+        try {
+            period.removeInterval(bean.getStart(), bean.getEnd());
+
+            return redirect(UPDATEINTERVALS_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
+        } catch (Exception de) {
+
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+            setPeriod(period, model);
+            this.setBean(bean, model);
+
+            return jspPage("updateintervals");
+        }
+    }
+    private static final String _UPDATEDEGREES_URI = "/updatedegrees/";
+    public static final String UPDATEDEGREES_URL = CONTROLLER_URL + _UPDATEDEGREES_URI;
+
+    @RequestMapping(value = _UPDATEDEGREES_URI + "{oid}", method = RequestMethod.GET)
+    public String updateDegrees(@PathVariable("oid") final EvaluationSeasonPeriod period, final Model model) {
+        setPeriod(period, model);
+
+        final EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean(period);
+        this.setBean(bean, model);
+
+        return jspPage("updatedegrees");
+    }
+
+    @RequestMapping(value = _UPDATEDEGREES_URI + "{oid}/add", method = RequestMethod.POST)
+    public String addDegree(@PathVariable("oid") final EvaluationSeasonPeriod period,
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        setPeriod(period, model);
+
+        try {
+            period.addDegree(bean.getExecutionDegree());
+
+            return redirect(UPDATEDEGREES_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
+        } catch (Exception de) {
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+            this.setBean(bean, model);
+
+            return jspPage("updatedegrees");
+        }
+    }
+
+    @RequestMapping(value = _UPDATEDEGREES_URI + "{oid}/remove", method = RequestMethod.POST)
+    public String removeDegree(@PathVariable("oid") final EvaluationSeasonPeriod period,
+            @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        setPeriod(period, model);
+
+        try {
+            period.removeDegree(bean.getExecutionDegree());
+
+            return redirect(UPDATEDEGREES_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
+        } catch (Exception de) {
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+            this.setBean(bean, model);
+
+            return jspPage("updatedegrees");
         }
     }
 

@@ -1,3 +1,5 @@
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod"%>
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices"%>
 <%@page import="org.fenixedu.ulisboa.specifications.ui.evaluation.manageevaluationseasonperiod.EvaluationSeasonPeriodController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -43,8 +45,8 @@ ${portal.angularToolkit()}
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.READ_URL%>${period.externalId}"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+		href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.SEARCH_URL%>/"><spring:message
+			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -97,71 +99,118 @@ ${portal.angularToolkit()}
 
 		//Begin here of Custom Screen business JS - code
 
-	    } ]);
+		$scope.addDegree = function() {
+
+		    if ($scope.object.executionDegree == '' || $scope.object.executionDegree == undefined){
+				return;				
+			}
+			
+			$('#form').attr('action','${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${period.externalId}/add');
+			$('#form').submit();	
+		}
+
+		$scope.removeDegree = function() {
+
+		    if ($scope.object.executionDegree == '' || $scope.object.executionDegree == undefined) {
+				return;				
+			}
+			
+			$('#form').attr('action','${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${period.externalId}/remove');
+			    $('#form').submit();
+				}
+
+			    } ]);
 </script>
 
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppPeriod" ng-controller="EvaluationSeasonPeriodController"
-	action='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATE_URL%>${period.externalId}'>
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			<spring:message code="label.details" />
+		</h3>
+	</div>
+	<div class="panel-body">
+		<table class="table">
+			<tbody>
+				<tr>
+					<th scope="row" class="col-xs-3"><spring:message code="label.EvaluationSeasonPeriod.executionSemester" /></th>
+					<td><c:out value='${period.executionSemester.qualifiedName}' /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="col-xs-3"><spring:message code="label.EvaluationSeasonPeriod.periodType" /></th>
+					<td><c:out value='${period.periodType.descriptionI18N.content}' /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="col-xs-3"><spring:message code="label.EvaluationSeasonPeriod.season" /></th>
+					<td><c:out
+							value='<%=EvaluationSeasonServices
+					.getDescriptionI18N(((EvaluationSeasonPeriod) request.getAttribute("period")).getSeason())
+					.getContent()%>' /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="col-xs-3"><spring:message code="label.EvaluationSeasonPeriod.intervals" /></th>
+					<td><c:out value='${period.intervalsDescription}' /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="col-xs-3"><spring:message code="label.EvaluationSeasonPeriod.degrees" /></th>
+					<td><c:out value='${period.degreesDescription}' /></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
 
-	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEPOSTBACK_URL%>${period.externalId}' /> <input
-		name="bean" type="hidden" value="{{ object }}" />
+<form id="form" name='form' method="post" class="form-horizontal" ng-app="angularAppPeriod"
+	ng-controller="EvaluationSeasonPeriodController" action="">
+
+	<input name="bean" type="hidden" value="{{ object }}" />
 
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.executionSemester" />
-				</div>
+				<div class="col-sm-6">
+					<ui-select id="executionDegreeSelect" name="executionDegree" ng-model="object.executionDegree" theme="bootstrap">
+					<ui-select-match>{{$select.selected.text}}</ui-select-match> <ui-select-choices
+						repeat="executionDegree.id as executionDegree in object.executionDegreesDataSource | filter: $select.search">
+					<span ng-bind-html="executionDegree.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+					&nbsp;&nbsp;
 
-				<div class="col-sm-10">
-					<input id="executionSemester" class="form-control" type="text" ng-model="object.executionSemester" name="executionperiod" />
+				</div>
+				<div class="col-sm-2">
+					<button class="glyphicon glyphicon-plus-sign btn btn-default" type="button" ng-click="addDegree()">
+						<spring:message code="label.add" />
+					</button>
 				</div>
 			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.periodType" />
-				</div>
 
-				<div class="col-sm-10">
-					<input id="periodType" class="form-control" type="text" ng-model="object.periodType" name="periodType" />
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.evaluationSeason" />
-				</div>
-
-				<div class="col-sm-4">
-					<ui-select id="evaluationSeason" class="form-control" name="evaluationseason" ng-model="$parent.object.evaluationSeason"
-						theme="bootstrap" ng-disabled="disabled" multiple> <ui-select-match>{{$item.text}}</ui-select-match> <ui-select-choices
-						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
-					<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.start" />
-				</div>
-
-				<div class="col-sm-10">
-					<input id="start" class="form-control" type="text" ng-model="object.start" name="begindate" />
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.end" />
-				</div>
-
-				<div class="col-sm-10">
-					<input id="end" class="form-control" type="text" ng-model="object.end" name="enddate" />
-				</div>
-			</div>
-		</div>
-		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<table id="degreesDataTable" class="table responsive table-bordered table-hover" width="100%">
+				<thead>
+					<tr>
+						<th><spring:message code="label.Degree.code" /></th>
+						<th><spring:message code="label.name" /></th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="item" items="${period.executionDegrees}">
+						<tr>
+							<td><c:out value="${item.degree.code}"></c:out></td>
+							<td><c:out value="${item.degreeCurricularPlan.presentationName}"></c:out></td>
+							<td>	<!-- TODO legidio delete -->
+							</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+			<script type="text/javascript">
+		createDataTablesWithSortSwitch('degreesDataTable',
+			true /*filterable*/, false /*show tools*/,
+			false /*paging*/, true /*sortable*/,
+			"${pageContext.request.contextPath}",
+			"${datatablesI18NUrl}");
+	    </script>
 		</div>
 	</div>
+
+
 </form>
 
 <script>
