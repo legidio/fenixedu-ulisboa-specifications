@@ -538,6 +538,39 @@ relation AnyCurricularCourseExceptionsCompetenceCourse {
 class evaluation.season.EvaluationSeasonPeriod {
 }
 
+
+
+class evaluation.config.MarkSheetSettings {
+
+}
+
+relation MarkSheetSettingsRoot {
+   
+    ULisboaSpecificationsRoot playsRole uLisboaSpecificationsRoot {
+    	multiplicity 1..1;
+    }
+    
+    evaluation.config.MarkSheetSettings playsRole markSheetSettings {
+        multiplicity 0..1;
+    }
+}
+
+class evaluation.config.CompetenceCourseMarkSheetTemplateFile extends .org.fenixedu.bennu.io.domain.GenericFile {
+
+}
+
+relation CompetenceCourseMarkSheetTemplateFileMarkSheetSettings {
+
+	evaluation.config.MarkSheetSettings playsRole markSheetSettings {
+    	multiplicity 1..1;
+    }
+    
+    evaluation.config.CompetenceCourseMarkSheetTemplateFile playsRole templateFile {
+        multiplicity 0..1;
+    }
+}
+
+
 relation EvaluationSeasonPeriodRelation {
     protected evaluation.season.EvaluationSeasonPeriod playsRole evaluationSeasonPeriod {
         multiplicity *;
