@@ -116,7 +116,7 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
 
     private Stream<EvaluationSeasonPeriod> getSearchUniverseSearchDataSet(final ExecutionYear executionYear,
             final EvaluationSeasonPeriodType periodType) {
-        return EvaluationSeasonPeriod.findAll(executionYear, periodType).stream();
+        return EvaluationSeasonPeriod.findBy(executionYear, periodType).stream();
     }
 
     private List<EvaluationSeasonPeriod> filterSearch(final ExecutionYear executionYear,

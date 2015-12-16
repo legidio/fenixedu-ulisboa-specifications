@@ -30,16 +30,19 @@ package org.fenixedu.ulisboa.specifications.domain;
 
 
 enum org.fenixedu.ulisboa.specifications.domain.serviceRequests.UIComponentType as UIComponentType;
+enum org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetStateEnum as CompetenceCourseMarkSheetStateEnum;
 
 external class .org.fenixedu.academic.domain.CompetenceCourse;
 external class .org.fenixedu.academic.domain.EvaluationSeason;
 external class .org.fenixedu.academic.domain.ExecutionSemester;
+external class .org.fenixedu.academic.domain.Person;
 external class .org.fenixedu.academic.domain.OccupationPeriod;
 external class .org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
 external class .org.fenixedu.academic.domain.curricularRules.AnyCurricularCourseExceptions;
 external class .org.fenixedu.academic.domain.student.StatuteType;
 external class .org.fenixedu.academic.domain.student.Registration;
 external class .org.fenixedu.academic.domain.SchoolClass;
+external class .org.fenixedu.academic.domain.Shift;
 external class .org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
 external class .org.fenixedu.academic.domain.serviceRequests.ServiceRequestType;
 external class .org.fenixedu.academic.domain.student.Registration;
@@ -641,7 +644,111 @@ relation EvaluationSeasonRuleRelation {
     }
 }
 
+class evaluation.markSheet.CompetenceCourseMarkSheet {
+    DateTime evaluationDate;
+    String checkSum;
+    boolean printed;
+}
+
+class evaluation.markSheet.CompetenceCourseMarkSheetStateChange  {
+    CompetenceCourseMarkSheetStateEnum state;
+    DateTime date;
+    String reason;
+    boolean byTeacher;
+}
+
+relation CompetenceCourseMarkSheetRectification {
+	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectified {
+		multiplicity 1..1;
+	}
+	
+	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectification {
+		multiplicity *;
+	}
+}
+
+relation CompetenceCourseMarkSheetStateChangeRelation {
+	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+		multiplicity 1..1;
+	}
+	
+	protected evaluation.markSheet.CompetenceCourseMarkSheetStateChange playsRole stateChange {
+		multiplicity 1..*;
+	}
+}
+
+relation CompetenceCourseMarkSheetStateChangeResponsible {
+    protected evaluation.markSheet.CompetenceCourseMarkSheetStateChange playsRole competenceCourseMarkSheetChange {
+        multiplicity *;
+    }
+    
+    protected .org.fenixedu.academic.domain.Person playsRole responsible {
+		multiplicity 1..1;
+	}
+}
+
+relation CompetenceCourseMarkSheetRelation {
+    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+        multiplicity *;
+    }
+    
+    protected .org.fenixedu.academic.domain.CompetenceCourse playsRole competenceCourse {
+		multiplicity 1..1;
+	}
+}
+
+relation CompetenceCourseMarkSheetShift {
+    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+        multiplicity *;
+    }
+    
+    protected .org.fenixedu.academic.domain.Shift playsRole shift {
+		multiplicity *;
+	}
+}
+
+relation CompetenceCourseMarkSheetEnrolmentEvaluation {
+    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+		multiplicity 0..1;
+	}
+    
+    protected .org.fenixedu.academic.domain.EnrolmentEvaluation playsRole enrolmentEvaluation {
+        multiplicity *;
+    }
+}
+
+relation CompetenceCourseMarkSheetEvaluationSeason {
+    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+        multiplicity *;
+    }
+    
+    .org.fenixedu.academic.domain.EvaluationSeason playsRole evaluationSeason {
+        multiplicity 1..1;
+    }
+}
+
+relation CompetenceCourseMarkSheetExecutionSemester {
+    .org.fenixedu.academic.domain.ExecutionSemester playsRole executionSemester {
+        multiplicity 1..1;
+    }
+    
+    evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+        multiplicity *;
+    }
+}
+
+relation CompetenceCourseMarkSheetCertifier {
+    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+        multiplicity *;
+    }
+
+    protected .org.fenixedu.academic.domain.Person playsRole certifier {
+		multiplicity 1..1;
+	}
+}
+
 // ==================== END: Evaluations ====================
+
 
 // ==================== Parishes as domain objects
 class Parish{
@@ -1082,7 +1189,3 @@ relation ULisboaSpecificationsTemporaryFileUser {
         multiplicity *;
     }
 }
-
-
-
-

@@ -121,7 +121,7 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
      * be duplicated if the EvaluationSeason is different
      */
     private void checkDuplicates() {
-        for (final EvaluationSeasonPeriod iter : findAll(getExecutionYear(), getPeriodType())) {
+        for (final EvaluationSeasonPeriod iter : findBy(getExecutionYear(), getPeriodType())) {
             if (iter != this && iter.getSeason() == getSeason()) {
 
                 if (iter.getOccupationPeriod().isEqualTo(getOccupationPeriod())) {
@@ -246,7 +246,7 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         deleteDomainObject();
     }
 
-    static public Set<EvaluationSeasonPeriod> findAll(final ExecutionYear executionYear,
+    static public Set<EvaluationSeasonPeriod> findBy(final ExecutionYear executionYear,
             final EvaluationSeasonPeriodType periodType) {
 
         final Set<EvaluationSeasonPeriod> result = Sets.<EvaluationSeasonPeriod> newHashSet();
