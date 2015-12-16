@@ -115,7 +115,7 @@ ${portal.angularToolkit()}
 			code="label.event.back" /></a> &nbsp;&nbsp;|&nbsp;&nbsp;
 
 	<div class="btn-group">
-		<button type="button" class=" btn-default dropdown-toggle"
+		<button type="button" class="btn-default dropdown-toggle"
 			data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;
 			<spring:message code="label.event.create" />

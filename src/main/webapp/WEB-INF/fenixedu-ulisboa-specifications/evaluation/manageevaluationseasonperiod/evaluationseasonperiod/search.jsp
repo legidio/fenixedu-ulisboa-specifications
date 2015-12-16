@@ -92,110 +92,149 @@ ${portal.angularToolkit()}
 		} ];
 
 		$scope.object = angular.fromJson('${beanJson}');
-
+		
 		//Begin here of Custom Screen business JS - code
+		
+		$scope.deletePeriod = function(periodId) {
+			$("#deleteConfirmationForm").attr("action", '${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.DELETE_URL%>' + periodId);
+			$('#deleteConfirmation').modal('toggle')
+		}
+
 
 	    } ]);
 </script>
 
-<div class="panel panel-default">
-	<form name='form' method="post" class="form-horizontal" ng-app="angularAppEvaluationSeasonPeriod"
-		ng-controller="EvaluationSeasonPeriodController"
-		action='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.SEARCH_URL%>'>
-
-		<input name="bean" type="hidden" value="{{ object }}" />
-
-		<div class="panel-body">
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.executionYear" />
+<div class="modal fade" id="deleteConfirmation">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="deleteConfirmationForm" method="POST" action="">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<spring:message code="label.confirmation" />
+					</h4>
 				</div>
-
-				<div class="col-sm-4">
-					<ui-select id="executionYear" name="executionYear" ng-model="object.executionYear" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices repeat="iterator.id as iterator in object.executionYearDataSource | filter: $select.search">
-					<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+				<div class="modal-body"> 
+					<p><spring:message code="label.delete.confirm"/></p>
 				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.periodType" />
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<spring:message code="label.no" />
+					</button>
+					<button class="btn btn-danger" type="submit">
+						<spring:message code="label.yes" />
+					</button>
 				</div>
-
-				<div class="col-sm-4">
-					<ui-select id="periodType" name="periodType" ng-model="object.periodType" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices repeat="iterator.id as iterator in object.periodTypeDataSource | filter: $select.search">
-					<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.EvaluationSeasonPeriod.season" />
-				</div>
-
-				<div class="col-sm-4">
-					<ui-select id="season" name="season" ng-model="object.season" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices repeat="iterator.id as iterator in object.seasonDataSource | filter: $select.search">
-					<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
-				</div>
-			</div>
+			</form>
 		</div>
-		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.search" />" />
-		</div>
-	</form>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
 </div>
+<!-- /.modal -->
 
-
-<c:choose>
-	<c:when test="${not empty searchResultsDataSet}">
-		<table id="searchTable" class="table responsive table-bordered table-hover" width="100%">
-			<thead>
-				<tr>
-					<th><spring:message code="label.EvaluationSeasonPeriod.executionSemester" /></th>
-					<th><spring:message code="label.EvaluationSeasonPeriod.periodType" /></th>
-					<th><spring:message code="label.EvaluationSeasonPeriod.season" /></th>
-					<th><spring:message code="label.EvaluationSeasonPeriod.intervals" /></th>
-					<th><spring:message code="label.EvaluationSeasonPeriod.degrees" /></th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<c:forEach var="var" items="${searchResultsDataSet}">
-					<tr>
-						<td><c:out value="${var.executionSemester.qualifiedName}"></c:out></td>
-						<td><c:out value="${var.periodType.descriptionI18N.content}"></c:out></td>
-						<td><c:out value="${var.season.name.content}"></c:out></td>
-						<td><c:out value="${var.intervalsDescription}"></c:out></td>
-						<td><c:out value="${var.degreesDescription}"></c:out></td>
-						<td>
-							<a class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${var.externalId}">
-								<spring:message	code='label.event.evaluation.manageEvaluationSeasonRule.updateDegrees' />
-							</a>&nbsp;&nbsp;
-							<a class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEINTERVALS_URL%>${var.externalId}">
-								<spring:message	code='label.event.evaluation.manageEvaluationSeasonRule.updateIntervals' />
-							</a>&nbsp;&nbsp;
-						</td>
-					</tr>
-				</c:forEach>
-			</tbody>
-		</table>
-		<script type="text/javascript">
-	    createDataTables('searchTable', true /*filterable*/,
-		    false /*show tools*/, false /*paging*/, 
-		    "${pageContext.request.contextPath}",
-		    "${datatablesI18NUrl}");
-	</script>
-	</c:when>
-	<c:otherwise>
-		<div class="alert alert-warning" role="alert">
-
-			<p>
-				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>
-				<spring:message code="label.noResultsFound" />
-			</p>
-
+<form name='form' method="post" class="form-horizontal" ng-app="angularAppEvaluationSeasonPeriod"
+	ng-controller="EvaluationSeasonPeriodController"
+	action='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.SEARCH_URL%>'>
+		<div class="panel panel-default">
+		
+				<input name="bean" type="hidden" value="{{ object }}" />
+		
+				<div class="panel-body">
+					<div class="form-group row">
+						<div class="col-sm-2 control-label">
+							<spring:message code="label.EvaluationSeasonPeriod.executionYear" />
+						</div>
+		
+						<div class="col-sm-4">
+							<ui-select id="executionYear" name="executionYear" ng-model="object.executionYear" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
+							<ui-select-choices repeat="iterator.id as iterator in object.executionYearDataSource | filter: $select.search">
+							<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<div class="col-sm-2 control-label">
+							<spring:message code="label.EvaluationSeasonPeriod.periodType" />
+						</div>
+		
+						<div class="col-sm-4">
+							<ui-select id="periodType" name="periodType" ng-model="object.periodType" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
+							<ui-select-choices repeat="iterator.id as iterator in object.periodTypeDataSource | filter: $select.search">
+							<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<div class="col-sm-2 control-label">
+							<spring:message code="label.EvaluationSeasonPeriod.season" />
+						</div>
+		
+						<div class="col-sm-4">
+							<ui-select id="season" name="season" ng-model="object.season" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
+							<ui-select-choices repeat="iterator.id as iterator in object.seasonDataSource | filter: $select.search">
+							<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+						</div>
+					</div>
+				</div>
+				<div class="panel-footer">
+					<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.search" />" />
+				</div>
 		</div>
-
-	</c:otherwise>
-</c:choose>
+		
+		
+		<c:choose>
+			<c:when test="${not empty searchResultsDataSet}">
+				<table id="searchTable" class="table responsive table-bordered table-hover" width="100%">
+					<thead>
+						<tr>
+							<th><spring:message code="label.EvaluationSeasonPeriod.executionSemester" /></th>
+							<th><spring:message code="label.EvaluationSeasonPeriod.periodType" /></th>
+							<th><spring:message code="label.EvaluationSeasonPeriod.season" /></th>
+							<th><spring:message code="label.EvaluationSeasonPeriod.intervals" /></th>
+							<th><spring:message code="label.EvaluationSeasonPeriod.degrees" /></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="var" items="${searchResultsDataSet}">
+							<tr>
+								<td><c:out value="${var.executionSemester.qualifiedName}"></c:out></td>
+								<td><c:out value="${var.periodType.descriptionI18N.content}"></c:out></td>
+								<td><c:out value="${var.season.name.content}"></c:out></td>
+								<td><c:out value="${var.intervalsDescription}"></c:out></td>
+								<td><c:out value="${var.degreesDescription}"></c:out></td>
+								<td>
+									<a class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${var.externalId}">
+										<spring:message	code='label.event.evaluation.manageEvaluationSeasonRule.updateDegrees' />
+									</a>&nbsp;&nbsp;
+									<a class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEINTERVALS_URL%>${var.externalId}">
+										<spring:message	code='label.event.evaluation.manageEvaluationSeasonRule.updateIntervals' />
+									</a>&nbsp;&nbsp;
+									<button class="btn btn-danger btn-xs" role="button" type="button" ng-click="deletePeriod('${var.externalId}')"><spring:message code="label.delete"/></button>
+								</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+				<script type="text/javascript">
+			    createDataTables('searchTable', true /*filterable*/,
+				    false /*show tools*/, false /*paging*/, 
+				    "${pageContext.request.contextPath}",
+				    "${datatablesI18NUrl}");
+			</script>
+			</c:when>
+			<c:otherwise>
+				<div class="alert alert-warning" role="alert">
+		
+					<p>
+						<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>
+						<spring:message code="label.noResultsFound" />
+					</p>
+		
+				</div>
+		
+			</c:otherwise>
+		</c:choose>
+</form>

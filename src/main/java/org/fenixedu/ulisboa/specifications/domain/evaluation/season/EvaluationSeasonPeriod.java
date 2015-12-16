@@ -80,9 +80,16 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
     }
 
     private void checkRules() {
+        checkConsistencyExecutionDegrees();
         checkConsistencySeason();
         checkConsistencyExecutionYear();
         checkDuplicates();
+    }
+
+    private void checkConsistencyExecutionDegrees() {
+        if (getOccupationPeriod().getExecutionDegreesSet().isEmpty()) {
+            throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.executionDegrees.required");
+        }
     }
 
     /**
@@ -104,7 +111,7 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
     private void checkConsistencyExecutionYear() {
         for (final OccupationPeriodReference reference : getOccupationPeriod().getExecutionDegreesSet()) {
             if (reference.getExecutionDegree().getExecutionYear() != getExecutionYear()) {
-                throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.evaluationSeason.inconsistent");
+                throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.executionYear.inconsistent");
             }
         }
     }
@@ -129,6 +136,7 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         final Set<ExecutionDegree> changed = getExecutionDegrees();
         changed.add(input);
         editDegrees(changed);
+        checkRules();
     }
 
     @Atomic
@@ -136,15 +144,10 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         final Set<ExecutionDegree> changed = getExecutionDegrees();
         changed.remove(input);
         editDegrees(changed);
-    }
-
-    @Atomic
-    public void editDegrees(final Set<ExecutionDegree> executionDegrees) {
-        updateReferences(executionDegrees);
         checkRules();
     }
 
-    private void updateReferences(final Set<ExecutionDegree> input) {
+    private void editDegrees(final Set<ExecutionDegree> input) {
 
         // Step 1, Remove unwanted references
         final Set<OccupationPeriodReference> references = getOccupationPeriod().getExecutionDegreesSet();
@@ -157,13 +160,15 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
                 input.remove(executionDegree);
 
             } else {
-                reference.delete();
                 iterator.remove();
+                reference.delete();
             }
         }
 
         // Step 2, Add new references
-        createReferences(input, getPeriodType());
+        if (!input.isEmpty()) {
+            createReferences(input, getPeriodType());
+        }
     }
 
     @Atomic
@@ -171,16 +176,19 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         final List<Interval> changed = getOccupationPeriod().getIntervals();
         changed.add(IntervalTools.getInterval(start, end));
         editIntervals(changed);
+        checkRules();
     }
 
     @Atomic
     public void removeInterval(final LocalDate start, final LocalDate end) {
         final List<Interval> changed = getOccupationPeriod().getIntervals();
 
+        final Interval intervalToRemove = IntervalTools.getInterval(start, end);
+
         for (final Iterator<Interval> iterator = changed.iterator(); iterator.hasNext();) {
             final Interval interval = iterator.next();
 
-            if (interval.getStart().equals(start) && interval.getEnd().equals(end)) {
+            if (interval.getStart().equals(intervalToRemove.getStart()) && interval.getEnd().equals(intervalToRemove.getEnd())) {
                 iterator.remove();
             }
         }
@@ -190,13 +198,22 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         }
 
         editIntervals(changed);
+        checkRules();
     }
 
-    @Atomic
+
     private void editIntervals(final List<Interval> input) {
+
         for (final Interval interval : input) {
-            if (interval.getStart().equals(input)) {
-                throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.interval.duplicate.start");
+            for (final Interval toCheck : input) {
+
+                if (interval.equals(toCheck)) {
+                    continue;
+                }
+
+                if (interval.getStart().equals(toCheck.getStart())) {
+                    throw new ULisboaSpecificationsDomainException("error.EvaluationSeasonPeriod.interval.duplicate.start");
+                }
             }
         }
 
@@ -208,7 +225,6 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
         });
 
         getOccupationPeriod().editDates(input.iterator());
-        checkRules();
     }
 
     @Override
@@ -218,6 +234,14 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
 
     @Atomic
     public void delete() {
+        editDegrees(Collections.emptySet());
+        super.setExecutionSemester(null);
+        super.setSeason(null);
+        
+        final OccupationPeriod occupationPeriod = getOccupationPeriod();
+        super.setOccupationPeriod(null);
+        occupationPeriod.delete();
+
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
         deleteDomainObject();
     }
@@ -328,7 +352,8 @@ public class EvaluationSeasonPeriod extends EvaluationSeasonPeriod_Base implemen
 
         final Map<DegreeType, Set<ExecutionDegree>> mapped = Maps.<DegreeType, Set<ExecutionDegree>> newLinkedHashMap();
         getExecutionDegrees().stream()
-                .sorted(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME_AND_EXECUTION_YEAR).forEach(i -> {
+                .sorted(ExecutionDegree.EXECUTION_DEGREE_COMPARATORY_BY_DEGREE_TYPE_AND_NAME_AND_EXECUTION_YEAR).forEach(i ->
+                {
 
                     final DegreeType key = i.getDegreeType();
                     if (!mapped.containsKey(key)) {

@@ -83,6 +83,7 @@ ${portal.angularToolkit()}
 </c:if>
 
 <script>
+	
     angular.module('angularAppPeriod',
 	    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ]).controller(
 	    'EvaluationSeasonPeriodController', [ '$scope', function($scope) {
@@ -98,29 +99,61 @@ ${portal.angularToolkit()}
 		$scope.postBack = createAngularPostbackFunction($scope);
 
 		//Begin here of Custom Screen business JS - code
+		
+		$scope.isUndefinedOrNull = function(val){
+			return angular.isUndefined(val) || val === null
+		}
 
 		$scope.addInterval = function() {
 
-		    if ($scope.object.executionDegree == '' || $scope.object.executionDegree == undefined){
+		    if ($scope.isUndefinedOrNull($scope.object.start) || $scope.isUndefinedOrNull($scope.object.end)) {
 				return;				
 			}
-			
+		    
 			$('#form').attr('action','${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEINTERVALS_URL%>${period.externalId}/add');
 			$('#form').submit();	
 		}
 
-		$scope.removeInterval = function() {
+		$scope.removeInterval = function(start,end) {
+			$("#deleteConfirmationForm").attr("action", '${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEINTERVALS_URL%>${period.externalId}/remove/' + start + '/' + end);
+			$('#deleteConfirmation').modal('toggle')
 
-		    if ($scope.object.executionDegree == '' || $scope.object.executionDegree == undefined) {
-				return;				
-			}
-			
-			$('#form').attr('action','${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEINTERVALS_URL%>${period.externalId}/remove');
-			    $('#form').submit();
-				}
-
-			    } ]);
+		}
+	 }
+]);
 </script>
+
+<div class="modal fade" id="deleteConfirmation">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="deleteConfirmationForm" method="POST">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<spring:message code="label.confirmation" />
+					</h4>
+				</div>
+				<div class="modal-body">
+					<p id="modalMessage"><spring:message code="label.delete.confirm"></spring:message></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<spring:message code="label.no" />
+					</button>
+					<button class="btn btn-danger" type="submit">
+						<spring:message code="label.yes" />
+					</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -129,6 +162,7 @@ ${portal.angularToolkit()}
 		</h3>
 	</div>
 	<div class="panel-body">
+	
 		<table class="table">
 			<tbody>
 				<tr>
@@ -166,19 +200,57 @@ ${portal.angularToolkit()}
 
 	<div class="panel panel-default">
 		<div class="panel-body">
+		
+			<div class="row">
+				<div class="col-sm-1">
+					<spring:message code="label.EvaluationSeasonPeriod.start" />
+				</div>
+				
+				<div class="col-sm-3">
+					<input class="form-control" type="text" bennu-date="object.start" />
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-1">
+					<spring:message code="label.EvaluationSeasonPeriod.end" />
+				</div>
+				
+				<div class="col-sm-3">
+					<input class="form-control" type="text" bennu-date="object.end" />
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-sm-1">
+				</div>
+								
+				<div class="col-sm-3">
+					<button class="glyphicon glyphicon-plus-sign btn btn-default" type="button" ng-click="addInterval()">
+						<spring:message code="label.add" />
+					</button>
+				</div>
+			</div>
+		
 
 			<table id="degreesDataTable" class="table responsive table-bordered table-hover" width="100%">
 				<thead>
 					<tr>
 						<th><spring:message code="label.EvaluationSeasonPeriod.start" /></th>
 						<th><spring:message code="label.EvaluationSeasonPeriod.end" /></th>
+						<th> </th>
 					</tr>
 				</thead>
 				<tbody>
 					<c:forEach var="item" items="${bean.period.intervals}">
 						<tr>
-							<td><c:out value="${item.start}"></c:out></td>
-							<td><c:out value="${item.end}"></c:out></td>
+							<td><joda:format value="${item.start}" style="S-"/></td>
+							<td><joda:format value="${item.end}" style="S-"/></td>
+							<td>
+								<button class="btn btn-danger btn-xs" type="button" role="button" ng-click="removeInterval('${item.start.toLocalDate()}','${item.end.toLocalDate()}')"> 
+									<spring:message	code='label.remove' />
+								</button>
+							</td>
 						</tr>
 					</c:forEach>
 				</tbody>

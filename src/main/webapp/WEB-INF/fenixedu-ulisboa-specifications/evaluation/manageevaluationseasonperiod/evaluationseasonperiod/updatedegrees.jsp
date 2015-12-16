@@ -109,18 +109,46 @@ ${portal.angularToolkit()}
 			$('#form').submit();	
 		}
 
-		$scope.removeDegree = function() {
+		$scope.removeDegree = function(executionDegreeId) {
+			$("#deleteConfirmationForm").attr("action", '${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${period.externalId}/remove/' + executionDegreeId);
+			$('#deleteConfirmation').modal('toggle')
+		}
 
-		    if ($scope.object.executionDegree == '' || $scope.object.executionDegree == undefined) {
-				return;				
-			}
-			
-			$('#form').attr('action','${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.UPDATEDEGREES_URL%>${period.externalId}/remove');
-			    $('#form').submit();
-				}
-
-			    } ]);
+} ]);
+    
 </script>
+
+<div class="modal fade" id="deleteConfirmation">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="deleteConfirmationForm" method="POST">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<spring:message code="label.confirmation" />
+					</h4>
+				</div>
+				<div class="modal-body">
+					<p id="modalMessage"><spring:message code="label.delete.confirm"></spring:message></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<spring:message code="label.no" />
+					</button>
+					<button class="btn btn-danger" type="submit">
+						<spring:message code="label.yes" />
+					</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -187,6 +215,7 @@ ${portal.angularToolkit()}
 					<tr>
 						<th><spring:message code="label.Degree.code" /></th>
 						<th><spring:message code="label.name" /></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -194,7 +223,10 @@ ${portal.angularToolkit()}
 						<tr>
 							<td><c:out value="${item.degree.code}"></c:out></td>
 							<td><c:out value="${item.degreeCurricularPlan.presentationName}"></c:out></td>
-							<td>	<!-- TODO legidio delete -->
+							<td>
+								<button class="btn btn-danger btn-xs" type="button" role="button" ng-click="removeDegree('${item.externalId}')"> 
+									<spring:message	code='label.remove' />
+								</button>
 							</td>
 						</tr>
 					</c:forEach>

@@ -44,7 +44,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.CONTROLLER_URL%>"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -94,13 +94,17 @@ ${portal.angularToolkit()}
 
 		$scope.object = angular.fromJson('${beanJson}');
 		$scope.postBack = createAngularPostbackFunction($scope);
+		
+		$scope.submitForm = function() {
+			$('#createForm').submit();
+		}
 
 		//Begin here of Custom Screen business JS - code
 
 	    } ]);
 </script>
 
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppPeriod" ng-controller="EvaluationSeasonPeriodController"
+<form id="createForm" name='form' method="post" class="form-horizontal" ng-app="angularAppPeriod" ng-controller="EvaluationSeasonPeriodController"
 	action='${pageContext.request.contextPath}<%=EvaluationSeasonPeriodController.CREATE_URL%>'>
 
 	<input type="hidden" name="postback"
@@ -113,7 +117,7 @@ ${portal.angularToolkit()}
 					<spring:message code="label.EvaluationSeasonPeriod.executionSemester" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-4">
 					<ui-select id="executionSemester" name="executionSemester" ng-model="object.executionSemester" theme="bootstrap">
 					<ui-select-match>{{$select.selected.text}}</ui-select-match> <ui-select-choices
 						repeat="iterator.id as iterator in object.executionSemesterDataSource | filter: $select.search"> <span
@@ -125,7 +129,7 @@ ${portal.angularToolkit()}
 					<spring:message code="label.EvaluationSeasonPeriod.periodType" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-4">
 					<ui-select id="periodType" name="periodType" ng-model="object.periodType" theme="bootstrap"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
 					<ui-select-choices repeat="iterator.id as iterator in object.periodTypeDataSource | filter: $select.search">
 					<span ng-bind-html="iterator.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
@@ -158,7 +162,7 @@ ${portal.angularToolkit()}
 					<spring:message code="label.EvaluationSeasonPeriod.start" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-4">
 					<input id="start" class="form-control" type="text" ng-model="object.start" bennu-date="object.start" name="start" />
 				</div>
 			</div>
@@ -167,13 +171,13 @@ ${portal.angularToolkit()}
 					<spring:message code="label.EvaluationSeasonPeriod.end" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-4">
 					<input id="end" class="form-control" type="text" ng-model="object.end" bennu-date="object.end" name="end" />
 				</div>
 			</div>
 		</div>
 		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<button type="button" class="btn btn-primary" role="button" ng-click="submitForm()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>

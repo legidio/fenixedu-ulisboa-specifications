@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.util.date.IntervalTools;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonPeriod.EvaluationSeasonPeriodType;
@@ -40,6 +40,9 @@ import org.fenixedu.ulisboa.specifications.dto.evaluation.season.EvaluationSeaso
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -92,7 +95,7 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
     @RequestMapping(value = _SEARCH_URI)
     public String search(final Model model, final RedirectAttributes redirectAttributes) {
 
-        EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean(); 
+        EvaluationSeasonPeriodBean bean = new EvaluationSeasonPeriodBean();
         this.setBean(bean, model);
 
         return jspPage("search");
@@ -154,13 +157,12 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
             period.delete();
 
             addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete"), model);
-            return redirect(CONTROLLER_URL, model, redirectAttributes);
 
         } catch (Exception ex) {
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + ex.getLocalizedMessage(), model);
         }
 
-        return jspPage("read/") + getPeriod(model).getExternalId();
+        return redirect(SEARCH_URL, model, redirectAttributes);
     }
 
     private static final String _UPDATEINTERVALS_URI = "/updateintervals/";
@@ -197,14 +199,14 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
         }
     }
 
-    @RequestMapping(value = _UPDATEINTERVALS_URI + "{oid}/remove", method = RequestMethod.POST)
-    public String removeInterval(@PathVariable("oid") final EvaluationSeasonPeriod period,
-            @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
-            final RedirectAttributes redirectAttributes) {
+    @RequestMapping(value = _UPDATEINTERVALS_URI + "{oid}/remove/{start}/{end}", method = RequestMethod.POST)
+    public String removeInterval(@PathVariable("oid") final EvaluationSeasonPeriod period, @PathVariable("start") String start,
+            @PathVariable("end") String end, final Model model, final RedirectAttributes redirectAttributes) {
         setPeriod(period, model);
 
         try {
-            period.removeInterval(bean.getStart(), bean.getEnd());
+            final DateTimeFormatter pattern = DateTimeFormat.forPattern("yyyy-MM-dd");
+            period.removeInterval(LocalDate.parse(start, pattern), LocalDate.parse(end, pattern));
 
             return redirect(UPDATEINTERVALS_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
@@ -212,11 +214,12 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
                     model);
             setPeriod(period, model);
-            this.setBean(bean, model);
+            this.setBean(new EvaluationSeasonPeriodBean(period), model);
 
             return jspPage("updateintervals");
         }
     }
+
     private static final String _UPDATEDEGREES_URI = "/updatedegrees/";
     public static final String UPDATEDEGREES_URL = CONTROLLER_URL + _UPDATEDEGREES_URI;
 
@@ -250,21 +253,21 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
         }
     }
 
-    @RequestMapping(value = _UPDATEDEGREES_URI + "{oid}/remove", method = RequestMethod.POST)
+    @RequestMapping(value = _UPDATEDEGREES_URI + "{oid}/remove/{executionDegreeId}", method = RequestMethod.POST)
     public String removeDegree(@PathVariable("oid") final EvaluationSeasonPeriod period,
-            @RequestParam(value = "bean", required = false) final EvaluationSeasonPeriodBean bean, final Model model,
+            @PathVariable("executionDegreeId") final ExecutionDegree executionDegree, final Model model,
             final RedirectAttributes redirectAttributes) {
 
         setPeriod(period, model);
 
         try {
-            period.removeDegree(bean.getExecutionDegree());
+            period.removeDegree(executionDegree);
 
             return redirect(UPDATEDEGREES_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
                     model);
-            this.setBean(bean, model);
+            this.setBean(new EvaluationSeasonPeriodBean(period), model);
 
             return jspPage("updatedegrees");
         }
@@ -302,7 +305,7 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
                     bean.getSeason(), bean.getDegreeTypes(), bean.getStart(), bean.getEnd());
 
             model.addAttribute("period", period);
-            return redirect(READ_URL + getPeriod(model).getExternalId(), model, redirectAttributes);
+            return redirect(SEARCH_URL, model, redirectAttributes);
         } catch (Exception de) {
 
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",

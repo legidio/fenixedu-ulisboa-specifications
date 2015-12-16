@@ -28,6 +28,7 @@
 package org.fenixedu.ulisboa.specifications.dto.evaluation.season;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,7 +48,6 @@ import org.joda.time.LocalDate;
 
 import com.google.common.collect.Lists;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 
 public class EvaluationSeasonPeriodBean implements IBean {
 
