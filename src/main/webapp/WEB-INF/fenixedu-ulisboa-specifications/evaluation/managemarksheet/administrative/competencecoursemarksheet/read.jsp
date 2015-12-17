@@ -204,6 +204,7 @@ ${portal.angularToolkit()}
 	</div>
 </div>
 
+<%-- State Changes --%>
 <h2><spring:message code="label.CompetenceCourseMarkSheet.stateChanges"></spring:message></h2>
 <table id="stateChangesTable" class="table responsive table-bordered table-hover" width="100%">
 	<thead>
@@ -226,9 +227,10 @@ ${portal.angularToolkit()}
 	</tbody>
 </table>
 <script type="text/javascript">
-	createDataTables('stateChangesTable',true /*filterable*/, false /*show tools*/, true /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
+	createDataTables('stateChangesTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 </script>
 
+<%-- Evaluations --%>
 <h2><spring:message code="label.CompetenceCourseMarkSheet.enrolmentEvaluations"></spring:message></h2>
 <table id="enrolmentEvaluationsTable" class="table responsive table-bordered table-hover" width="100%">
 	<thead>

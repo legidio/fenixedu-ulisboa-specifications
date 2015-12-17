@@ -43,12 +43,9 @@ ${portal.angularToolkit()}
 
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
-	<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.ANNULMARKSHEET_URL%>${competenceCourseMarkSheet.externalId}/annul"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"
-		aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.ANNULMARKSHEET_URL%>${competenceCourseMarkSheet.externalId}/cancel"><spring:message
-			code="action.cancel" /></a>
+	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+			code="label.event.back" /></a> 
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
