@@ -28,10 +28,16 @@
 package org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
+import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
@@ -39,10 +45,14 @@ import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.bennu.core.domain.User;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationComparator;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+import org.joda.time.YearMonthDay;
 
 import com.google.common.collect.Sets;
 
@@ -100,7 +110,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     protected void checkIfEvaluationDateIsInExamsPeriod() {
-// TODO
+// TODO legidio
 //        CurricularCourse curricularCourse = getCompetenceCourse();
 //        ExecutionDegree executionDegree = getExecutionDegree(getCurricularCourse(), getExecutionPeriod());
 //        ExecutionSemester executionSemester = getExecutionSemester();
@@ -261,6 +271,145 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         }
 
         return result.toString();
+	}
+
+    public Set<Enrolment> getEnrolmentsNotInAnyMarkSheet() {
+        final Set<Enrolment> result = Sets.newHashSet();
+
+        final ExecutionSemester executionSemester = getExecutionSemester();
+        final EvaluationSeason evaluationSeason = getEvaluationSeason();
+
+        for (final CurricularCourse curricularCourse : getExecutionCourse().getAssociatedCurricularCoursesSet()) {
+            for (final Enrolment enrolment : getEnrolmentsForGradeSubmission(curricularCourse)) {
+
+                final Optional<EnrolmentEvaluation> finalEvaluation =
+                        enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
+                if (finalEvaluation.isPresent()) {
+                    continue;
+                }
+
+                final Optional<EnrolmentEvaluation> temporaryEvaluation =
+                        enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
+                if (temporaryEvaluation.isPresent() && temporaryEvaluation.get().getCompetenceCourseMarkSheet() != null) {
+                    continue;
+                }
+
+                result.add(enrolment);
+            }
+        }
+
+        return result;
+    }
+
+    private Set<Enrolment> getEnrolmentsForGradeSubmission(final CurricularCourse curricularCourse) {
+        final Set<Enrolment> result = new HashSet<Enrolment>();
+
+        final ExecutionSemester executionSemester = getExecutionSemester();
+        final EvaluationSeason season = getEvaluationSeason();
+
+        for (final CurriculumModule curriculumModule : curricularCourse.getCurriculumModulesSet()) {
+
+            if (!curriculumModule.isEnrolment()) {
+                continue;
+            }
+
+            final Enrolment enrolment = (Enrolment) curriculumModule;
+
+            if (!season.isImprovement() && !enrolment.isValid(executionSemester)) {
+                continue;
+            }
+
+            if (!isEnrolmentCandidateForEvaluation(enrolment)) {
+                continue;
+            }
+
+            final Optional<EnrolmentEvaluation> evaluation = enrolment.getEnrolmentEvaluation(season, executionSemester, false);
+            if (evaluation.isPresent() && evaluation.get().getCompetenceCourseMarkSheet() != null) {
+                continue;
+            }
+
+            result.add(enrolment);
+        }
+
+        return result;
+    }
+
+    private boolean isEnrolmentCandidateForEvaluation(final Enrolment enrolment) {
+        final ExecutionSemester executionSemester = getExecutionSemester();
+        final EvaluationSeason season = getEvaluationSeason();
+
+        if (enrolment.isEvaluatedInSeason(season, executionSemester)) {
+            return false;
+        }
+
+        final Collection<EnrolmentEvaluation> evaluations = getAllFinalEnrolmentEvaluations(enrolment);
+        final EnrolmentEvaluation latestEvaluation = getLatestEnrolmentEvaluation(evaluations);
+        final boolean isApproved = latestEvaluation != null && latestEvaluation.isApproved();
+
+        // this evaluation season is for not approved enrolments
+        if (!season.isImprovement() && isApproved) {
+            return false;
+        }
+
+        // this evaluation season is for approved enrolments
+        if (season.isImprovement() && !isApproved) {
+            return false;
+        }
+
+        if (EvaluationSeasonServices.hasPreviousSeasonBlockingGrade(season, latestEvaluation)) {
+            return false;
+        }
+
+        if (!EvaluationSeasonServices.hasRequiredPreviousSeasonMinimumGrade(season, evaluations)) {
+            return false;
+        }
+
+        final Optional<EnrolmentEvaluation> temporaryEvaluation =
+                enrolment.getEnrolmentEvaluation(season, executionSemester, false);
+
+        if (EvaluationSeasonServices.isRequiresEnrolmentEvaluation(season) && season.isImprovement()
+                && temporaryEvaluation.isPresent()) {
+
+            return temporaryEvaluation.get().getExecutionPeriod() == executionSemester;
+
+        } else {
+
+            return !temporaryEvaluation.isPresent();
+        }
+    }
+
+    /**
+     * Returns final evaluations that took place before the evaluation date
+     */
+    private Collection<EnrolmentEvaluation> getAllFinalEnrolmentEvaluations(final Enrolment enrolment) {
+        final Collection<EnrolmentEvaluation> evaluations = enrolment.getAllFinalEnrolmentEvaluations();
+
+        for (final Iterator<EnrolmentEvaluation> iterator = evaluations.iterator(); iterator.hasNext();) {
+            final EnrolmentEvaluation enrolmentEvaluation = iterator.next();
+
+            final YearMonthDay examDate = enrolmentEvaluation.getExamDateYearMonthDay();
+            if (examDate != null && !examDate.isBefore(getEvaluationDate())) {
+                iterator.remove();
+            }
+        }
+        return evaluations;
+    }
+
+    private EnrolmentEvaluation getLatestEnrolmentEvaluation(final Collection<EnrolmentEvaluation> evaluations) {
+        return ((evaluations == null || evaluations.isEmpty()) ? null : Collections.<EnrolmentEvaluation> max(evaluations,
+                new EvaluationComparator()));
+    }
+
+    private EnrolmentEvaluation getPreviousSeasonEnrolmentEvaluation(final Collection<EnrolmentEvaluation> evaluations) {
+        if (evaluations != null) {
+
+            for (final EnrolmentEvaluation iter : evaluations) {
+
+            }
+        }
+
+        return ((evaluations == null || evaluations.isEmpty()) ? null : Collections.<EnrolmentEvaluation> max(evaluations,
+                new EvaluationComparator()));
     }
 
 }

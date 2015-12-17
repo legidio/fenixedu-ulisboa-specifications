@@ -718,7 +718,7 @@ relation CompetenceCourseMarkSheetShift {
 }
 
 relation CompetenceCourseMarkSheetEnrolmentEvaluation {
-    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+    evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
 		multiplicity 0..1;
 	}
     

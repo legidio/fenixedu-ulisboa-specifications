@@ -29,20 +29,22 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation.season;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.academic.domain.curriculum.EnrolmentEvaluationContext;
-import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.util.LocalizedStringUtil;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.EvaluationSeasonRule;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.PreviousSeasonApproval;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.PreviousSeasonBlockingGrade;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.PreviousSeasonMinimumGrade;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.joda.time.LocalDate;
@@ -185,124 +187,68 @@ abstract public class EvaluationSeasonServices {
         return result;
     }
 
-    static public Set<Enrolment> getEnrolmentsForGradeSubmission(final CurricularCourse curricularCourse,
-            final LocalDate evaluationDate, final ExecutionSemester executionSemester) {
+    static public boolean isRequiredPreviousSeasonApproval2(final EvaluationSeason season) {
+        if (season != null) {
 
-        final Set<Enrolment> result = new HashSet<Enrolment>();
-        for (final CurriculumModule curriculumModule : curricularCourse.getCurriculumModulesSet()) {
+            for (final EvaluationSeasonRule iter : season.getRulesSet()) {
+                if (iter instanceof PreviousSeasonApproval) {
 
-            if (!curriculumModule.isEnrolment()) {
-                continue;
+                    return true;
+                }
             }
-
-            final Enrolment enrolment = (Enrolment) curriculumModule;
-// TODO
-//            if (!isEvaluatesOnlyApprovedEnrolments() && !enrolment.isValid(executionSemester)) {
-//                continue;
-//            }
-//
-//            if (!isEnrolmentCandidateForEvaluation(enrolment, evaluationDate, executionSemester)) {
-//                continue;
-//            }
-//
-//            final EnrolmentEvaluation evaluation =
-//                    enrolment.getActiveEvaluationBySeason(this, evaluationDate, executionSemester, false);
-//
-//            if (evaluation != null && evaluation.hasMarkSheet()) {
-//                continue;
-//            }
-
-            result.add(enrolment);
         }
 
-        return result;
+        return false;
     }
 
-    static public Set<Enrolment> getEnrolmentsForGradeSubmission(final Collection<CurricularCourse> curricularCourses,
-            final LocalDate evaluationDate, final ExecutionSemester executionSemester) {
+    static public boolean hasPreviousSeasonBlockingGrade(final EvaluationSeason season, final EnrolmentEvaluation evaluation) {
+        if (season != null && evaluation != null) {
 
-        final Set<Enrolment> result = new HashSet<Enrolment>();
+            for (final EvaluationSeasonRule iter : season.getRulesSet()) {
+                if (iter instanceof PreviousSeasonBlockingGrade) {
 
-        for (CurricularCourse curricularCourse : curricularCourses) {
-            result.addAll(getEnrolmentsForGradeSubmission(curricularCourse, evaluationDate, executionSemester));
+                    final Grade blocking = ((PreviousSeasonBlockingGrade) iter).getBlocking();
+                    final Grade grade = evaluation.getGrade();
+                    if (blocking.compareTo(grade) == 0) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        return result;
-
+        return false;
     }
 
-    protected boolean isEnrolmentCandidateForEvaluation(final Enrolment enrolment, final LocalDate evaluationDate,
-            final ExecutionSemester executionSemester) {
+    static public boolean hasRequiredPreviousSeasonMinimumGrade(final EvaluationSeason season,
+            final Collection<EnrolmentEvaluation> evaluations) {
+        if (season != null && evaluations != null) {
 
-// TODO
+            final EvaluationSeason previousSeason = EvaluationSeasonServices.getPreviousSeason(season);
+            if (previousSeason != null) {
+
+                for (final EvaluationSeasonRule rule : season.getRulesSet()) {
+                    if (rule instanceof PreviousSeasonMinimumGrade) {
+
+                        for (final EnrolmentEvaluation evaluation : evaluations) {
+                            if (evaluation.getEvaluationSeason() == previousSeason) {
+
+                                final Grade minimum = ((PreviousSeasonMinimumGrade) rule).getMinimum();
+                                final Grade grade = evaluation.getGrade();
+                                if (minimum.compareTo(grade) < 0) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return true;
-//
-//        if (isEnrolmentEvaluatedInSeason(enrolment, evaluationDate, executionSemester)) {
-//            return false;
-//        }
-//
-//        // only evaluations before the input evaluation date should be investigated
-//        final List<EnrolmentEvaluation> evaluations = enrolment.getAllFinalEnrolmentEvaluations(evaluationDate);
-//        final EnrolmentEvaluation latestEvaluation = Enrolment.getLatestEnrolmentEvaluation(evaluations);
-//        final boolean isApproved = latestEvaluation != null && latestEvaluation.isApproved();
-//
-//        // this evaluation season is for not approved enrolments
-//        if (!isEvaluatesOnlyApprovedEnrolments()) {
-//
-//            if (isApproved) {
-//                return false;
-//            }
-//        }
-//
-//        // this evaluation season is for approved enrolments
-//        if (isEvaluatesOnlyApprovedEnrolments()) {
-//
-//            if (!isApproved) {
-//                return false;
-//            }
-//        }
-//
-//        if (latestEvaluation != null && latestEvaluation.isSubsequentEvaluationPrevented()) {
-//            return false;
-//        }
-//
-//        if (isRequiresEvaluationOnPreviousSeason()) {
-//            if (latestEvaluation == null) {
-//                return false;
-//            }
-//
-//            boolean exclude = true;
-//
-//            final EvaluationSeason previousSeason = getPreviousSeason();
-//            if (previousSeason != null) {
-//
-//                // WARNING: we should be using EnrolmentEvaluation.find API, but for simplicity reasons we're dealing with this "manually" 
-//                for (final EnrolmentEvaluation iter : evaluations) {
-//                    if (iter.getEvaluationSeason() == previousSeason) {
-//                        exclude = false;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            if (exclude) {
-//                return false;
-//            }
-//        }
-//
-//        final EnrolmentEvaluation temporaryEvaluation =
-//                enrolment.getActiveEvaluationBySeason(this, evaluationDate, executionSemester, false);
-//
-//        if (isRequiresEnrolmentEvaluation() && isEvaluatesOnlyApprovedEnrolments() && temporaryEvaluation != null) {
-//            return temporaryEvaluation.getExecutionPeriod() == executionSemester;
-//        }
-//
-//        if (isRequiresEnrolmentEvaluation() && isSupportsMultipleEvaluation() && temporaryEvaluation != null) {
-//            return evaluationDate != null && temporaryEvaluation.getExamDateYearMonthDay().toLocalDate().isEqual(evaluationDate);
-//        }
-//
-//        return !this.isRequiresEnrolmentEvaluation() || temporaryEvaluation != null;
+    }
 
+    static public boolean isRequiresEnrolmentEvaluation(final EvaluationSeason season) {
+        return season != null && (season.isImprovement() || season.isSpecial());
     }
 
     public void validateEnrolment(final Enrolment enrolment, final LocalDate evaluationDate,
