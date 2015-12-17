@@ -119,7 +119,8 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
             addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete"), model);
 
         } catch (Exception ex) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + ex.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + "\"" + ex.getLocalizedMessage() + "\"",
+                    model);
         }
 
         return redirect(SEARCH_URL + season.getExternalId(), model, redirectAttributes);
@@ -182,7 +183,8 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
             return redirect(SEARCH_URL + rule.getSeason().getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"", model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
             setEvaluationSeasonRule(rule, model);
             this.setEvaluationSeasonRuleBean(bean, model);
 
@@ -229,7 +231,8 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
             return redirect(SEARCH_URL + rule.getSeason().getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"", model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
             setEvaluationSeasonRule(rule, model);
             this.setEvaluationSeasonRuleBean(bean, model);
 
@@ -249,7 +252,8 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
             model.addAttribute("evaluationSeasonRule", rule);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
         }
 
         return redirect(SEARCH_URL + season.getExternalId(), model, redirectAttributes);
@@ -293,7 +297,8 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
             return redirect(SEARCH_URL + getEvaluationSeasonRule(model).getSeason().getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
             this.setEvaluationSeasonRuleBean(bean, model);
             return jspPage("createpreviousseasonblockinggrade");
         }
@@ -337,7 +342,8 @@ public class EvaluationSeasonRuleController extends FenixeduUlisboaSpecification
             return redirect(SEARCH_URL + getEvaluationSeasonRule(model).getSeason().getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + de.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
             this.setEvaluationSeasonRuleBean(bean, model);
             return jspPage("createpreviousseasonminimumgrade");
         }

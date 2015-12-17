@@ -160,7 +160,8 @@ public class EvaluationSeasonController extends FenixeduUlisboaSpecificationsBas
             return redirect(CONTROLLER_URL, model, redirectAttributes);
 
         } catch (Exception ex) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + ex.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + "\"" + ex.getLocalizedMessage() + "\"",
+                    model);
         }
 
         return jspPage("read/") + getEvaluationSeason(model).getExternalId();

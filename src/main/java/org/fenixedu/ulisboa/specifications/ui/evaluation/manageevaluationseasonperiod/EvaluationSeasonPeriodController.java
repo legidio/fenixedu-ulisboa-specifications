@@ -159,7 +159,8 @@ public class EvaluationSeasonPeriodController extends FenixeduUlisboaSpecificati
             addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete"), model);
 
         } catch (Exception ex) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + ex.getLocalizedMessage(), model);
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + "\"" + ex.getLocalizedMessage() + "\"",
+                    model);
         }
 
         return redirect(SEARCH_URL, model, redirectAttributes);
