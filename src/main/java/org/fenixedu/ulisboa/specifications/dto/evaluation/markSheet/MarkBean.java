@@ -27,15 +27,30 @@
 
 package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
+import java.util.stream.Collectors;
+
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.IBean;
 
 public class MarkBean implements IBean, Comparable<MarkBean> {
 
     private Enrolment enrolment;
+    private Integer studentNumber;
+    private String studentName;
+    private String gradeValue;
+    private String degreeName;
+    private String shifts;
 
     public MarkBean(final Enrolment enrolment) {
         setEnrolment(enrolment);
+
+        final Student student = enrolment.getStudent();
+        this.studentNumber = student.getNumber();
+        this.studentName = student.getPerson().getFirstAndLastName();
+        this.degreeName = enrolment.getStudentCurricularPlan().getDegree().getPresentationName();
+        this.shifts = enrolment.getRegistration().getShiftEnrolmentsSet().stream().map(i -> i.getShift().getNome())
+                .collect(Collectors.joining(", "));
     }
 
     public Enrolment getEnrolment() {
@@ -44,6 +59,46 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
 
     public void setEnrolment(final Enrolment input) {
         this.enrolment = input;
+    }
+
+    public Integer getStudentNumber() {
+        return studentNumber;
+    }
+
+    public void setStudentNumber(Integer studentNumber) {
+        this.studentNumber = studentNumber;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    public String getGradeValue() {
+        return gradeValue;
+    }
+
+    public void setGradeValue(String gradeValue) {
+        this.gradeValue = gradeValue;
+    }
+
+    public String getDegreeName() {
+        return degreeName;
+    }
+
+    public void setDegreeName(String degreeName) {
+        this.degreeName = degreeName;
+    }
+
+    public String getShifts() {
+        return shifts;
+    }
+
+    public void setShifts(String shifts) {
+        this.shifts = shifts;
     }
 
     @Override

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
@@ -79,10 +80,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     private void checkRules() {
-        if (getExecutionCourse() == null) {
-            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.executionCourse.required");
-        }
-
         if (getEvaluationSeason() == null) {
             throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationSeason.required");
         }
@@ -260,17 +257,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     public String getShiftsDescription() {
-        final StringBuilder result = new StringBuilder();
-
-        for (final Shift shift : getShiftSet()) {
-            result.append(shift.getNome()).append(", ");
-        }
-
-        if (result.toString().endsWith(", ")) {
-            result.delete(result.length() - 2, result.length());
-        }
-
-        return result.toString();
+        return getShiftSet().stream().map(i -> i.getNome()).collect(Collectors.joining(", "));
     }
 
     public Set<Enrolment> getEnrolmentsNotInAnyMarkSheet() {
@@ -375,15 +362,11 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         final Optional<EnrolmentEvaluation> temporaryEvaluation =
                 enrolment.getEnrolmentEvaluation(season, executionSemester, false);
 
-        if (EvaluationSeasonServices.isRequiresEnrolmentEvaluation(season) && season.isImprovement()
-                && temporaryEvaluation.isPresent()) {
-
+        if (season.isImprovement() && temporaryEvaluation.isPresent()) {
             return temporaryEvaluation.get().getExecutionPeriod() == executionSemester;
-
-        } else {
-
-            return !temporaryEvaluation.isPresent();
         }
+
+        return !EvaluationSeasonServices.isRequiresEnrolmentEvaluation(season) || !temporaryEvaluation.isPresent();
     }
 
     /**
@@ -404,18 +387,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     private EnrolmentEvaluation getLatestEnrolmentEvaluation(final Collection<EnrolmentEvaluation> evaluations) {
-        return ((evaluations == null || evaluations.isEmpty()) ? null : Collections.<EnrolmentEvaluation> max(evaluations,
-                new EvaluationComparator()));
-    }
-
-    private EnrolmentEvaluation getPreviousSeasonEnrolmentEvaluation(final Collection<EnrolmentEvaluation> evaluations) {
-        if (evaluations != null) {
-
-            for (final EnrolmentEvaluation iter : evaluations) {
-
-            }
-        }
-
         return ((evaluations == null || evaluations.isEmpty()) ? null : Collections.<EnrolmentEvaluation> max(evaluations,
                 new EvaluationComparator()));
     }

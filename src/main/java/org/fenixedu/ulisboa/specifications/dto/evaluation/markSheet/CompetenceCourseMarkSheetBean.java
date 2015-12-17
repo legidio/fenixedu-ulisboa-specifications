@@ -44,6 +44,7 @@ import org.fenixedu.bennu.IBean;
 import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Lists;
@@ -96,13 +97,12 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setEvaluationSeasonDataSource(List<EvaluationSeason> value) {
-        this.evaluationSeasonDataSource =
-                value.stream().sorted((x, y) -> x.getName().getContent().compareTo(y.getName().getContent())).map(x -> {
-                    TupleDataSourceBean tuple = new TupleDataSourceBean();
-                    tuple.setId(x.getExternalId());
-                    tuple.setText(x.getName().getContent());
-                    return tuple;
-                }).collect(Collectors.toList());
+        this.evaluationSeasonDataSource = value.stream().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR).map(x -> {
+            TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+            tuple.setText(EvaluationSeasonServices.getDescriptionI18N(x).getContent());
+            return tuple;
+        }).collect(Collectors.toList());
     }
 
     public LocalDate getEvaluationDate() {
@@ -271,8 +271,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
         setExecutionCourseDataSource(getFilteredExecutionCourses(null).collect(Collectors.toList()));
 
-        setEvaluationSeasonDataSource(EvaluationSeason.all().filter(e -> e.getInformation().getActive())
-                .sorted((x, y) -> x.getName().getContent().compareTo(y.getName().getContent())).collect(Collectors.toList()));
+        setEvaluationSeasonDataSource(EvaluationSeasonServices.findByActive(true).collect(Collectors.toList()));
 
         setCertifierDataSource(Bennu.getInstance().getTeachersSet().stream().map(t -> t.getPerson())
                 .sorted(Person.COMPARATOR_BY_NAME).collect(Collectors.toList()));

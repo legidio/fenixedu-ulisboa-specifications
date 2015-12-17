@@ -187,7 +187,7 @@ abstract public class EvaluationSeasonServices {
         return result;
     }
 
-    static public boolean isRequiredPreviousSeasonApproval2(final EvaluationSeason season) {
+    static public boolean isRequiredPreviousSeasonApproval(final EvaluationSeason season) {
         if (season != null) {
 
             for (final EvaluationSeasonRule iter : season.getRulesSet()) {
