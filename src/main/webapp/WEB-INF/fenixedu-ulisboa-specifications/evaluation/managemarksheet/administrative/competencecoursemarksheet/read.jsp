@@ -229,28 +229,3 @@ ${portal.angularToolkit()}
 <script type="text/javascript">
 	createDataTables('stateChangesTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 </script>
-
-<%-- Evaluations --%>
-<h2><spring:message code="label.CompetenceCourseMarkSheet.enrolmentEvaluations"></spring:message></h2>
-<table id="enrolmentEvaluationsTable" class="table responsive table-bordered table-hover" width="100%">
-	<thead>
-		<tr>
-			<th><spring:message code="label.Student.number" /></th>
-			<th><spring:message code="label.Student.name" /></th>
-			<th><spring:message code="label.Student.statutes" /></th>
-		</tr>
-	</thead>
-	<tbody>
-		<c:forEach var="each" items="${competenceCourseMarkSheet.enrolmentEvaluationSet}">
-		<tr>
-			<td><c:out value="${each.registration.student.number}"></c:out></td>
-			<td><c:out value="${each.registration.student.name}"></c:out></td>
-			<td><%= StatuteServices.getStatuteTypesDescription(((EnrolmentEvaluation) pageContext.findAttribute("each")).getRegistration()) %> </td>
-		</tr>
-		</c:forEach>
-	</tbody>
-</table>
-<script type="text/javascript">
-	createDataTables('enrolmentEvaluationsTable',true /*filterable*/, false /*show tools*/, true /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
-</script>
-
