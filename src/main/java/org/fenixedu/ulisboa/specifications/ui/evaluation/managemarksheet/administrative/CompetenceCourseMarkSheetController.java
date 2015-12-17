@@ -50,8 +50,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Component("org.fenixedu.ulisboa.specifications.evaluation.manageMarkSheet.administrative")
-@SpringFunctionality(app = FenixeduUlisboaSpecificationsController.class,
-        title = "label.title.evaluation.manageMarkSheet.administrative", accessGroup = "academic(MANAGE_MARKSHEETS)")
+@SpringFunctionality(app = FenixeduUlisboaSpecificationsController.class, title = "label.title.evaluation.manageMarkSheet",
+        accessGroup = "academic(MANAGE_MARKSHEETS)")
 @RequestMapping(CompetenceCourseMarkSheetController.CONTROLLER_URL)
 public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecificationsBaseController {
 
@@ -340,8 +340,9 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     }
 
     @RequestMapping(value = _CREATERECTIFICATION_URI + "{oid}", method = RequestMethod.POST)
-    public String createrectification(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean,
-            final Model model, final RedirectAttributes redirectAttributes) {
+    public String createrectification(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
+            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
 
         try {
             final CompetenceCourseMarkSheet rectification = competenceCourseMarkSheet.rectify();

@@ -49,8 +49,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Component("org.fenixedu.ulisboa.specifications.evaluation.manageMarkSheet.teacher")
-@SpringFunctionality(app = FenixeduUlisboaSpecificationsController.class,
-        title = "label.title.evaluation.manageMarkSheet.teacher", accessGroup = "role(TEACHER)")
+@SpringFunctionality(app = FenixeduUlisboaSpecificationsController.class, title = "label.title.evaluation.manageMarkSheet",
+        accessGroup = "role(TEACHER)")
 @RequestMapping(CompetenceCourseMarkSheetController.CONTROLLER_URL)
 public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecificationsBaseController {
 

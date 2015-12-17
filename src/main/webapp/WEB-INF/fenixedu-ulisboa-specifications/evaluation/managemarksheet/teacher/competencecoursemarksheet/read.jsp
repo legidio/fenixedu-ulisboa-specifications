@@ -35,7 +35,7 @@ ${portal.angularToolkit()}
 <%-- TITLE --%>
 <div class="page-header">
 	<h1>
-		<spring:message code="label.evaluation.manageMarkSheet.teacher.readCompetenceCourseMarkSheet" />
+		<spring:message code="label.evaluation.manageMarkSheet.readCompetenceCourseMarkSheet" />
 		<small></small>
 	</h1>
 </div>
@@ -83,7 +83,7 @@ ${portal.angularToolkit()}
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
 			code="label.event.update" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
-			code="label.event.evaluation.manageMarkSheet.teacher.updateEvaluations" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"
+			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"
 		aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/submitmarksheet"><spring:message
 			code="label.event.evaluation.manageMarkSheet.teacher.submitMarkSheet" /></a>

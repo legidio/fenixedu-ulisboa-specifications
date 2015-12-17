@@ -35,7 +35,7 @@ ${portal.angularToolkit()}
 <%-- TITLE --%>
 <div class="page-header">
 	<h1>
-		<spring:message code="label.evaluation.manageMarkSheet.teacher.updateEvaluations" />
+		<spring:message code="label.evaluation.manageMarkSheet.updateEvaluations" />
 		<small></small>
 	</h1>
 </div>

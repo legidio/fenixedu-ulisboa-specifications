@@ -48,7 +48,7 @@ ${portal.angularToolkit()}
 			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"
 		aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.ANNULMARKSHEET_URL%>${competenceCourseMarkSheet.externalId}/cancel"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.cancel" /></a>
+			code="action.cancel" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">

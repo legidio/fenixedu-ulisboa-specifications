@@ -36,7 +36,7 @@ ${portal.angularToolkit()}
 <%-- TITLE --%>
 <div class="page-header">
 	<h1>
-		<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet" />
+		<spring:message code="label.evaluation.manageMarkSheet.readCompetenceCourseMarkSheet" />
 		<small></small>
 	</h1>
 </div>
@@ -84,7 +84,7 @@ ${portal.angularToolkit()}
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
 			code="label.event.update" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.updateEvaluations" /></a> |&nbsp;&nbsp; <span
+			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a> |&nbsp;&nbsp; <span
 		class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
 			code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"

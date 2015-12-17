@@ -36,7 +36,7 @@ ${portal.angularToolkit()}
 <%-- TITLE --%>
 <div class="page-header">
 	<h1>
-		<spring:message code="label.evaluation.manageMarkSheet.administrative.searchCompetenceCourseMarkSheet" />
+		<spring:message code="label.evaluation.manageMarkSheet.searchCompetenceCourseMarkSheet" />
 		<small></small>
 	</h1>
 </div>
