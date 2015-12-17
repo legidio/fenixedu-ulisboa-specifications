@@ -44,7 +44,7 @@ ${portal.angularToolkit()}
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%><spring:message
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>"><spring:message
 			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -102,9 +102,24 @@ ${portal.angularToolkit()}
 
 				$scope.object = angular
 					.fromJson('${competenceCourseMarkSheetBeanJson}');
+				$scope.form = {};
+				$scope.form.object = $scope.object;
+
 				$scope.postBack = createAngularPostbackFunction($scope);
 
 				//Begin here of Custom Screen business JS - code
+				
+				$scope.onBeanChange = function(model) {
+					
+					$scope.object.competenceCourse = '';
+					
+					if ($scope.object.evaluationDate == ''){
+						$scope.object.evaluationDate = null;
+					}
+					
+					
+					$scope.postBack(model);
+				}
 
 			    } ]);
 </script>
@@ -117,6 +132,7 @@ ${portal.angularToolkit()}
 		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATEPOSTBACK_URL%>' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
+	
 	<div class="panel panel-default">
 		<div class="panel-body">
 			<div class="form-group row">
@@ -125,8 +141,13 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_executionSemester" class="form-control" type="text" ng-model="object.executionSemester"
-						name="executionsemester" required />
+					<ui-select	id="executionSemesterSelect" name="executionSemester" ng-model="$parent.object.executionSemester" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="executionSemester.id as executionSemester in object.executionSemesterDataSource | filter: $select.search">
+							<span ng-bind-html="executionSemester.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
+
 				</div>
 			</div>
 			<div class="form-group row">
@@ -135,8 +156,13 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_competenceCourse" class="form-control" type="text" ng-model="object.competenceCourse"
-						name="competencecourse" required />
+					<ui-select	id="competenceCourseSelect" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="competenceCourse.id as competenceCourse in object.competenceCourseDataSource | filter: $select.search">
+							<span ng-bind-html="competenceCourse.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
+
 				</div>
 			</div>
 			<div class="form-group row">
@@ -145,12 +171,13 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-4">
-					<%-- Relation to side 1 drop down rendered in input --%>
-					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="form-control" name="evaluationseason"
-						ng-model="$parent.object.evaluationSeason" theme="bootstrap" ng-disabled="disabled"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices
-						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
-					<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+					<ui-select	id="evaluationSeasonSelect" name="evaluationSeason" ng-model="$parent.object.evaluationSeason" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
+							<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
+
 				</div>
 			</div>
 			<div class="form-group row">
@@ -158,9 +185,9 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" />
 				</div>
 
-				<%-- <div class="col-sm-4">
-	<input id="competenceCourseMarkSheet_evaluationDate" class="form-control" type="text" name="evaluationdate"  bennu-datetime  />
-</div> --%>
+				<div class="col-sm-4">
+					<input class="form-control" type="text" bennu-date="object.evaluationDate" />
+				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
@@ -168,8 +195,12 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_certifier" class="form-control" type="text" ng-model="object.certifier" name="certifier"
-						required />
+					<ui-select	id="certifierSelect" name="certifier" ng-model="$parent.object.certifier" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="certifier.id as certifier in object.certifier | filter: $select.search">
+							<span ng-bind-html="certifier.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 			<div class="form-group row">
@@ -178,7 +209,12 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_shifts" class="form-control" type="text" ng-model="object.shifts" name="shifts" />
+					<ui-select	id="shiftsSelect" name="shifts" ng-model="$parent.object.shifts" theme="bootstrap"  on-select="onBeanChange($model)" on-remove="onBeanChange($model)" multiple="true">
+						<ui-select-match>{{$item.text}}</ui-select-match> 
+						<ui-select-choices	repeat="shift.id as shift in object.shiftsDataSource | filter: $select.search">
+							<span ng-bind-html="shift.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 		</div>

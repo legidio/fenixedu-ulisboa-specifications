@@ -27,49 +27,46 @@
 
 package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.bennu.IBean;
 import org.fenixedu.bennu.TupleDataSourceBean;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetStateChange;
+import org.joda.time.LocalDate;
+
+import com.google.common.collect.Sets;
 
 public class CompetenceCourseMarkSheetBean implements IBean {
 
-    private CompetenceCourseMarkSheet rectified;
-    private List<TupleDataSourceBean> rectifiedDataSource;
     private EvaluationSeason evaluationSeason;
     private List<TupleDataSourceBean> evaluationSeasonDataSource;
-    private org.joda.time.DateTime evaluationDate;
-    private java.lang.String checkSum;
-    private boolean printed;
+    private LocalDate evaluationDate;
 
     private List<CompetenceCourseMarkSheetStateChange> stateChange;
     private List<TupleDataSourceBean> stateChangeDataSource;
     private String reason;
 
-    public CompetenceCourseMarkSheet getRectified() {
-        return rectified;
-    }
+    private ExecutionSemester executionSemester;
+    private List<TupleDataSourceBean> executionSemesterDataSource;
 
-    public void setRectified(CompetenceCourseMarkSheet value) {
-        rectified = value;
-    }
+    private CompetenceCourse competenceCourse;
+    private List<TupleDataSourceBean> competenceCourseDataSource;
 
-    public List<TupleDataSourceBean> getRectifiedDataSource() {
-        return rectifiedDataSource;
-    }
+    private Person certifier;
+    private List<TupleDataSourceBean> certifierDataSource;
 
-    public void setRectifiedDataSource(List<CompetenceCourseMarkSheet> value) {
-        this.rectifiedDataSource = value.stream().map(x -> {
-            TupleDataSourceBean tuple = new TupleDataSourceBean();
-            tuple.setId(x.getExternalId()); //CHANGE_ME
-            tuple.setText(x.toString()); //CHANGE_ME
-            return tuple;
-        }).collect(Collectors.toList());
-    }
+    private List<Shift> shifts;
+    private List<TupleDataSourceBean> shiftsDataSource;
 
     public EvaluationSeason getEvaluationSeason() {
         return evaluationSeason;
@@ -84,36 +81,22 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setEvaluationSeasonDataSource(List<EvaluationSeason> value) {
-        this.evaluationSeasonDataSource = value.stream().map(x -> {
-            TupleDataSourceBean tuple = new TupleDataSourceBean();
-            tuple.setId(x.getExternalId()); //CHANGE_ME
-            tuple.setText(x.toString()); //CHANGE_ME
-            return tuple;
-        }).collect(Collectors.toList());
+        this.evaluationSeasonDataSource =
+                value.stream().sorted((x, y) -> x.getName().getContent().compareTo(y.getName().getContent())).map(x ->
+                {
+                    TupleDataSourceBean tuple = new TupleDataSourceBean();
+                    tuple.setId(x.getExternalId());
+                    tuple.setText(x.getName().getContent());
+                    return tuple;
+                }).collect(Collectors.toList());
     }
 
-    public org.joda.time.DateTime getEvaluationDate() {
+    public LocalDate getEvaluationDate() {
         return evaluationDate;
     }
 
-    public void setEvaluationDate(org.joda.time.DateTime value) {
-        evaluationDate = value;
-    }
-
-    public java.lang.String getCheckSum() {
-        return checkSum;
-    }
-
-    public void setCheckSum(java.lang.String value) {
-        checkSum = value;
-    }
-
-    public boolean getPrinted() {
-        return printed;
-    }
-
-    public void setPrinted(boolean value) {
-        printed = value;
+    public void setEvaluationDate(LocalDate evaluationDate) {
+        this.evaluationDate = evaluationDate;
     }
 
     public List<CompetenceCourseMarkSheetStateChange> getStateChange() {
@@ -129,7 +112,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setStateChangeDataSource(List<CompetenceCourseMarkSheetStateChange> value) {
-        this.stateChangeDataSource = value.stream().map(x -> {
+        this.stateChangeDataSource = value.stream().map(x ->
+        {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId()); //CHANGE_ME
             tuple.setText(x.toString()); //CHANGE_ME
@@ -145,18 +129,138 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         this.reason = reason;
     }
 
+    public ExecutionSemester getExecutionSemester() {
+        return executionSemester;
+    }
+
+    public List<TupleDataSourceBean> getExecutionSemesterDataSource() {
+        return executionSemesterDataSource;
+    }
+
+    public void setExecutionSemester(ExecutionSemester executionSemester) {
+        this.executionSemester = executionSemester;
+    }
+
+    public void setExecutionSemesterDataSource(List<ExecutionSemester> value) {
+        this.executionSemesterDataSource = value.stream().map(x ->
+        {
+            TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+            tuple.setText(x.getQualifiedName());
+
+            return tuple;
+
+        }).collect(Collectors.toList());
+    }
+
+    public CompetenceCourse getCompetenceCourse() {
+        return competenceCourse;
+    }
+
+    public List<TupleDataSourceBean> getCompetenceCourseDataSource() {
+        return competenceCourseDataSource;
+    }
+
+    public void setCompetenceCourse(CompetenceCourse competenceCourse) {
+        this.competenceCourse = competenceCourse;
+    }
+
+    public void setCompetenceCourseDataSource(List<CompetenceCourse> value) {
+        this.competenceCourseDataSource = value.stream().sorted(CompetenceCourse.COMPETENCE_COURSE_COMPARATOR_BY_NAME).map(x ->
+        {
+            TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+            tuple.setText(x.getCode() + " - " + (x.getName().replace("'", " ").replace("\"", " ")));
+
+            return tuple;
+
+        }).collect(Collectors.toList());
+    }
+
+    public Person getCertifier() {
+        return certifier;
+    }
+
+    public List<TupleDataSourceBean> getCertifierDataSource() {
+        return certifierDataSource;
+    }
+
+    public void setCertifier(Person certifier) {
+        this.certifier = certifier;
+    }
+
+    public void setCertifierDataSource(List<Person> value) {
+
+        final Set<Person> competenceCourseTeachers = Sets.newHashSet();
+        if (getCompetenceCourse() != null && getExecutionSemester() != null) {
+            competenceCourseTeachers
+                    .addAll(getCompetenceCourse().getExecutionCoursesByExecutionPeriod(getExecutionSemester()).stream()
+                            .flatMap(e -> e.getProfessorshipsSet().stream()).map(p -> p.getPerson()).collect(Collectors.toSet()));
+        }
+
+        this.certifierDataSource = value.stream().sorted(Person.COMPARATOR_BY_NAME).map(x ->
+        {
+            TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+            tuple.setText(x
+                    .getFirstAndLastName() /* + "(" + x.getUsername() + ")" + (competenceCourseTeachers.contains(x) ? "*" : "") */);
+
+            return tuple;
+
+        }).collect(Collectors.toList());
+    }
+
+    public List<Shift> getShifts() {
+        return shifts;
+    }
+
+    public List<TupleDataSourceBean> getShiftsDataSource() {
+        return shiftsDataSource;
+    }
+
+    public void setShifts(List<Shift> shifts) {
+        this.shifts = shifts;
+    }
+
+    public void setShiftsDataSource(List<Shift> value) {
+        this.shiftsDataSource = value.stream().sorted(Shift.SHIFT_COMPARATOR_BY_NAME).map(x ->
+        {
+            TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+            tuple.setText(x.getNome());
+
+            return tuple;
+
+        }).collect(Collectors.toList());
+    }
+
     public CompetenceCourseMarkSheetBean() {
+        update();
+    }
+
+    public void update() {
+        setExecutionSemesterDataSource(ExecutionSemester.readNotClosedExecutionPeriods().stream()
+                .sorted(ExecutionSemester.COMPARATOR_BY_BEGIN_DATE.reversed()).collect(Collectors.toList()));
+
+        setCompetenceCourseDataSource(getExecutionSemester() != null ? getExecutionSemester().getAssociatedExecutionCoursesSet()
+                .stream().flatMap(e -> e.getCompetenceCourses().stream()).collect(Collectors.toList()) : Collections.EMPTY_LIST);
+
+        setEvaluationSeasonDataSource(EvaluationSeason.all().filter(e -> e.getInformation().getActive())
+                .sorted((x, y) -> x.getName().getContent().compareTo(y.getName().getContent())).collect(Collectors.toList()));
+
+        setCertifierDataSource(Bennu.getInstance().getTeachersSet().stream().map(t -> t.getPerson())
+                .sorted(Person.COMPARATOR_BY_NAME).collect(Collectors.toList()));
+
+        setShiftsDataSource(getCompetenceCourse() != null ? getCompetenceCourse()
+                .getExecutionCoursesByExecutionPeriod(getExecutionSemester()).stream()
+                .flatMap(e -> e.getAssociatedShifts().stream()).collect(Collectors.toList()) : Collections.EMPTY_LIST);
 
     }
 
     public CompetenceCourseMarkSheetBean(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
-        this.setEvaluationSeason(competenceCourseMarkSheet.getEvaluationSeason());
-        this.setEvaluationDate(competenceCourseMarkSheet.getEvaluationDate());
-        this.setCheckSum(competenceCourseMarkSheet.getCheckSum());
-        this.setPrinted(competenceCourseMarkSheet.getPrinted());
-        this.setEvaluationDate(competenceCourseMarkSheet.getEvaluationDate());
-        this.setCheckSum(competenceCourseMarkSheet.getCheckSum());
-        this.setPrinted(competenceCourseMarkSheet.getPrinted());
+        //TODO: finish
+//        this.setEvaluationSeason(competenceCourseMarkSheet.getEvaluationSeason());
+//        this.setEvaluationDate(competenceCourseMarkSheet.getEvaluationDate());
     }
 
 }

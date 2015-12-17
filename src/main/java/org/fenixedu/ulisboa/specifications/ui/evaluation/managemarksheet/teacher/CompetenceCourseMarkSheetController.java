@@ -195,9 +195,9 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-
-            competenceCourseMarkSheet.edit(bean.getRectified(), bean.getEvaluationSeason(), bean.getEvaluationDate(),
-                    bean.getCheckSum(), bean.getPrinted());
+//
+//            competenceCourseMarkSheet.edit(bean.getRectified(), bean.getEvaluationSeason(), bean.getEvaluationDate(),
+//                    bean.getCheckSum(), bean.getPrinted());
 
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {

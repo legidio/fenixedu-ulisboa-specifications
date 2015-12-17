@@ -95,8 +95,36 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         List<CompetenceCourseMarkSheet> searchcompetencecoursemarksheetResultsDataSet =
                 filterSearch(executionSemester, competenceCourse);
 
+        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
+        bean.update();
+        setCompetenceCourseMarkSheetBean(bean, model);
+
         model.addAttribute("searchcompetencecoursemarksheetResultsDataSet", searchcompetencecoursemarksheetResultsDataSet);
         return jspPage("search");
+    }
+
+    @RequestMapping(value = _SEARCH_URI, method = RequestMethod.POST)
+    public String search(@RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean,
+            final Model model) {
+
+        setCompetenceCourseMarkSheetBean(bean, model);
+
+        model.addAttribute("searchcompetencecoursemarksheetResultsDataSet",
+                filterSearch(bean.getExecutionSemester(), bean.getCompetenceCourse()));
+        
+        return jspPage("search");
+    }
+
+    private static final String _SEARCHPOSTBACK_URI = "/searchpostback";
+    public static final String SEARCHPOSTBACK_URL = CONTROLLER_URL + _SEARCHPOSTBACK_URI;
+
+    @RequestMapping(value = _SEARCHPOSTBACK_URI, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public @ResponseBody ResponseEntity<String> searchpostback(
+            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
+
+        bean.update();
+        this.setCompetenceCourseMarkSheetBean(bean, model);
+        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
     private Stream<CompetenceCourseMarkSheet> getSearchUniverseSearchDataSet(final ExecutionSemester executionSemester,
@@ -196,6 +224,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
 
+        bean.update();
         this.setCompetenceCourseMarkSheetBean(bean, model);
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
@@ -208,8 +237,8 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         try {
 
-            competenceCourseMarkSheet.edit(bean.getRectified(), bean.getEvaluationSeason(), bean.getEvaluationDate(),
-                    bean.getCheckSum(), bean.getPrinted());
+//            competenceCourseMarkSheet.edit(bean.getRectified(), bean.getEvaluationSeason(), bean.getEvaluationDate(),
+//                    bean.getCheckSum(), bean.getPrinted());
 
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
@@ -240,6 +269,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     public @ResponseBody ResponseEntity<String> createpostback(
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
 
+        bean.update();
         this.setCompetenceCourseMarkSheetBean(bean, model);
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
@@ -335,6 +365,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     public @ResponseBody ResponseEntity<String> createrectificationpostback(
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
 
+        bean.update();
         this.setCompetenceCourseMarkSheetBean(bean, model);
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }

@@ -645,7 +645,7 @@ relation EvaluationSeasonRuleRelation {
 }
 
 class evaluation.markSheet.CompetenceCourseMarkSheet {
-    DateTime evaluationDate;
+    LocalDate evaluationDate;
     String checkSum;
     boolean printed;
 }

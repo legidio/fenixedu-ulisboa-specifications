@@ -35,7 +35,7 @@ import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import com.google.common.collect.Sets;
 
@@ -47,7 +47,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         super();
     }
 
-    protected void init(final EvaluationSeason evaluationSeason, final DateTime evaluationDate) {
+    protected void init(final EvaluationSeason evaluationSeason, final LocalDate evaluationDate) {
         setEvaluationSeason(evaluationSeason);
         setEvaluationDate(evaluationDate);
         checkRules();
@@ -65,7 +65,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
     @Atomic
     public void edit(final CompetenceCourseMarkSheet rectified, final EvaluationSeason evaluationSeason,
-            final DateTime evaluationDate, final java.lang.String checkSum, final boolean printed) {
+            final LocalDate evaluationDate, final java.lang.String checkSum, final boolean printed) {
         setRectified(rectified);
         setEvaluationSeason(evaluationSeason);
         setEvaluationDate(evaluationDate);
@@ -101,7 +101,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     @Atomic
-    public static CompetenceCourseMarkSheet create(final EvaluationSeason evaluationSeason, final DateTime evaluationDate) {
+    public static CompetenceCourseMarkSheet create(final EvaluationSeason evaluationSeason, final LocalDate evaluationDate) {
         CompetenceCourseMarkSheet competenceCourseMarkSheet = new CompetenceCourseMarkSheet();
         competenceCourseMarkSheet.init(evaluationSeason, evaluationDate);
         return competenceCourseMarkSheet;
