@@ -169,6 +169,20 @@ ${portal.angularToolkit()}
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
+					<spring:message code="label.CompetenceCourseMarkSheet.executionCourse" />
+				</div>
+
+				<div class="col-sm-6">
+					<ui-select	id="executionCourseSelect" name="executionCourse" ng-model="$parent.object.executionCourse" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="executionCourse.id as executionCourse in object.executionCourseDataSource | filter: $select.search">
+							<span ng-bind-html="executionCourse.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" />
 				</div>
 

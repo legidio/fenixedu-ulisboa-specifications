@@ -31,9 +31,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
@@ -41,7 +43,6 @@ import org.fenixedu.bennu.IBean;
 import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
-import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetStateChange;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Sets;
@@ -50,11 +51,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
     private EvaluationSeason evaluationSeason;
     private List<TupleDataSourceBean> evaluationSeasonDataSource;
-    private LocalDate evaluationDate;
 
-    private List<CompetenceCourseMarkSheetStateChange> stateChange;
-    private List<TupleDataSourceBean> stateChangeDataSource;
-    private String reason;
+    private LocalDate evaluationDate;
 
     private ExecutionSemester executionSemester;
     private List<TupleDataSourceBean> executionSemesterDataSource;
@@ -62,11 +60,16 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     private CompetenceCourse competenceCourse;
     private List<TupleDataSourceBean> competenceCourseDataSource;
 
+    private ExecutionCourse executionCourse;
+    private List<TupleDataSourceBean> executionCourseDataSource;
+
     private Person certifier;
     private List<TupleDataSourceBean> certifierDataSource;
 
     private Set<Shift> shifts;
     private List<TupleDataSourceBean> shiftsDataSource;
+
+    private String reason;
 
     public EvaluationSeason getEvaluationSeason() {
         return evaluationSeason;
@@ -97,36 +100,6 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
     public void setEvaluationDate(LocalDate evaluationDate) {
         this.evaluationDate = evaluationDate;
-    }
-
-    public List<CompetenceCourseMarkSheetStateChange> getStateChange() {
-        return stateChange;
-    }
-
-    public void setStateChange(List<CompetenceCourseMarkSheetStateChange> value) {
-        stateChange = value;
-    }
-
-    public List<TupleDataSourceBean> getStateChangeDataSource() {
-        return stateChangeDataSource;
-    }
-
-    public void setStateChangeDataSource(List<CompetenceCourseMarkSheetStateChange> value) {
-        this.stateChangeDataSource = value.stream().map(x ->
-        {
-            TupleDataSourceBean tuple = new TupleDataSourceBean();
-            tuple.setId(x.getExternalId()); //CHANGE_ME
-            tuple.setText(x.toString()); //CHANGE_ME
-            return tuple;
-        }).collect(Collectors.toList());
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 
     public ExecutionSemester getExecutionSemester() {
@@ -192,11 +165,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     public void setCertifierDataSource(List<Person> value) {
 
         final Set<Person> competenceCourseTeachers = Sets.newHashSet();
-        if (getCompetenceCourse() != null && getExecutionSemester() != null) {
-            competenceCourseTeachers
-                    .addAll(getCompetenceCourse().getExecutionCoursesByExecutionPeriod(getExecutionSemester()).stream()
-                            .flatMap(e -> e.getProfessorshipsSet().stream()).map(p -> p.getPerson()).collect(Collectors.toSet()));
-        }
+        competenceCourseTeachers.addAll(getFilteredExecutionCourses(getExecutionCourse())
+                .flatMap(e -> e.getProfessorshipsSet().stream()).map(p -> p.getPerson()).collect(Collectors.toSet()));
 
         this.certifierDataSource = value.stream().sorted(Person.COMPARATOR_BY_NAME).map(x ->
         {
@@ -234,6 +204,40 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         }).collect(Collectors.toList());
     }
 
+    public ExecutionCourse getExecutionCourse() {
+        return executionCourse;
+    }
+
+    public List<TupleDataSourceBean> getExecutionCourseDataSource() {
+        return executionCourseDataSource;
+    }
+
+    public void setExecutionCourse(ExecutionCourse executionCourse) {
+        this.executionCourse = executionCourse;
+    }
+
+    public void setExecutionCourseDataSource(List<ExecutionCourse> value) {
+        this.executionCourseDataSource = value.stream().sorted(ExecutionCourse.EXECUTION_COURSE_NAME_COMPARATOR).map(x ->
+        {
+            TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+            
+            final String name = x.getNameI18N().getContent();
+            tuple.setText(name.replace("'", " ").replace("\"", " "));
+
+            return tuple;
+
+        }).collect(Collectors.toList());
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
     public CompetenceCourseMarkSheetBean() {
         update();
     }
@@ -243,7 +247,9 @@ public class CompetenceCourseMarkSheetBean implements IBean {
                 .sorted(ExecutionSemester.COMPARATOR_BY_BEGIN_DATE.reversed()).collect(Collectors.toList()));
 
         setCompetenceCourseDataSource(getExecutionSemester() != null ? getExecutionSemester().getAssociatedExecutionCoursesSet()
-                .stream().flatMap(e -> e.getCompetenceCourses().stream()).collect(Collectors.toList()) : Collections.EMPTY_LIST);
+                .stream().flatMap(e -> e.getCompetenceCourses().stream()).collect(Collectors.toList()) : Collections.emptyList());
+
+        setExecutionCourseDataSource(getFilteredExecutionCourses(null).collect(Collectors.toList()));
 
         setEvaluationSeasonDataSource(EvaluationSeason.all().filter(e -> e.getInformation().getActive())
                 .sorted((x, y) -> x.getName().getContent().compareTo(y.getName().getContent())).collect(Collectors.toList()));
@@ -251,10 +257,19 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         setCertifierDataSource(Bennu.getInstance().getTeachersSet().stream().map(t -> t.getPerson())
                 .sorted(Person.COMPARATOR_BY_NAME).collect(Collectors.toList()));
 
-        setShiftsDataSource(getCompetenceCourse() != null ? getCompetenceCourse()
-                .getExecutionCoursesByExecutionPeriod(getExecutionSemester()).stream()
-                .flatMap(e -> e.getAssociatedShifts().stream()).collect(Collectors.toList()) : Collections.EMPTY_LIST);
+        setShiftsDataSource(getFilteredExecutionCourses(getExecutionCourse()).flatMap(e -> e.getAssociatedShifts().stream())
+                .collect(Collectors.toList()));
 
+    }
+
+    private Stream<ExecutionCourse> getFilteredExecutionCourses(final ExecutionCourse toFilter) {
+
+        if (getCompetenceCourse() == null || getExecutionSemester() == null) {
+            return Collections.<ExecutionCourse> emptyList().stream();
+        }
+
+        return getCompetenceCourse().getExecutionCoursesByExecutionPeriod(getExecutionSemester()).stream()
+                .filter(e -> toFilter == null || e == toFilter);
     }
 
     public CompetenceCourseMarkSheetBean(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
@@ -264,7 +279,9 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         setCompetenceCourse(competenceCourseMarkSheet.getCompetenceCourse());
         setCertifier(competenceCourseMarkSheet.getCertifier());
         setShifts(Sets.newHashSet(competenceCourseMarkSheet.getShiftSet()));
-        
+
+        //TODO: missing execution course
+
         update();
     }
 
