@@ -30,25 +30,28 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.Atomic;
 
-public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSheetStateChange_Base {
+public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSheetStateChange_Base
+        implements Comparable<CompetenceCourseMarkSheetStateChange> {
 
     protected CompetenceCourseMarkSheetStateChange() {
         super();
     }
 
-    protected void init(final CompetenceCourseMarkSheet competenceCourseMarkSheet, final CompetenceCourseMarkSheetStateEnum state,
-            final DateTime date, final java.lang.String reason, final boolean byTeacher) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet);
+    protected void init(final CompetenceCourseMarkSheet markSheet, final CompetenceCourseMarkSheetStateEnum state,
+            final String reason, final boolean byTeacher) {
+
+        setCompetenceCourseMarkSheet(markSheet);
         setState(state);
-        setDate(date);
         setReason(reason);
         setByTeacher(byTeacher);
+        setDate(new DateTime());
+        setResponsible(Authenticate.getUser().getPerson());
         checkRules();
     }
 
@@ -56,6 +59,18 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
         if (getCompetenceCourseMarkSheet() == null) {
             throw new ULisboaSpecificationsDomainException(
                     "error.CompetenceCourseMarkSheetStateChange.competenceCourseMarkSheet.required");
+        }
+
+        if (getState() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheetStateChange.state.required");
+        }
+
+        if (getDate() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheetStateChange.date.required");
+        }
+
+        if (getResponsible() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheetStateChange.responsible.required");
         }
     }
 
@@ -82,12 +97,12 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
     }
 
     @Atomic
-    public static CompetenceCourseMarkSheetStateChange create(final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final CompetenceCourseMarkSheetStateEnum state, final DateTime date, final java.lang.String reason,
+    public static CompetenceCourseMarkSheetStateChange createEditionState(final CompetenceCourseMarkSheet markSheet,
             final boolean byTeacher) {
-        CompetenceCourseMarkSheetStateChange competenceCourseMarkSheetStateChange = new CompetenceCourseMarkSheetStateChange();
-        competenceCourseMarkSheetStateChange.init(competenceCourseMarkSheet, state, date, reason, byTeacher);
-        return competenceCourseMarkSheetStateChange;
+
+        final CompetenceCourseMarkSheetStateChange result = new CompetenceCourseMarkSheetStateChange();
+        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findEdition(), (String) null, byTeacher);
+        return result;
     }
 
     // @formatter: off
@@ -100,6 +115,16 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
             final CompetenceCourseMarkSheet competenceCourseMarkSheet) {
         return competenceCourseMarkSheet.getStateChangeSet().stream()
                 .filter(i -> competenceCourseMarkSheet.equals(i.getCompetenceCourseMarkSheet()));
+    }
+
+    @Override
+    public int compareTo(final CompetenceCourseMarkSheetStateChange o) {
+        int c = getDate().compareTo(o.getDate());
+        return c != 0 ? c : getExternalId().compareTo(o.getExternalId());
+    }
+
+    public boolean isConfirmed() {
+        return getState().isConfirmed();
     }
 
 }

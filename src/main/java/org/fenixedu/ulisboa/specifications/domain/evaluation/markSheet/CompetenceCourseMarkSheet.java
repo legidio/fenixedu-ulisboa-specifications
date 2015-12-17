@@ -32,8 +32,12 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
+import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
+import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.joda.time.LocalDate;
 
@@ -47,39 +51,109 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         super();
     }
 
-    protected void init(final EvaluationSeason evaluationSeason, final LocalDate evaluationDate) {
+    protected void init(final CompetenceCourse competenceCourse, final ExecutionCourse executionCourse,
+            final EvaluationSeason evaluationSeason, final LocalDate evaluationDate, final Person certifier,
+            final Set<Shift> set) {
+
+        setCompetenceCourse(competenceCourse);
+        setExecutionCourse(executionCourse);
         setEvaluationSeason(evaluationSeason);
         setEvaluationDate(evaluationDate);
+        setCertifier(certifier);
         checkRules();
     }
 
     private void checkRules() {
-        if (getRectified() == null) {
-            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.rectified.required");
+        if (getExecutionCourse() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.executionCourse.required");
         }
 
         if (getEvaluationSeason() == null) {
             throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationSeason.required");
         }
+
+        if (getCompetenceCourse() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.competenceCourse.required");
+        }
+
+        if (getExecutionSemester() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.executionSemester.required");
+        }
+
+        if (getCertifier() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.certifier.required");
+        }
+
+        if (getEvaluationDate() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationDate.required");
+        }
+
+        if (getStateChangeSet().isEmpty()) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.states.required");
+        }
+
+        // TODO legidio, needed in future? 
+        // checkIfTeacherIsResponsibleOrCoordinator;
+        checkIfEvaluationDateIsInExamsPeriod();
+        checkIfEvaluationsDateIsEqualToMarkSheetEvaluationDate();
+    }
+
+    protected void checkIfEvaluationDateIsInExamsPeriod() {
+// TODO
+//        CurricularCourse curricularCourse = getCompetenceCourse();
+//        ExecutionDegree executionDegree = getExecutionDegree(getCurricularCourse(), getExecutionPeriod());
+//        ExecutionSemester executionSemester = getExecutionSemester();
+//        Date evaluationDate = getEvaluationDate();
+//
+//        if (executionDegree == null) {
+//            if (!markSheetType.equals(MarkSheetType.IMPROVEMENT) || !curricularCourse.getDegreeCurricularPlan()
+//                    .canSubmitImprovementMarkSheets(executionSemester.getExecutionYear())) {
+//                throw new ULisboaSpecificationsDomainException("error.evaluationDateNotInExamsPeriod");
+//            }
+//
+//        } else if (!executionDegree.isEvaluationDateInExamPeriod(evaluationDate, executionSemester, markSheetType)) {
+//
+//            OccupationPeriod occupationPeriod = executionDegree.getOccupationPeriodFor(executionSemester, markSheetType);
+//            if (occupationPeriod == null) {
+//                throw new ULisboaSpecificationsDomainException("error.evaluationDateNotInExamsPeriod");
+//            } else {
+//                throw new ULisboaSpecificationsDomainException(
+//                        "error.evaluationDateNotInExamsPeriod.withEvaluationDateAndPeriodDates",
+//                        DateFormatUtil.format("dd/MM/yyyy", evaluationDate),
+//                        occupationPeriod.getStartYearMonthDay().toString("dd/MM/yyyy"),
+//                        occupationPeriod.getEndYearMonthDay().toString("dd/MM/yyyy"));
+//            }
+//        }
+    }
+
+    private void checkIfEvaluationsDateIsEqualToMarkSheetEvaluationDate() {
+        for (final EnrolmentEvaluation iter : getEnrolmentEvaluationSet()) {
+            if (!iter.getExamDateYearMonthDay().toLocalDate().isEqual(getEvaluationDate())) {
+                throw new ULisboaSpecificationsDomainException(
+                        "error.MarkSheet.evaluations.examDate.must.be.equal.marksheet.evaluationDate");
+            }
+        }
     }
 
     @Atomic
-    public void edit(final CompetenceCourseMarkSheet rectified, final EvaluationSeason evaluationSeason,
-            final LocalDate evaluationDate, final java.lang.String checkSum, final boolean printed) {
-        setRectified(rectified);
-        setEvaluationSeason(evaluationSeason);
-        setEvaluationDate(evaluationDate);
-        setCheckSum(checkSum);
-        setPrinted(printed);
+    public void edit(final LocalDate evaluationDate, final Person certifier) {
+        init(getCompetenceCourse(), getExecutionCourse(), getEvaluationSeason(), evaluationDate, certifier, getShiftSet());
         checkRules();
     }
 
     public void editEvaluations() {
         // TODO Auto-generated method stub
 
+        if (getEvaluationDate() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationDate.required");
+        }
+
+        if (getEnrolmentEvaluationSet().isEmpty()) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.enrolmentEvaluations.required");
+        }
     }
 
-    public CompetenceCourseMarkSheet rectify() {
+    public CompetenceCourseMarkSheet rectify(String string) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -101,10 +175,14 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     @Atomic
-    public static CompetenceCourseMarkSheet create(final EvaluationSeason evaluationSeason, final LocalDate evaluationDate) {
-        CompetenceCourseMarkSheet competenceCourseMarkSheet = new CompetenceCourseMarkSheet();
-        competenceCourseMarkSheet.init(evaluationSeason, evaluationDate);
-        return competenceCourseMarkSheet;
+    public static CompetenceCourseMarkSheet create(final CompetenceCourse competenceCourse, final ExecutionCourse executionCourse,
+            final EvaluationSeason evaluationSeason, final LocalDate evaluationDate, final Person certifier,
+            final Set<Shift> shifts, final boolean byTeacher) {
+
+        final CompetenceCourseMarkSheet result = new CompetenceCourseMarkSheet();
+        result.init(competenceCourse, executionCourse, evaluationSeason, evaluationDate, certifier, shifts);
+        CompetenceCourseMarkSheetStateChange.createEditionState(result, byTeacher);
+        return result;
     }
 
     // @formatter: off
@@ -125,6 +203,14 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         }
 
         return result.stream();
+    }
+
+    private CompetenceCourseMarkSheetStateChange getStateChange() {
+        return getStateChangeSet().stream().max(CompetenceCourseMarkSheetStateChange::compareTo).get();
+    }
+
+    public boolean isConfirmed() {
+        return getStateChange().isConfirmed();
     }
 
 }

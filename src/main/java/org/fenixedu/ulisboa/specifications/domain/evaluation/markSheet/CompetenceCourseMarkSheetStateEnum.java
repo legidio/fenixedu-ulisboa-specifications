@@ -32,18 +32,50 @@ import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
 public enum CompetenceCourseMarkSheetStateEnum {
 
-    CREATED,
+    EDITION,
 
-    NOT_CONFIRMED,
+    SUBMITTED,
 
     CONFIRMED,
 
-    CANCELED,
+    CANCELLED,
 
     ;
 
     public LocalizedString getDescriptionI18N() {
         return ULisboaSpecificationsUtil.bundleI18N(getClass().getSimpleName() + "." + name());
+    }
+
+    static public CompetenceCourseMarkSheetStateEnum findEdition() {
+        return EDITION;
+    }
+
+    static public CompetenceCourseMarkSheetStateEnum findSubmited() {
+        return SUBMITTED;
+    }
+
+    static public CompetenceCourseMarkSheetStateEnum findConfirmed() {
+        return CONFIRMED;
+    }
+
+    static public CompetenceCourseMarkSheetStateEnum findCancelled() {
+        return CANCELLED;
+    }
+
+    public boolean isEdition() {
+        return this == EDITION;
+    }
+
+    public boolean isSubmitted() {
+        return this == SUBMITTED;
+    }
+
+    public boolean isConfirmed() {
+        return this == CONFIRMED;
+    }
+
+    public boolean isCancelled() {
+        return this == CANCELLED;
     }
 
 }

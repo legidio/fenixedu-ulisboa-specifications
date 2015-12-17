@@ -659,7 +659,7 @@ class evaluation.markSheet.CompetenceCourseMarkSheetStateChange  {
 
 relation CompetenceCourseMarkSheetRectification {
 	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectified {
-		multiplicity 1..1;
+		multiplicity 0..1;
 	}
 	
 	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectification {
@@ -693,6 +693,16 @@ relation CompetenceCourseMarkSheetRelation {
     }
     
     .org.fenixedu.academic.domain.CompetenceCourse playsRole competenceCourse {
+		multiplicity 1..1;
+	}
+}
+
+relation CompetenceCourseMarkSheetExecutionCourse {
+    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+        multiplicity *;
+    }
+    
+    protected .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse {
 		multiplicity 1..1;
 	}
 }
