@@ -78,16 +78,30 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
-		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a> |&nbsp;&nbsp; <span
+			code="label.event.back" /></a>&nbsp;|&nbsp; 
+			
+	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
+		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>&nbsp;|&nbsp;
+		
+	<span
 		class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.update" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
+			code="label.event.update" /></a>&nbsp;|&nbsp;
+			
+	<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
-			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a> |&nbsp;&nbsp; <span
+			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>&nbsp;|&nbsp; 
+			
+	<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>/print/${competenceCourseMarkSheet.externalId}"><spring:message
+			code="label.event.evaluation.manageMarkSheet.print" /></a>&nbsp;|&nbsp;
+			
+	<span
 		class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"
+			code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>&nbsp;|&nbsp; 
+
+	<span class="glyphicon glyphicon-cog"
 		aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/annul"><spring:message
 			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a>
@@ -137,6 +151,10 @@ ${portal.angularToolkit()}
 			<table class="table">
 				<tbody>
 					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.competenceCourse.code}"/> - <c:out value="${competenceCourseMarkSheet.competenceCourse.nameI18N.content}"/></td>
+					</tr>
+					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
 						<td><c:out value='${competenceCourseMarkSheet.evaluationSeason.name.content}' /></td>
 					</tr>
@@ -150,7 +168,7 @@ ${portal.angularToolkit()}
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.shifts}' /></td>
+						<td><c:out value='${competenceCourseMarkSheet.shiftsDescription}' /></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
@@ -165,14 +183,19 @@ ${portal.angularToolkit()}
 						<td><c:out value='${competenceCourseMarkSheet.rectified}' /></td>
 					</tr>
 					<tr>
-						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checksum" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.checksum}' /></td>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checkSum" /></th>
+						<td><c:out value='${competenceCourseMarkSheet.checkSum}' /></td>
 					</tr>
 				</tbody>
 			</table>
 		</form>
 	</div>
 </div>
+
+<strong>FALTA ESTADOS!</strong>
+
+<strong>FALTA ALUNOS JÁ ASSOCIADOS!</strong>
+
 
 <script>
     $(document).ready(function() {

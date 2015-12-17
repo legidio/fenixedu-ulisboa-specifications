@@ -658,7 +658,7 @@ class evaluation.markSheet.CompetenceCourseMarkSheetStateChange  {
 }
 
 relation CompetenceCourseMarkSheetRectification {
-	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectified {
+	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectifies {
 		multiplicity 0..1;
 	}
 	

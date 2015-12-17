@@ -36,9 +36,12 @@ import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Sets;
@@ -51,15 +54,17 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         super();
     }
 
-    protected void init(final CompetenceCourse competenceCourse, final ExecutionCourse executionCourse,
-            final EvaluationSeason evaluationSeason, final LocalDate evaluationDate, final Person certifier,
-            final Set<Shift> set) {
+    protected void init(final ExecutionSemester executionSemester, final CompetenceCourse competenceCourse,
+            final ExecutionCourse executionCourse, final EvaluationSeason evaluationSeason, final LocalDate evaluationDate,
+            final Person certifier, final Set<Shift> shifts) {
 
+        setExecutionSemester(executionSemester);
         setCompetenceCourse(competenceCourse);
         setExecutionCourse(executionCourse);
         setEvaluationSeason(evaluationSeason);
         setEvaluationDate(evaluationDate);
         setCertifier(certifier);
+        getShiftSet().addAll(shifts);
         checkRules();
     }
 
@@ -86,10 +91,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
         if (getEvaluationDate() == null) {
             throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationDate.required");
-        }
-
-        if (getStateChangeSet().isEmpty()) {
-            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.states.required");
         }
 
         // TODO legidio, needed in future? 
@@ -137,7 +138,8 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
     @Atomic
     public void edit(final LocalDate evaluationDate, final Person certifier) {
-        init(getCompetenceCourse(), getExecutionCourse(), getEvaluationSeason(), evaluationDate, certifier, getShiftSet());
+        init(getExecutionSemester(), getCompetenceCourse(), getExecutionCourse(), getEvaluationSeason(), evaluationDate,
+                certifier, getShiftSet());
         checkRules();
     }
 
@@ -175,12 +177,13 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     @Atomic
-    public static CompetenceCourseMarkSheet create(final CompetenceCourse competenceCourse, final ExecutionCourse executionCourse,
+    public static CompetenceCourseMarkSheet create(final ExecutionSemester executionSemester,
+            final CompetenceCourse competenceCourse, final ExecutionCourse executionCourse,
             final EvaluationSeason evaluationSeason, final LocalDate evaluationDate, final Person certifier,
             final Set<Shift> shifts, final boolean byTeacher) {
 
         final CompetenceCourseMarkSheet result = new CompetenceCourseMarkSheet();
-        result.init(competenceCourse, executionCourse, evaluationSeason, evaluationDate, certifier, shifts);
+        result.init(executionSemester, competenceCourse, executionCourse, evaluationSeason, evaluationDate, certifier, shifts);
         CompetenceCourseMarkSheetStateChange.createEditionState(result, byTeacher);
         return result;
     }
@@ -197,12 +200,12 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     public static Stream<CompetenceCourseMarkSheet> findBy(final ExecutionSemester executionSemester,
             final CompetenceCourse competenceCourse) {
 
-        final Set<CompetenceCourseMarkSheet> result = Sets.<CompetenceCourseMarkSheet> newHashSet();
+        final Set<CompetenceCourseMarkSheet> result = Sets.newHashSet();
         if (executionSemester != null && competenceCourse != null) {
-            executionSemester.getCompetenceCourseMarkSheetSet();
+            result.addAll(executionSemester.getCompetenceCourseMarkSheetSet());
         }
 
-        return result.stream();
+        return result.stream().filter(c -> c.getCompetenceCourse() == competenceCourse);
     }
 
     private CompetenceCourseMarkSheetStateChange getStateChange() {
@@ -211,6 +214,53 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
     public boolean isConfirmed() {
         return getStateChange().isConfirmed();
+    }
+
+    public DateTime getCreationDate() {
+        //TODO LE:
+        return getStateDate();
+    }
+
+    public Person getCreator() {
+        //TODO LE:
+        return User.findByUsername(getVersioningUpdatedBy().getUsername()).getPerson();
+    }
+
+    public String getState() {
+        //TODO:LE
+        return getStateChange().getState().getDescriptionI18N().getContent();
+    }
+
+    public DateTime getStateDate() {
+        //TODO:LE
+        return getStateChange().getDate();
+    }
+
+    public boolean getRectified() {
+        return !getRectificationSet().isEmpty();
+    }
+
+    @Atomic
+    public void markAsPrinted() {
+        super.setPrinted(true);
+    }
+
+    public ExecutionYear getExecutionYear() {
+        return getExecutionSemester().getExecutionYear();
+    }
+
+    public String getShiftsDescription() {
+        final StringBuilder result = new StringBuilder();
+
+        for (final Shift shift : getShiftSet()) {
+            result.append(shift.getNome()).append(", ");
+        }
+
+        if (result.toString().endsWith(", ")) {
+            result.delete(result.length() - 2, result.length());
+        }
+
+        return result.toString();
     }
 
 }

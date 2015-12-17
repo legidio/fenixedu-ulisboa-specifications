@@ -111,6 +111,22 @@ ${portal.angularToolkit()}
 				
 				$scope.onExecutionSemesterChange = function(model) {					
 					$scope.object.competenceCourse = '';
+					$scope.object.executionCourse = '';
+					$scope.object.certifier = '';
+					$scope.object.shifts = [];
+					$scope.onBeanChange(model);
+				}
+				
+				$scope.onCompetenceCourseChange = function(model) {
+					$scope.object.executionCourse = '';
+					$scope.object.certifier = '';
+					$scope.object.shifts = [];
+					$scope.onBeanChange(model);
+				}
+				
+				$scope.onExecutionCourseChange = function(model) {
+					$scope.object.certifier = '';
+					$scope.object.shifts = [];
 					$scope.onBeanChange(model);
 				}
 				
@@ -158,7 +174,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-6">
-					<ui-select	id="competenceCourseSelect" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+					<ui-select	id="competenceCourseSelect" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap" on-select="onCompetenceCourseChange($model)" on-remove="onCompetenceCourseChange($model)">
 						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
 						<ui-select-choices	repeat="competenceCourse.id as competenceCourse in object.competenceCourseDataSource | filter: $select.search">
 							<span ng-bind-html="competenceCourse.text | highlight: $select.search"></span>
@@ -173,7 +189,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-6">
-					<ui-select	id="executionCourseSelect" name="executionCourse" ng-model="$parent.object.executionCourse" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+					<ui-select	id="executionCourseSelect" name="executionCourse" ng-model="$parent.object.executionCourse" theme="bootstrap" on-select="onExecutionCourseChange($model)" on-remove="onExecutionCourseChange($model)">
 						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
 						<ui-select-choices	repeat="executionCourse.id as executionCourse in object.executionCourseDataSource | filter: $select.search">
 							<span ng-bind-html="executionCourse.text | highlight: $select.search"></span>

@@ -179,20 +179,20 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 	
 	<c:choose>
 		<c:when test="${not empty searchcompetencecoursemarksheetResultsDataSet}">
+			<spring:message code="label.yes" var="yesLabel"/>
+			<spring:message code="label.no" var="noLabel"/>
 		
 			<table id="searchcompetencecoursemarksheetTable" class="table responsive table-bordered table-hover" width="100%">
 				<thead>
 					<tr>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.creationDate" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.creator" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.stateDate" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.creationDate" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
 						<%-- Operations Column --%>
 						<th></th>
 					</tr>
@@ -200,18 +200,16 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 				<tbody>
 					<c:forEach var="searchResult" items="${searchcompetencecoursemarksheetResultsDataSet}">
 					<tr>
-						<td><c:out value="${searchResult.evaluationSeason}"></c:out></td>
-						<td><c:out value='${searchResult.evaluationDate}'/></td>
-						<td><c:out value='${searchResult.certifier}'/></td>
-						<td><c:out value='${searchResult.shifts}'/></td>
-						<td><c:out value='${searchResult.creationDate}'/></td>
-						<td><c:out value='${searchResult.creator}'/></td>
+						<td><c:out value="${searchResult.evaluationSeason.name.content}"></c:out></td>
+						<td><joda:format value="${searchResult.evaluationDate}" style="S-"/></td>
 						<td><c:out value='${searchResult.state}'/></td>
-						<td><c:out value='${searchResult.stateDate}'/></td>
-						<td><c:out value='${searchResult.printed}'/></td>
-						<td><c:out value='${searchResult.rectified}'/></td>
+						<td><c:out value='${searchResult.certifier.firstAndLastName}'/></td>
+						<td><joda:format value="${searchResult.creationDate}" style="SM" /></td>
+						<td><c:out value='${searchResult.printed ? yesLabel : noLabel}'/></td>
+						<td><c:out value='${searchResult.rectified ? yesLabel : noLabel}'/></td>
+						<td><c:out value='${searchResult.shiftsDescription}'/></td>
 						<td>
-							<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>{searchResult.externalId}"><spring:message code='label.view'/></a>
+							<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>${searchResult.externalId}"><spring:message code='label.view'/></a>
 						</td>
 					</tr>
 					</c:forEach>

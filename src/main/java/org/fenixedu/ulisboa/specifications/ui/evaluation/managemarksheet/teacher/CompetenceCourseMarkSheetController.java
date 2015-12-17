@@ -237,9 +237,9 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             final Model model, final RedirectAttributes redirectAttributes) {
 
         try {
-            final CompetenceCourseMarkSheet markSheet =
-                    CompetenceCourseMarkSheet.create(bean.getCompetenceCourse(), bean.getExecutionCourse(),
-                            bean.getEvaluationSeason(), bean.getEvaluationDate(), bean.getCertifier(), bean.getShifts(), true);
+            final CompetenceCourseMarkSheet markSheet = CompetenceCourseMarkSheet.create(bean.getExecutionSemester(),
+                    bean.getCompetenceCourse(), bean.getExecutionCourse(), bean.getEvaluationSeason(), bean.getEvaluationDate(),
+                    bean.getCertifier(), bean.getShifts(), true);
 
             model.addAttribute("competenceCourseMarkSheet", markSheet);
             return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model,

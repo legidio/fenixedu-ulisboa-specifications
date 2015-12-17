@@ -26,15 +26,19 @@
  */
 package org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.administrative;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.CompetenceCourseMarkSheetBean;
+import org.fenixedu.ulisboa.specifications.service.evaluation.MarkSheetDocumentPrintService;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
@@ -280,9 +284,9 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             final Model model, final RedirectAttributes redirectAttributes) {
 
         try {
-            final CompetenceCourseMarkSheet markSheet =
-                    CompetenceCourseMarkSheet.create(bean.getCompetenceCourse(), bean.getExecutionCourse(),
-                            bean.getEvaluationSeason(), bean.getEvaluationDate(), bean.getCertifier(), bean.getShifts(), false);
+            final CompetenceCourseMarkSheet markSheet = CompetenceCourseMarkSheet.create(bean.getExecutionSemester(),
+                    bean.getCompetenceCourse(), bean.getExecutionCourse(), bean.getEvaluationSeason(), bean.getEvaluationDate(),
+                    bean.getCertifier(), bean.getShifts(), false);
 
             model.addAttribute("competenceCourseMarkSheet", markSheet);
             return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model,
@@ -456,6 +460,22 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
+    }
+
+    private static final String _PRINT_URI = "/print/";
+    public static final String PRINT_URL = CONTROLLER_URL + _PRINT_URI;
+
+    @RequestMapping(value = _PRINT_URI + "{oid}")
+    public void print(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final HttpServletResponse response) throws IOException {
+
+        final CompetenceCourse competenceCourse = competenceCourseMarkSheet.getCompetenceCourse();
+        final String filename = competenceCourse.getCode() + "_"
+                + competenceCourse.getName().replace(' ', '_').replace('/', '-').replace('\\', '-')
+                + competenceCourseMarkSheet.getEvaluationDate().toString("yyyy-MM-dd") + ".pdf";
+
+        writeFile(response, filename, MarkSheetDocumentPrintService.PDF,
+                MarkSheetDocumentPrintService.print(competenceCourseMarkSheet));
     }
 
 }
