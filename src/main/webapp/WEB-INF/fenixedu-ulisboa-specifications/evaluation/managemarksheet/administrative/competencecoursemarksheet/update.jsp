@@ -125,9 +125,8 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_executionSemester" class="form-control" type="text" ng-model="object.executionSemester"
-						name="executionsemester" required />
+				<div class="col-sm-6">
+					<c:out value="${competenceCourseMarkSheet.executionSemester.qualifiedName}" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -135,9 +134,8 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_competenceCourse" class="form-control" type="text" ng-model="object.competenceCourse"
-						name="competencecourse" required />
+				<div class="col-sm-6">
+					<c:out value="${competenceCourseMarkSheet.code + ' - ' + competenceCourseMarkSheet.competenceCourse.name}" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -146,12 +144,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-4">
-					<%-- Relation to side 1 drop down rendered in input --%>
-					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="form-control" name="evaluationseason"
-						ng-model="$parent.object.evaluationSeason" theme="bootstrap" ng-disabled="disabled"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices
-						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
-					<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+					<c:out value="${competenceCourseMarkSheet.evaluationSeason.name.content}" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -159,18 +152,22 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" />
 				</div>
 
-				<%-- <div class="col-sm-4">
-	<input id="competenceCourseMarkSheet_evaluationDate" class="form-control" type="text" name="evaluationdate"  bennu-datetime  />
-</div> --%>
+				<div class="col-sm-4">
+					<input class="form-control" type="text" bennu-date="object.evaluationDate" required="true"/>
+				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.certifier" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_certifier" class="form-control" type="text" ng-model="object.certifier" name="certifier"
-						required />
+				<div class="col-sm-6">
+					<ui-select	id="certifierSelect" name="certifier" ng-model="$parent.object.certifier" theme="bootstrap">
+						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="certifier.id as certifier in object.certifierDataSource | filter: $select.search">
+							<span ng-bind-html="certifier.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 			<div class="form-group row">
@@ -178,19 +175,15 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.shifts" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_shifts" class="form-control" type="text" ng-model="object.shifts" name="shifts" />
+				<div class="col-sm-6">
+					<c:out value="${competenceCourseMarkSheet.evaluationSeason.shifts}" />
 				</div>
 			</div>
 		</div>
 		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<button type="button" class="btn btn-primary" role="button" ng-click="updaMarksheet()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>
 
-<script>
-    $(document).ready(function() {
 
-    });
-</script>

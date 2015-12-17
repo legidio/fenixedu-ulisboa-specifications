@@ -9,6 +9,7 @@ import org.fenixedu.qubdocs.util.reports.helpers.MoneyHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.NumbersHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.StringsHelper;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.config.MarkSheetSettings;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 
 import com.qubit.terra.docs.core.DocumentGenerator;
 import com.qubit.terra.docs.util.IDocumentFieldsData;
@@ -21,10 +22,9 @@ public class MarkSheetDocumentPrintService {
 
         private static final String KEY = "markSheet";
 
-        //TODO: change
-        private Object competenceCourseMarkSheet;
+        private CompetenceCourseMarkSheet competenceCourseMarkSheet;
 
-        public CompetenceCourseMarkSheetDataProvider(Object competenceCourseMarkSheet) {
+        public CompetenceCourseMarkSheetDataProvider(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
             this.competenceCourseMarkSheet = competenceCourseMarkSheet;
         }
 
@@ -59,8 +59,7 @@ public class MarkSheetDocumentPrintService {
         generator.registerHelper("money", new MoneyHelper());
     }
 
-    //TODO: change
-    public static byte[] print(Object competenceCourseMarkSheet) {
+    public static byte[] print(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
 
         final DocumentGenerator generator = DocumentGenerator.create(
                 new ByteArrayInputStream(MarkSheetSettings.getInstance().getTemplateFile().getContent()), DocumentGenerator.PDF);

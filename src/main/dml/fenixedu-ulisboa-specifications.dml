@@ -692,7 +692,7 @@ relation CompetenceCourseMarkSheetRelation {
         multiplicity *;
     }
     
-    protected .org.fenixedu.academic.domain.CompetenceCourse playsRole competenceCourse {
+    .org.fenixedu.academic.domain.CompetenceCourse playsRole competenceCourse {
 		multiplicity 1..1;
 	}
 }
@@ -702,7 +702,7 @@ relation CompetenceCourseMarkSheetShift {
         multiplicity *;
     }
     
-    protected .org.fenixedu.academic.domain.Shift playsRole shift {
+    .org.fenixedu.academic.domain.Shift playsRole shift {
 		multiplicity *;
 	}
 }
@@ -742,7 +742,7 @@ relation CompetenceCourseMarkSheetCertifier {
         multiplicity *;
     }
 
-    protected .org.fenixedu.academic.domain.Person playsRole certifier {
+    .org.fenixedu.academic.domain.Person playsRole certifier {
 		multiplicity 1..1;
 	}
 }

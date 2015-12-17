@@ -65,7 +65,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     private Person certifier;
     private List<TupleDataSourceBean> certifierDataSource;
 
-    private List<Shift> shifts;
+    private Set<Shift> shifts;
     private List<TupleDataSourceBean> shiftsDataSource;
 
     public EvaluationSeason getEvaluationSeason() {
@@ -202,24 +202,24 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
-            tuple.setText(x
-                    .getFirstAndLastName() /* + "(" + x.getUsername() + ")" + (competenceCourseTeachers.contains(x) ? "*" : "") */);
+            tuple.setText(
+                    (competenceCourseTeachers.contains(x) ? "* " : "") + x.getFirstAndLastName() + " (" + x.getUsername() + ")");
 
             return tuple;
 
         }).collect(Collectors.toList());
     }
 
-    public List<Shift> getShifts() {
+    public Set<Shift> getShifts() {
         return shifts;
+    }
+
+    public void setShifts(Set<Shift> shifts) {
+        this.shifts = shifts;
     }
 
     public List<TupleDataSourceBean> getShiftsDataSource() {
         return shiftsDataSource;
-    }
-
-    public void setShifts(List<Shift> shifts) {
-        this.shifts = shifts;
     }
 
     public void setShiftsDataSource(List<Shift> value) {
@@ -258,9 +258,14 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public CompetenceCourseMarkSheetBean(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
-        //TODO: finish
-//        this.setEvaluationSeason(competenceCourseMarkSheet.getEvaluationSeason());
-//        this.setEvaluationDate(competenceCourseMarkSheet.getEvaluationDate());
+        setEvaluationDate(competenceCourseMarkSheet.getEvaluationDate());
+        setEvaluationSeason(competenceCourseMarkSheet.getEvaluationSeason());
+        setExecutionSemester(competenceCourseMarkSheet.getExecutionSemester());
+        setCompetenceCourse(competenceCourseMarkSheet.getCompetenceCourse());
+        setCertifier(competenceCourseMarkSheet.getCertifier());
+        setShifts(Sets.newHashSet(competenceCourseMarkSheet.getShiftSet()));
+        
+        update();
     }
 
 }

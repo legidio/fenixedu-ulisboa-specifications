@@ -138,15 +138,15 @@ ${portal.angularToolkit()}
 				<tbody>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.evaluationSeason}' /></td>
+						<td><c:out value='${competenceCourseMarkSheet.evaluationSeason.name.content}' /></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.evaluationDate}' /></td>
+						<td><joda:format value="${competenceCourseMarkSheet.evaluationDate}" style="S-"/></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.certifier}' /></td>
+						<td><c:out value='${competenceCourseMarkSheet.certifier.name}' /></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
