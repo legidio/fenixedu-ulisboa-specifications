@@ -1,3 +1,6 @@
+<%@page import="org.fenixedu.academic.domain.EnrolmentEvaluation"%>
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet"%>
+<%@page import="org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices"%>
 <%@page
 	import="org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.administrative.CompetenceCourseMarkSheetController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -80,28 +83,29 @@ ${portal.angularToolkit()}
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>"><spring:message
 			code="label.event.back" /></a>&nbsp;|&nbsp; 
 			
-	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
-		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>&nbsp;|&nbsp;
-		
 	<span
 		class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
 			code="label.event.update" /></a>&nbsp;|&nbsp;
 			
-	<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
+	<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
 			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>&nbsp;|&nbsp; 
 			
-	<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
+	<span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>/print/${competenceCourseMarkSheet.externalId}"><spring:message
 			code="label.event.evaluation.manageMarkSheet.print" /></a>&nbsp;|&nbsp;
 			
 	<span
-		class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
+		class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>&nbsp;|&nbsp; 
+			code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>&nbsp;|&nbsp;
+			
+	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
+		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>&nbsp;|&nbsp;
+			 
 
-	<span class="glyphicon glyphicon-cog"
+	<span class="glyphicon glyphicon-ban-circle"
 		aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/annul"><spring:message
 			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a>
@@ -146,10 +150,18 @@ ${portal.angularToolkit()}
 			<spring:message code="label.details" />
 		</h3>
 	</div>
+	
+	<spring:message code="label.yes" var="yesLabel" />	
+	<spring:message code="label.no" var="noLabel" />
+
 	<div class="panel-body">
 		<form method="post" class="form-horizontal">
 			<table class="table">
 				<tbody>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.executionSemester" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.executionSemester.qualifiedName}"/></td>
+					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
 						<td><c:out value="${competenceCourseMarkSheet.competenceCourse.code}"/> - <c:out value="${competenceCourseMarkSheet.competenceCourse.nameI18N.content}"/></td>
@@ -163,28 +175,28 @@ ${portal.angularToolkit()}
 						<td><joda:format value="${competenceCourseMarkSheet.evaluationDate}" style="S-"/></td>
 					</tr>
 					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.state}"/></td>
+					</tr>
+					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
 						<td><c:out value='${competenceCourseMarkSheet.certifier.name}' /></td>
 					</tr>
 					<tr>
-						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.shiftsDescription}' /></td>
-					</tr>
-					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
-						<td><c:if test="${competenceCourseMarkSheet.printed}">
-								<spring:message code="label.true" />
-							</c:if> <c:if test="${not competenceCourseMarkSheet.printed}">
-								<spring:message code="label.false" />
-							</c:if></td>
+						<td><c:out value="${competenceCourseMarkSheet.printed ? yesLabel : noLabel}"></c:out></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.rectified}' /></td>
+						<td><c:out value='${competenceCourseMarkSheet.rectified ? yesLabel : noLabel}' /></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checkSum" /></th>
 						<td><c:out value='${competenceCourseMarkSheet.checkSum}' /></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
+						<td><c:out value='${competenceCourseMarkSheet.shiftsDescription}' /></td>
 					</tr>
 				</tbody>
 			</table>
@@ -192,13 +204,51 @@ ${portal.angularToolkit()}
 	</div>
 </div>
 
-<strong>FALTA ESTADOS!</strong>
-
-<strong>FALTA ALUNOS JÁ ASSOCIADOS!</strong>
-
-
-<script>
-    $(document).ready(function() {
-
-    });
+<h2><spring:message code="label.CompetenceCourseMarkSheet.stateChanges"></spring:message></h2>
+<table id="stateChangesTable" class="table responsive table-bordered table-hover" width="100%">
+	<thead>
+		<tr>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.date" /></th>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.state" /></th>
+<%-- 			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.responsible" /></th> --%>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.byTeacher" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="each" items="${competenceCourseMarkSheet.stateChangeSet}">
+		<tr>
+			<td><joda:format value="${each.date}" style="SM" /></td>
+			<td><c:out value="${each.state.descriptionI18N.content}"></c:out></td>
+<%-- 			<td><c:out value="${each.responsible}"></c:out></td> --%>
+			<td><c:out value="${each.byTeacher ? yesLabel : noLabel}"></c:out></td>
+		</tr>
+		</c:forEach>
+	</tbody>
+</table>
+<script type="text/javascript">
+	createDataTables('stateChangesTable',true /*filterable*/, false /*show tools*/, true /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 </script>
+
+<h2><spring:message code="label.CompetenceCourseMarkSheet.enrolmentEvaluations"></spring:message></h2>
+<table id="enrolmentEvaluationsTable" class="table responsive table-bordered table-hover" width="100%">
+	<thead>
+		<tr>
+			<th><spring:message code="label.Student.number" /></th>
+			<th><spring:message code="label.Student.name" /></th>
+			<th><spring:message code="label.Student.statutes" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="each" items="${competenceCourseMarkSheet.enrolmentEvaluationSet}">
+		<tr>
+			<td><c:out value="${each.registration.student.number}"></c:out></td>
+			<td><c:out value="${each.registration.student.name}"></c:out></td>
+			<td><%= StatuteServices.getStatuteTypesDescription(((EnrolmentEvaluation) pageContext.findAttribute("each")).getRegistration()) %> </td>
+		</tr>
+		</c:forEach>
+	</tbody>
+</table>
+<script type="text/javascript">
+	createDataTables('enrolmentEvaluationsTable',true /*filterable*/, false /*show tools*/, true /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
+</script>
+

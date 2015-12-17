@@ -45,7 +45,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -102,14 +102,19 @@ ${portal.angularToolkit()}
 
 				$scope.object = angular
 					.fromJson('${competenceCourseMarkSheetBeanJson}');
+
 				$scope.postBack = createAngularPostbackFunction($scope);
 
 				//Begin here of Custom Screen business JS - code
+				$scope.updateMarkSheet = function(){
+					$('#updateForm').submit();
+				}
+				
 
 			    } ]);
 </script>
 
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
+<form id="updateForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
 	ng-controller="CompetenceCourseMarkSheetController"
 	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}'>
 
@@ -120,6 +125,7 @@ ${portal.angularToolkit()}
 
 	<div class="panel panel-default">
 		<div class="panel-body">
+		
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
@@ -135,7 +141,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-6">
-					<c:out value="${competenceCourseMarkSheet.code + ' - ' + competenceCourseMarkSheet.competenceCourse.name}" />
+					<c:out value="${competenceCourseMarkSheet.competenceCourse.code}" /> - <c:out value="${competenceCourseMarkSheet.competenceCourse.name}" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -144,7 +150,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-4">
-					<c:out value="${competenceCourseMarkSheet.evaluationSeason.name.content}" />
+					<span><c:out value="${competenceCourseMarkSheet.evaluationSeason.name.content}" /></span>
 				</div>
 			</div>
 			<div class="form-group row">
@@ -170,18 +176,10 @@ ${portal.angularToolkit()}
 					</ui-select>
 				</div>
 			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.CompetenceCourseMarkSheet.shifts" />
-				</div>
 
-				<div class="col-sm-6">
-					<c:out value="${competenceCourseMarkSheet.evaluationSeason.shifts}" />
-				</div>
-			</div>
 		</div>
 		<div class="panel-footer">
-			<button type="button" class="btn btn-primary" role="button" ng-click="updaMarksheet()"><spring:message code="label.submit" /></button>
+			<button type="button" class="btn btn-primary" role="button" ng-click="updateMarkSheet()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>
