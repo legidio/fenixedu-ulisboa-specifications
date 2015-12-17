@@ -271,7 +271,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         }
 
         return result.toString();
-	}
+    }
 
     public Set<Enrolment> getEnrolmentsNotInAnyMarkSheet() {
         final Set<Enrolment> result = Sets.newHashSet();
@@ -279,22 +279,30 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         final ExecutionSemester executionSemester = getExecutionSemester();
         final EvaluationSeason evaluationSeason = getEvaluationSeason();
 
-        for (final CurricularCourse curricularCourse : getExecutionCourse().getAssociatedCurricularCoursesSet()) {
-            for (final Enrolment enrolment : getEnrolmentsForGradeSubmission(curricularCourse)) {
+        for (final ExecutionCourse executionCourse : getCompetenceCourse()
+                .getExecutionCoursesByExecutionPeriod(getExecutionSemester())) {
 
-                final Optional<EnrolmentEvaluation> finalEvaluation =
-                        enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
-                if (finalEvaluation.isPresent()) {
-                    continue;
+            if (getExecutionCourse() == null || executionCourse == getExecutionCourse()) {
+
+                for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
+
+                    for (final Enrolment enrolment : getEnrolmentsForGradeSubmission(curricularCourse)) {
+
+                        final Optional<EnrolmentEvaluation> finalEvaluation =
+                                enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
+                        if (finalEvaluation.isPresent()) {
+                            continue;
+                        }
+
+                        final Optional<EnrolmentEvaluation> temporaryEvaluation =
+                                enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
+                        if (temporaryEvaluation.isPresent() && temporaryEvaluation.get().getCompetenceCourseMarkSheet() != null) {
+                            continue;
+                        }
+
+                        result.add(enrolment);
+                    }
                 }
-
-                final Optional<EnrolmentEvaluation> temporaryEvaluation =
-                        enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
-                if (temporaryEvaluation.isPresent() && temporaryEvaluation.get().getCompetenceCourseMarkSheet() != null) {
-                    continue;
-                }
-
-                result.add(enrolment);
             }
         }
 
