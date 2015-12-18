@@ -31,6 +31,7 @@ import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.bennu.IBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonInformation;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 
 public class EvaluationSeasonBean implements IBean {
 
@@ -149,7 +150,7 @@ public class EvaluationSeasonBean implements IBean {
         this.setSpecialAuthorization(evaluationSeason.getSpecialAuthorization());
         this.setSeasonOrder(getInformation().getSeasonOrder());
         this.setActive(getInformation().getActive());
-        this.setRequiresEnrolmentEvaluation(getInformation().getRequiresEnrolmentEvaluation());
+        this.setRequiresEnrolmentEvaluation(EvaluationSeasonServices.isRequiresEnrolmentEvaluation(evaluationSeason));
     }
 
 }

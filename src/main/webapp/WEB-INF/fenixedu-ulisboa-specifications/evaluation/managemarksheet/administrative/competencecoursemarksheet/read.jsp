@@ -1,6 +1,5 @@
 <%@page import="org.fenixedu.academic.domain.EnrolmentEvaluation"%>
 <%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet"%>
-<%@page import="org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices"%>
 <%@page
 	import="org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.administrative.CompetenceCourseMarkSheetController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>

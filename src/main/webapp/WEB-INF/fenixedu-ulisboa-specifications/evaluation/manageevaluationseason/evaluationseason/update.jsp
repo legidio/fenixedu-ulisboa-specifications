@@ -189,20 +189,6 @@ ${portal.angularToolkit()}
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
-					<spring:message
-						code="label.EvaluationSeason.requiresEnrolmentEvaluation" />
-				</div>
-
-				<div class="col-sm-2">
-					<select id="evaluationSeason_requiresEnrolmentEvaluation"
-						name="requiresEnrolmentEvaluation" class="form-control"
-						ng-model="object.requiresEnrolmentEvaluation"
-						ng-options="bvalue.value as bvalue.name for bvalue in booleanvalues">
-					</select>
-				</div>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
 					<spring:message code="label.EvaluationSeason.normal" />
 				</div>
 

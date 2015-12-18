@@ -56,10 +56,9 @@ abstract public class EvaluationSeasonServices {
 
     private static final Logger logger = LoggerFactory.getLogger(EvaluationSeasonServices.class);
 
-    static private void init(final EvaluationSeason evaluationSeason, final boolean active,
-            final boolean requiresEnrolmentEvaluation) {
+    static private void init(final EvaluationSeason evaluationSeason, final boolean active) {
 
-        EvaluationSeasonInformation.create(evaluationSeason, active, requiresEnrolmentEvaluation);
+        EvaluationSeasonInformation.create(evaluationSeason, active);
 
         checkRules(evaluationSeason);
     }
@@ -113,7 +112,7 @@ abstract public class EvaluationSeasonServices {
     @Atomic
     static public void edit(final EvaluationSeason evaluationSeason, final String code, final LocalizedString acronym,
             final LocalizedString name, final boolean normal, final boolean improvement, final boolean special,
-            final boolean specialAuthorization, final boolean active, final boolean requiresEnrolmentEvaluation) {
+            final boolean specialAuthorization, final boolean active) {
 
         checkSeasonExistsForName(evaluationSeason, name);
 
@@ -125,20 +124,20 @@ abstract public class EvaluationSeasonServices {
         evaluationSeason.setSpecial(special);
         evaluationSeason.setSpecialAuthorization(specialAuthorization);
 
-        evaluationSeason.getInformation().edit(active, requiresEnrolmentEvaluation);
+        evaluationSeason.getInformation().edit(active);
         checkRules(evaluationSeason);
     }
 
     @Atomic
     static public EvaluationSeason create(final String code, final LocalizedString acronym, final LocalizedString name,
             final boolean normal, final boolean improvement, final boolean special, final boolean specialAuthorization,
-            final boolean active, final boolean requiresEnrolmentEvaluation) {
+            final boolean active) {
 
         final EvaluationSeason evaluationSeason =
                 new EvaluationSeason(acronym, name, normal, improvement, specialAuthorization, special);
         evaluationSeason.setCode(code);
 
-        init(evaluationSeason, active, requiresEnrolmentEvaluation);
+        init(evaluationSeason, active);
         return evaluationSeason;
     }
 
@@ -166,21 +165,21 @@ abstract public class EvaluationSeasonServices {
         return findAll().filter(i -> active == getActive(i));
     }
 
-    static public Stream<EvaluationSeason> findByRequiresEnrolmentEvaluation(final boolean requiresEnrolmentEvaluation) {
-        return findAll().filter(i -> requiresEnrolmentEvaluation == getRequiresEnrolmentEvaluation(i));
-    }
-
     static public LocalizedString getDescriptionI18N(final EvaluationSeason input) {
         LocalizedString result = new LocalizedString();
 
         if (input != null) {
             result = result.append(input.getName());
             result = result.append(" [");
-            result = result.append(getEnrolmentEvaluationType(input).getDescriptionI18N());
+            result = result.append(getTypeDescriptionI18N(input));
             result = result.append("]");
         }
 
         return result;
+    }
+
+    static public LocalizedString getTypeDescriptionI18N(final EvaluationSeason input) {
+        return getEnrolmentEvaluationType(input).getDescriptionI18N();
     }
 
     static public boolean isRequiredPreviousSeasonApproval(final EvaluationSeason season) {
@@ -323,10 +322,6 @@ abstract public class EvaluationSeasonServices {
         return input.getInformation().getActive();
     }
 
-    static public boolean getRequiresEnrolmentEvaluation(final EvaluationSeason input) {
-        return input.getInformation().getRequiresEnrolmentEvaluation();
-    }
-
     static public Integer getSeasonOrder(final EvaluationSeason input) {
         final EvaluationSeasonInformation information = input.getInformation();
 
@@ -437,7 +432,7 @@ abstract public class EvaluationSeasonServices {
 
             if (iter.getInformation() == null) {
                 logger.info("Init " + iter.getName().getContent());
-                EvaluationSeasonInformation.create(iter, true, false).setSeasonOrder(i);
+                EvaluationSeasonInformation.create(iter, true).setSeasonOrder(i);
             }
         }
     }
