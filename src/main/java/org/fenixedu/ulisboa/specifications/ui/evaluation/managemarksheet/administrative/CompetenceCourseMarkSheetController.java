@@ -238,6 +238,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     public String update(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
             final RedirectAttributes redirectAttributes) {
+
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
@@ -339,6 +340,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
+            bean.validateEvaluations();
             // TODO
             competenceCourseMarkSheet.editEvaluations();
 

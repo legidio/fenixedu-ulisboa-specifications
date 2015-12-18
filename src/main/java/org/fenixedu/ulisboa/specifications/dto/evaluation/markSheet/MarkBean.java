@@ -29,9 +29,13 @@ package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.GradeScale;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.IBean;
+import org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices;
+import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 
 public class MarkBean implements IBean, Comparable<MarkBean> {
 
@@ -41,6 +45,8 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     private String gradeValue;
     private String degreeName;
     private String shifts;
+    private String statutes;
+    private String errorMessage;
 
     public MarkBean(final Enrolment enrolment) {
         setEnrolment(enrolment);
@@ -48,9 +54,14 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         final Student student = enrolment.getStudent();
         this.studentNumber = student.getNumber();
         this.studentName = student.getPerson().getFirstAndLastName();
-        this.degreeName = enrolment.getStudentCurricularPlan().getDegree().getPresentationName();
-        this.shifts = enrolment.getRegistration().getShiftEnrolmentsSet().stream().map(i -> i.getShift().getNome())
-                .collect(Collectors.joining(", "));
+        this.degreeName =
+                enrolment.getStudentCurricularPlan().getDegree().getPresentationName().replace("'", " ").replace("\"", " ");
+        this.shifts = enrolment.getRegistration().getShiftEnrolmentsSet().stream()
+                .filter(s -> s.getShift().getExecutionCourse().getAssociatedCurricularCoursesSet()
+                        .contains(enrolment.getCurricularCourse()))
+                .map(i -> i.getShift().getNome()).collect(Collectors.joining(", "));
+        this.statutes = StatuteServices.getStatuteTypesDescription(enrolment.getRegistration(), enrolment.getExecutionPeriod())
+                .replace("'", " ").replace("\"", " ");
     }
 
     public Enrolment getEnrolment() {
@@ -101,10 +112,43 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         this.shifts = shifts;
     }
 
+    public String getStatutes() {
+        return statutes;
+    }
+
+    public void setStatutes(String statutes) {
+        this.statutes = statutes;
+    }
+
     @Override
     public int compareTo(final MarkBean o) {
         // TODO legidio
         return 0;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
+    public void validate() {
+        //TODO: support other grade scales
+        validateGrade();
+    }
+
+    protected void validateGrade() {
+        if (hasGradeValue() && !GradeScale.TYPE20.belongsTo(gradeValue)) {
+            setErrorMessage(ULisboaSpecificationsUtil.bundle("error.MarkBean.gradeValue.does.not.belong.to.scale",
+                    GradeScale.TYPE20.getDescription()));
+        }
+
+    }
+
+    public boolean hasGradeValue() {
+        return !StringUtils.isEmpty(getGradeValue());
     }
 
 }

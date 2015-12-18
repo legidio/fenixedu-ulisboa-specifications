@@ -45,7 +45,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -119,7 +119,33 @@ ${portal.angularToolkit()}
 	<input name="bean" type="hidden" value="{{ object }}" />
 
 	<div class="panel panel-default">
-		<div class="panel-body"></div>
+		<div class="panel-body">
+			<table id="evaluationsTable" class="table responsive table-bordered table-hover" width="100%">
+				<thead>
+					<tr>
+						<th><spring:message code="label.MarkBean.studentNumber" /></th>
+						<th><spring:message code="label.MarkBean.studentName" /></th>
+						<th><spring:message code="label.MarkBean.degreeName" /></th>
+						<th><spring:message code="label.MarkBean.statutes" /></th>
+						<th><spring:message code="label.MarkBean.shifts" /></th>
+						<th><spring:message code="label.MarkBean.gradeValue" /></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="evaluation in object.evaluations">
+						<td>{{evaluation.studentNumber}}</td>
+						<td>{{evaluation.studentName}}</td>
+						<td>{{evaluation.degreeName}}</td>
+						<td>{{evaluation.statutes}}</td>
+						<td>{{evaluation.shifts}}</td>
+						<td><input type="text" name="grade" ng-model="evaluation.gradeValue" size="6" maxlength="6"/>
+							<span class="alert alert-danger btn-xs" ng-show="evaluation.errorMessage != null">{{evaluation.errorMessage}}</span>
+						 </td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
 		<div class="panel-footer">
 			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
 		</div>

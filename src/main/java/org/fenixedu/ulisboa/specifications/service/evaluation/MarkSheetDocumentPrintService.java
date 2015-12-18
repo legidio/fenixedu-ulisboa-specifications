@@ -1,12 +1,12 @@
 package org.fenixedu.ulisboa.specifications.service.evaluation;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import org.fenixedu.academic.domain.EnrolmentEvaluation;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.qubdocs.util.reports.helpers.DateHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.EnumerationHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.LanguageHelper;
@@ -15,9 +15,9 @@ import org.fenixedu.qubdocs.util.reports.helpers.NumbersHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.StringsHelper;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.config.MarkSheetSettings;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices;
 import org.joda.time.DateTime;
 
-import com.google.common.collect.Lists;
 import com.qubit.terra.docs.core.DocumentGenerator;
 import com.qubit.terra.docs.util.IDocumentFieldsData;
 import com.qubit.terra.docs.util.IFieldsExporter;
@@ -37,6 +37,9 @@ public class MarkSheetDocumentPrintService {
 
         private CompetenceCourseMarkSheet competenceCourseMarkSheet;
 
+        private List<EvaluationLine> evaluations = new ArrayList<>();
+
+        //TODO: remove this object
         public static class EvaluationLine {
 
             private Integer studentNumber;
@@ -91,6 +94,15 @@ public class MarkSheetDocumentPrintService {
 
         public CompetenceCourseMarkSheetDataProvider(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
             this.competenceCourseMarkSheet = competenceCourseMarkSheet;
+
+            for (final EnrolmentEvaluation enrolmentEvaluation : competenceCourseMarkSheet.getEnrolmentEvaluationSet()) {
+                final Student student = enrolmentEvaluation.getRegistration().getStudent();
+                this.evaluations
+                        .add(new EvaluationLine(student.getNumber(), student.getName(), enrolmentEvaluation.getGradeValue(),
+                                StatuteServices.getVisibleStatuteTypesDescription(enrolmentEvaluation.getRegistration(),
+                                        enrolmentEvaluation.getExecutionPeriod())));
+            }
+
         }
 
         @Override
@@ -111,14 +123,8 @@ public class MarkSheetDocumentPrintService {
             }
 
             if (key.equals(MARK_SHEET_EVALUATIONS_KEY)) {
+                return evaluations;
 
-                //TODO: finish
-                final List<EvaluationLine> example = Lists.newArrayList();
-                for (int i = 1; i < 100; i++) {
-                    example.add(new EvaluationLine(i, "teste " + i, "10", (i % 2 == 0 ? "Estatuto 1, Estatuto 2" : "")));
-                }
-
-                return example;
             }
 
             if (key.equals(CURRENT_DATE_TIME_KEY)) {

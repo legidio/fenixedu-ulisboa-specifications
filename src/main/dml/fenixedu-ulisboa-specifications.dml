@@ -702,7 +702,7 @@ relation CompetenceCourseMarkSheetExecutionCourse {
         multiplicity *;
     }
     
-    protected .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse {
+    .org.fenixedu.academic.domain.ExecutionCourse playsRole executionCourse {
 		multiplicity 1..1;
 	}
 }
@@ -722,7 +722,7 @@ relation CompetenceCourseMarkSheetEnrolmentEvaluation {
 		multiplicity 0..1;
 	}
     
-    protected .org.fenixedu.academic.domain.EnrolmentEvaluation playsRole enrolmentEvaluation {
+    .org.fenixedu.academic.domain.EnrolmentEvaluation playsRole enrolmentEvaluation {
         multiplicity *;
     }
 }
