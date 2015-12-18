@@ -437,6 +437,11 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.already.confirmed");
         }
 
+        if (getEnrolmentEvaluationSet().isEmpty()) {
+            throw new ULisboaSpecificationsDomainException(
+                    "error.CompetenceCourseMarkSheet.enrolmentEvaluations.required.to.confirm.markSheet");
+        }
+
         //TODO: handle rectification marksheets
         for (final EnrolmentEvaluation evaluation : getEnrolmentEvaluationSet()) {
             evaluation.confirmSubmission(EnrolmentEvaluationState.FINAL_OBJ, Authenticate.getUser().getPerson(), null);

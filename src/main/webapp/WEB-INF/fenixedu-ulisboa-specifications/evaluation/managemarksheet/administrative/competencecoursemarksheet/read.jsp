@@ -125,10 +125,10 @@ ${portal.angularToolkit()}
 			
 	<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
-			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>&nbsp;|&nbsp;
+			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>
 			
 	<c:if test="${!competenceCourseMarkSheet.confirmed}">
-		<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class="" ng-click="confirmMarkSheet()"
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class="" ng-click="confirmMarkSheet()"
 			href="#"><spring:message code="label.event.evaluation.manageMarkSheet.confirm" /></a>
 	</c:if>
 	
