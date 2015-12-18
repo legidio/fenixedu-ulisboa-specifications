@@ -211,11 +211,11 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             final CompetenceCourse competenceCourse) {
 
         final Set<CompetenceCourseMarkSheet> result = Sets.newHashSet();
-        if (executionSemester != null && competenceCourse != null) {
+        if (executionSemester != null) {
             result.addAll(executionSemester.getCompetenceCourseMarkSheetSet());
         }
 
-        return result.stream().filter(c -> c.getCompetenceCourse() == competenceCourse);
+        return result.stream().filter(c -> competenceCourse == null || c.getCompetenceCourse() == competenceCourse);
     }
 
     private CompetenceCourseMarkSheetStateChange getFirstStateChange() {
