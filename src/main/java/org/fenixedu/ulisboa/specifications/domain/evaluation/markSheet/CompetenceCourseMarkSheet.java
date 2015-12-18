@@ -47,7 +47,6 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
-import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationComparator;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
@@ -215,6 +214,10 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         return result.stream().filter(c -> c.getCompetenceCourse() == competenceCourse);
     }
 
+    private CompetenceCourseMarkSheetStateChange getFirstStateChange() {
+        return getStateChangeSet().stream().min(CompetenceCourseMarkSheetStateChange::compareTo).get();
+    }
+
     private CompetenceCourseMarkSheetStateChange getStateChange() {
         return getStateChangeSet().stream().max(CompetenceCourseMarkSheetStateChange::compareTo).get();
     }
@@ -224,22 +227,18 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     public DateTime getCreationDate() {
-        //TODO LE:
-        return getStateDate();
+        return getFirstStateChange().getDate();
     }
 
     public Person getCreator() {
-        //TODO LE:
-        return User.findByUsername(getVersioningUpdatedBy().getUsername()).getPerson();
+        return getFirstStateChange().getResponsible();
     }
 
     public String getState() {
-        //TODO:LE
         return getStateChange().getState().getDescriptionI18N().getContent();
     }
 
     public DateTime getStateDate() {
-        //TODO:LE
         return getStateChange().getDate();
     }
 
@@ -282,7 +281,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
                         }
 
                         final Optional<EnrolmentEvaluation> temporaryEvaluation =
-                                enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, true);
+                                enrolment.getEnrolmentEvaluation(evaluationSeason, executionSemester, false);
                         if (temporaryEvaluation.isPresent() && temporaryEvaluation.get().getCompetenceCourseMarkSheet() != null) {
                             continue;
                         }
