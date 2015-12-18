@@ -222,10 +222,22 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         return getStateChangeSet().stream().max(CompetenceCourseMarkSheetStateChange::compareTo).get();
     }
 
+    public boolean isEdition() {
+        return getStateChange().isEdition();
+    }
+
+    public boolean isSubmitted() {
+        return getStateChange().isSubmitted();
+    }
+
     public boolean isConfirmed() {
         return getStateChange().isConfirmed();
     }
 
+    public boolean isCancelled() {
+        return getStateChange().isCancelled();
+    }
+    
     public DateTime getCreationDate() {
         return getFirstStateChange().getDate();
     }

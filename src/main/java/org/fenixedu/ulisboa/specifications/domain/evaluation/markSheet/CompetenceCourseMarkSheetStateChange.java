@@ -123,8 +123,20 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
         return c != 0 ? c : getExternalId().compareTo(o.getExternalId());
     }
 
+    public boolean isEdition() {
+        return getState().isEdition();
+    }
+
+    public boolean isSubmitted() {
+        return getState().isSubmitted();
+    }
+
     public boolean isConfirmed() {
         return getState().isConfirmed();
+    }
+
+    public boolean isCancelled() {
+        return getState().isCancelled();
     }
 
 }
