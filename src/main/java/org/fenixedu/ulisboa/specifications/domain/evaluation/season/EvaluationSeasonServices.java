@@ -33,12 +33,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
-import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.Grade;
-import org.fenixedu.academic.domain.curriculum.EnrolmentEvaluationContext;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.util.LocalizedStringUtil;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.EvaluationSeasonRule;
@@ -47,7 +44,6 @@ import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.Previou
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.rule.PreviousSeasonMinimumGrade;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -249,72 +245,6 @@ abstract public class EvaluationSeasonServices {
 
     static public boolean isRequiresEnrolmentEvaluation(final EvaluationSeason season) {
         return season != null && (season.isImprovement() || season.isSpecial());
-    }
-
-    public void validateEnrolment(final Enrolment enrolment, final LocalDate evaluationDate,
-            final ExecutionSemester executionSemester, final EnrolmentEvaluationContext context) {
-// TODO
-//
-//        if (isEnrolmentEvaluatedInSeason(enrolment, evaluationDate, executionSemester)) {
-//            throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.enrolment.evaluated.in.this.season");
-//        }
-//
-//        if (context == EnrolmentEvaluationContext.MARK_SHEET_EVALUATION) {
-//            if (isAlreadyEnroledInSeason(enrolment, evaluationDate, executionSemester)) {
-//                throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.already.enroled.in.this.season");
-//            }
-//
-//            if (enrolment.isApproved() && !isEvaluatesOnlyApprovedEnrolments()) {
-//                throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.evaluation.already.approved");
-//            }
-//        }
-    }
-
-    public void validateEvaluation(final Enrolment enrolment, final LocalDate evaluationDate,
-            final ExecutionSemester executionSemester, final EnrolmentEvaluationContext context) {
-
-// TODO
-//        if (isEnrolmentEvaluatedInSeason(enrolment, evaluationDate, executionSemester)) {
-//            throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.enrolment.evaluated.in.this.season",
-//                    enrolment.getStudent().getNumber().toString());
-//        }
-//
-//        if (isRequiresEvaluationOnPreviousSeason() && !isFirst()
-//                && !getPreviousSeason().isEnrolmentEvaluatedInSeason(enrolment, evaluationDate, executionSemester)) {
-//            throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.enrolment.must.be.evaluated.on.previous.season",
-//                    enrolment.getStudent().getNumber().toString());
-//        }
-//
-//        // only evaluations before the input evaluation date should be investigated
-//        final List<EnrolmentEvaluation> evaluations = enrolment.getAllFinalEnrolmentEvaluations(evaluationDate);
-//        final EnrolmentEvaluation latestEvaluation = Enrolment.getLatestEnrolmentEvaluation(evaluations);
-//        final boolean isApproved = latestEvaluation != null && latestEvaluation.isApproved();
-//
-//        if (context == EnrolmentEvaluationContext.MARK_SHEET_EVALUATION) {
-//
-//            // this evaluation season is for not approved enrolments
-//            if (!isEvaluatesOnlyApprovedEnrolments()) {
-//
-//                if (isApproved) {
-//
-//                    throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.evaluation.already.approved",
-//                            enrolment.getStudent().getNumber().toString());
-//                }
-//            }
-//
-//            final EnrolmentEvaluation temporaryEvaluation =
-//                    enrolment.getActiveEvaluationBySeason(this, evaluationDate, executionSemester, false);
-//
-//            // @RequestReview, different from isEnrolmentCandidateForEvaluation?
-//            if (isRequiresEnrolmentEvaluation() && temporaryEvaluation == null) {
-//                throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.enrolment.evaluation.required",
-//                        enrolment.getStudent().getNumber().toString());
-//            }
-//        }
-//
-//        if (latestEvaluation != null && latestEvaluation.isSubsequentEvaluationPrevented()) {
-//            throw new ULisboaSpecificationsDomainException("error.EvaluationSeason.subsequent.evaluation.locked");
-//        }
     }
 
     static public EvaluationSeason getPreviousSeason(final EvaluationSeason input) {
