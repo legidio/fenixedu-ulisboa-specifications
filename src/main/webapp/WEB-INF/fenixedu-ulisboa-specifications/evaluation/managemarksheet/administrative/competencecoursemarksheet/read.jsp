@@ -90,25 +90,36 @@ ${portal.angularToolkit()}
 			
 	<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
-			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>&nbsp;|&nbsp; 
+			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>&nbsp;|&nbsp;
 			
-	<span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>/print/${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.evaluation.manageMarkSheet.print" /></a>&nbsp;|&nbsp;
+	<c:if test="${!competenceCourseMarkSheet.confirmed}">
+		<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+				code="label.event.evaluation.manageMarkSheet.confirm" /></a>&nbsp;|&nbsp;
+	</c:if>
+	
+	<c:if test="${competenceCourseMarkSheet.confirmed}">
+		<span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.PRINT_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+				code="label.event.evaluation.manageMarkSheet.print" /></a>&nbsp;|&nbsp;
 			
-	<span
-		class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>&nbsp;|&nbsp;
+		<span
+			class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
+				code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>&nbsp;|&nbsp;
+	</c:if>
 			
 	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
-		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>&nbsp;|&nbsp;
+		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>
+		
 			 
+<%-- TODO: analyse --%>
+<!-- 		&nbsp;|&nbsp; -->
+<!-- 	<span class="glyphicon glyphicon-ban-circle" -->
+<!-- 		aria-hidden="true"></span>&nbsp;<a class="" -->
+<%-- 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/annul"><spring:message --%>
+<%-- 			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a> --%>
 
-	<span class="glyphicon glyphicon-ban-circle"
-		aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/annul"><spring:message
-			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">

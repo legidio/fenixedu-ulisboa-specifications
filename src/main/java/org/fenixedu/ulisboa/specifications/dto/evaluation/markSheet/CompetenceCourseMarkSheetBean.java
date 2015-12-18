@@ -343,4 +343,17 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
     }
 
+    public void updateEnrolmentEvaluations() {
+        validateEvaluations();
+
+        for (final MarkBean markBean : getEvaluations()) {
+            if (!markBean.hasGradeValue()) {
+                continue;
+            }
+            
+            markBean.createOrUpdateEnrolmentEvaluation(getCompetenceCourseMarkSheet());
+        }
+
+    }
+
 }

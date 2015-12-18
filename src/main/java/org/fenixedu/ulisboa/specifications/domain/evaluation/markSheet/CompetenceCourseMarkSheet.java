@@ -44,9 +44,13 @@ import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.academic.domain.curriculum.EnrollmentState;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
+import org.fenixedu.academic.util.EnrolmentEvaluationState;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationComparator;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
@@ -400,6 +404,26 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     private EnrolmentEvaluation getLatestEnrolmentEvaluation(final Collection<EnrolmentEvaluation> evaluations) {
         return ((evaluations == null || evaluations.isEmpty()) ? null : Collections.<EnrolmentEvaluation> max(evaluations,
                 new EvaluationComparator()));
+    }
+
+    @Atomic
+    public void confirm(boolean byTeacher) {
+
+        if (isConfirmed()) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.already.confirmed");
+        }
+
+        //TODO: handle rectification marksheets
+        for (final EnrolmentEvaluation evaluation : getEnrolmentEvaluationSet()) {
+            evaluation.confirmSubmission(EnrolmentEvaluationState.FINAL_OBJ, Authenticate.getUser().getPerson(), null);
+
+            final Grade finalGrade = evaluation.getEnrolment().getGrade();
+            evaluation.getEnrolment()
+                    .setEnrollmentState(finalGrade.isEmpty() ? EnrollmentState.ENROLLED : finalGrade.getEnrolmentState());
+        }
+
+        CompetenceCourseMarkSheetStateChange.createConfirmedState(this, byTeacher);
+
     }
 
 }

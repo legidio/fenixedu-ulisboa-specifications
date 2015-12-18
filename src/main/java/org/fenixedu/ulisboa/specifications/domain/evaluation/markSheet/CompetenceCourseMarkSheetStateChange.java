@@ -105,6 +105,15 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
         return result;
     }
 
+    @Atomic
+    public static CompetenceCourseMarkSheetStateChange createConfirmedState(final CompetenceCourseMarkSheet markSheet,
+            final boolean byTeacher) {
+
+        final CompetenceCourseMarkSheetStateChange result = new CompetenceCourseMarkSheetStateChange();
+        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findConfirmed(), (String) null, byTeacher);
+        return result;
+    }
+
     // @formatter: off
     /************
      * SERVICES *

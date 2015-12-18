@@ -340,7 +340,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-            bean.validateEvaluations();
+            bean.updateEnrolmentEvaluations();
             // TODO
             competenceCourseMarkSheet.editEvaluations();
 
@@ -478,6 +478,31 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         writeFile(response, filename, MarkSheetDocumentPrintService.PDF,
                 MarkSheetDocumentPrintService.print(competenceCourseMarkSheet));
+    }
+
+    private static final String _CONFIRM_URI = "/confirm";
+    public static final String CONFIRM_URL = CONTROLLER_URL + _CONFIRM_URI;
+
+    //TODO: change to post
+    @RequestMapping(value = _CONFIRM_URI + "{oid}", method = RequestMethod.GET)
+    public String confirm(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
+
+        try {
+            competenceCourseMarkSheet.confirm(false);
+
+        } catch (Exception de) {
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+
+            return jspPage("read");
+
+        }
+
+        return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
+
     }
 
 }

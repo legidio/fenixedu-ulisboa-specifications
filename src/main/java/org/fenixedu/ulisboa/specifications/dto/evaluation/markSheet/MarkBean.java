@@ -27,15 +27,26 @@
 
 package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.EnrolmentEvaluation;
+import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.academic.domain.GradeScale;
+import org.fenixedu.academic.domain.curriculum.EnrolmentEvaluationContext;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academic.util.EnrolmentEvaluationState;
 import org.fenixedu.bennu.IBean;
+import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 import org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
+import org.joda.time.DateTime;
+import org.joda.time.YearMonthDay;
+
+import pt.ist.fenixframework.Atomic;
 
 public class MarkBean implements IBean, Comparable<MarkBean> {
 
@@ -135,12 +146,11 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     }
 
     public void validate() {
-        //TODO: support other grade scales
         validateGrade();
     }
 
     protected void validateGrade() {
-        if (hasGradeValue() && !GradeScale.TYPE20.belongsTo(gradeValue)) {
+        if (hasGradeValue() && !getGradeScale().belongsTo(gradeValue)) {
             setErrorMessage(ULisboaSpecificationsUtil.bundle("error.MarkBean.gradeValue.does.not.belong.to.scale",
                     GradeScale.TYPE20.getDescription()));
         }
@@ -149,6 +159,34 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
 
     public boolean hasGradeValue() {
         return !StringUtils.isEmpty(getGradeValue());
+    }
+
+    private GradeScale getGradeScale() {
+        //TODO: support other grade scales
+        return GradeScale.TYPE20;
+    }
+
+    @Atomic
+    public void createOrUpdateEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
+        final EnrolmentEvaluation enrolmentEvaluation = findOrCreateEnrolmentEvaluation(markSheet);
+        enrolmentEvaluation.setWhenDateTime(new DateTime());
+        enrolmentEvaluation.setGrade(Grade.createGrade(getGradeValue(), getGradeScale()));
+        enrolmentEvaluation.setEnrolmentEvaluationState(EnrolmentEvaluationState.TEMPORARY_OBJ);
+        enrolmentEvaluation.setContext(EnrolmentEvaluationContext.MARK_SHEET_EVALUATION);
+        enrolmentEvaluation.setPerson(Authenticate.getUser().getPerson());
+        enrolmentEvaluation.setPersonResponsibleForGrade(markSheet.getCertifier());
+        enrolmentEvaluation.setExamDateYearMonthDay(markSheet.getEvaluationDate().toDateTimeAtStartOfDay().toYearMonthDay());
+        enrolmentEvaluation.setGradeAvailableDateYearMonthDay(new YearMonthDay());
+        
+        enrolmentEvaluation.setCompetenceCourseMarkSheet(markSheet);
+    }
+
+    protected EnrolmentEvaluation findOrCreateEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
+        final Optional<EnrolmentEvaluation> foundEvaluation =
+                getEnrolment().getEnrolmentEvaluation(markSheet.getEvaluationSeason(), markSheet.getExecutionSemester(), false);
+
+        return foundEvaluation.isPresent() ? foundEvaluation.get() : new EnrolmentEvaluation(getEnrolment(),
+                markSheet.getEvaluationSeason());
     }
 
 }
