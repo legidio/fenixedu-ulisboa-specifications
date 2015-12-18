@@ -483,8 +483,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _CONFIRM_URI = "/confirm";
     public static final String CONFIRM_URL = CONTROLLER_URL + _CONFIRM_URI;
 
-    //TODO: change to post
-    @RequestMapping(value = _CONFIRM_URI + "{oid}", method = RequestMethod.GET)
+    @RequestMapping(value = _CONFIRM_URI + "{oid}", method = RequestMethod.POST)
     public String confirm(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final RedirectAttributes redirectAttributes) {
 

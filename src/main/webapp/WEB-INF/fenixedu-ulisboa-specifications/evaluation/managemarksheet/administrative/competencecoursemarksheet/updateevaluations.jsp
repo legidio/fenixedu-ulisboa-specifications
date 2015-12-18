@@ -124,7 +124,7 @@ ${portal.angularToolkit()}
 					<tr>
 						<th><spring:message code="label.MarkBean.studentNumber" /></th>
 						<th><spring:message code="label.MarkBean.studentName" /></th>
-						<th><spring:message code="label.MarkBean.degreeName" /></th>
+						<th><spring:message code="label.MarkBean.degreeCode" /></th>
 						<th><spring:message code="label.MarkBean.statutes" /></th>
 						<th><spring:message code="label.MarkBean.shifts" /></th>
 						<th><spring:message code="label.MarkBean.gradeValue" /></th>
@@ -134,7 +134,7 @@ ${portal.angularToolkit()}
 					<tr ng-repeat="evaluation in object.evaluations">
 						<td>{{evaluation.studentNumber}}</td>
 						<td>{{evaluation.studentName}}</td>
-						<td>{{evaluation.degreeName}}</td>
+						<td>{{evaluation.degreeCode}}</td>
 						<td>{{evaluation.statutes}}</td>
 						<td>{{evaluation.shifts}}</td>
 						<td><input type="text" name="grade" ng-model="evaluation.gradeValue" size="6" maxlength="6"/>
@@ -151,8 +151,3 @@ ${portal.angularToolkit()}
 	</div>
 </form>
 
-<script>
-    $(document).ready(function() {
-
-    });
-</script>

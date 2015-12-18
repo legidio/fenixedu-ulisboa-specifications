@@ -29,15 +29,18 @@ package org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
@@ -182,6 +185,27 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
     @Atomic
     public void delete() {
+
+        if (!isEdition()) {
+            throw new ULisboaSpecificationsDomainException(
+                    "error.CompetenceCourseMarkSheet.markSheet.can.only.be.deleted.in.edition.state");
+        }
+
+        setExecutionSemester(null);
+        setCompetenceCourse(null);
+        setExecutionCourse(null);
+        setEvaluationSeason(null);
+        setCertifier(null);
+        getShiftSet().clear();
+        getEnrolmentEvaluationSet().clear();
+
+        final Iterator<CompetenceCourseMarkSheetStateChange> iterator = getStateChangeSet().iterator();
+        while (iterator.hasNext()) {
+            final CompetenceCourseMarkSheetStateChange stateChange = iterator.next();
+            iterator.remove();
+            stateChange.delete();
+        }
+
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
         deleteDomainObject();
     }
@@ -241,7 +265,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     public boolean isCancelled() {
         return getStateChange().isCancelled();
     }
-    
+
     public DateTime getCreationDate() {
         return getFirstStateChange().getDate();
     }
@@ -423,6 +447,20 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         }
 
         CompetenceCourseMarkSheetStateChange.createConfirmedState(this, byTeacher);
+
+    }
+
+    public SortedSet<EnrolmentEvaluation> getSortedEnrolmentEvaluations() {
+
+        final Comparator<EnrolmentEvaluation> byStudentName =
+                (x, y) -> x.getRegistration().getStudent().getName().compareTo(y.getRegistration().getStudent().getName());
+
+        final SortedSet<EnrolmentEvaluation> result =
+                Sets.newTreeSet(byStudentName.thenComparing(DomainObjectUtil.COMPARATOR_BY_ID));
+
+        result.addAll(getEnrolmentEvaluationSet());
+
+        return result;
 
     }
 

@@ -181,14 +181,14 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 			<spring:message code="label.yes" var="yesLabel"/>
 			<spring:message code="label.no" var="noLabel"/>
 		
-			<table id="searchcompetencecoursemarksheetTable" class="table responsive table-bordered table-hover" width="100%">
+			<table id="searchcompetencecoursemarksheetTable" class="table table-bordered table-hover" width="100%">
 				<thead>
 					<tr>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.creationDate" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
@@ -199,11 +199,11 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 				<tbody>
 					<c:forEach var="searchResult" items="${searchcompetencecoursemarksheetResultsDataSet}">
 					<tr>
+						<td><c:out value="${searchResult.competenceCourse.code}" /> - <c:out value="${searchResult.competenceCourse.nameI18N.content}" /></td>
 						<td><c:out value="${searchResult.evaluationSeason.name.content}"></c:out></td>
 						<td><joda:format value="${searchResult.evaluationDate}" style="S-"/></td>
 						<td><c:out value='${searchResult.state}'/></td>
 						<td><c:out value='${searchResult.certifier.firstAndLastName}'/></td>
-						<td><joda:format value="${searchResult.creationDate}" style="SM" /></td>
 						<td><c:out value='${searchResult.printed ? yesLabel : noLabel}'/></td>
 						<td><c:out value='${searchResult.rectified ? yesLabel : noLabel}'/></td>
 						<td><c:out value='${searchResult.shiftsDescription}'/></td>

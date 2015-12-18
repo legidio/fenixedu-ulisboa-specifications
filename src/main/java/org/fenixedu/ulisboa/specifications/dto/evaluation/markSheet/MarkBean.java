@@ -55,6 +55,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     private String studentName;
     private String gradeValue;
     private String degreeName;
+    private String degreeCode;
     private String shifts;
     private String statutes;
     private String errorMessage;
@@ -64,9 +65,10 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
 
         final Student student = enrolment.getStudent();
         this.studentNumber = student.getNumber();
-        this.studentName = student.getPerson().getFirstAndLastName();
+        this.studentName = student.getPerson().getName();
         this.degreeName =
                 enrolment.getStudentCurricularPlan().getDegree().getPresentationName().replace("'", " ").replace("\"", " ");
+        this.degreeCode = enrolment.getStudentCurricularPlan().getDegree().getCode();
         this.shifts = enrolment.getRegistration().getShiftEnrolmentsSet().stream()
                 .filter(s -> s.getShift().getExecutionCourse().getAssociatedCurricularCoursesSet()
                         .contains(enrolment.getCurricularCourse()))
@@ -115,6 +117,14 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         this.degreeName = degreeName;
     }
 
+    public String getDegreeCode() {
+        return degreeCode;
+    }
+
+    public void setDegreeCode(String degreeCode) {
+        this.degreeCode = degreeCode;
+    }
+
     public String getShifts() {
         return shifts;
     }
@@ -133,8 +143,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
 
     @Override
     public int compareTo(final MarkBean o) {
-        // TODO legidio
-        return 0;
+        return getStudentName().compareTo(o.getStudentName());
     }
 
     public String getErrorMessage() {
@@ -177,7 +186,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         enrolmentEvaluation.setPersonResponsibleForGrade(markSheet.getCertifier());
         enrolmentEvaluation.setExamDateYearMonthDay(markSheet.getEvaluationDate().toDateTimeAtStartOfDay().toYearMonthDay());
         enrolmentEvaluation.setGradeAvailableDateYearMonthDay(new YearMonthDay());
-        
+
         enrolmentEvaluation.setCompetenceCourseMarkSheet(markSheet);
     }
 

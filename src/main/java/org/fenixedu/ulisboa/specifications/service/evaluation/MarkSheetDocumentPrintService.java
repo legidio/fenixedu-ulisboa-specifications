@@ -15,7 +15,6 @@ import org.fenixedu.qubdocs.util.reports.helpers.NumbersHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.StringsHelper;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.config.MarkSheetSettings;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
-import org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices;
 import org.joda.time.DateTime;
 
 import com.qubit.terra.docs.core.DocumentGenerator;
@@ -48,14 +47,11 @@ public class MarkSheetDocumentPrintService {
 
             private String grade;
 
-            private String statutes;
-
-            private EvaluationLine(Integer studentNumber, String studentName, String grade, String statutes) {
+            private EvaluationLine(Integer studentNumber, String studentName, String grade) {
                 super();
                 this.studentNumber = studentNumber;
                 this.studentName = studentName;
                 this.grade = grade;
-                this.statutes = statutes;
             }
 
             public Integer getStudentNumber() {
@@ -70,10 +66,6 @@ public class MarkSheetDocumentPrintService {
                 return grade;
             }
 
-            public String getStatutes() {
-                return statutes;
-            }
-
             public void setStudentNumber(Integer studentNumber) {
                 this.studentNumber = studentNumber;
             }
@@ -86,21 +78,15 @@ public class MarkSheetDocumentPrintService {
                 this.grade = grade;
             }
 
-            public void setStatutes(String statutes) {
-                this.statutes = statutes;
-            }
-
         }
 
         public CompetenceCourseMarkSheetDataProvider(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
             this.competenceCourseMarkSheet = competenceCourseMarkSheet;
 
-            for (final EnrolmentEvaluation enrolmentEvaluation : competenceCourseMarkSheet.getEnrolmentEvaluationSet()) {
+            for (final EnrolmentEvaluation enrolmentEvaluation : competenceCourseMarkSheet.getSortedEnrolmentEvaluations()) {
                 final Student student = enrolmentEvaluation.getRegistration().getStudent();
                 this.evaluations
-                        .add(new EvaluationLine(student.getNumber(), student.getName(), enrolmentEvaluation.getGradeValue(),
-                                StatuteServices.getVisibleStatuteTypesDescription(enrolmentEvaluation.getRegistration(),
-                                        enrolmentEvaluation.getExecutionPeriod())));
+                        .add(new EvaluationLine(student.getNumber(), student.getName(), enrolmentEvaluation.getGradeValue()));
             }
 
         }

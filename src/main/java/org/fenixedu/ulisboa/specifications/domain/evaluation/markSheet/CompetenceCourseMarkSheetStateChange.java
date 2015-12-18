@@ -92,6 +92,10 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
 
     @Atomic
     public void delete() {
+        
+        super.setCompetenceCourseMarkSheet(null);
+        super.setResponsible(null);
+        
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
         deleteDomainObject();
     }

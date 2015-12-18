@@ -326,6 +326,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
                 }
             }
         }
+        
+        Collections.sort(result);
 
         return result;
     }

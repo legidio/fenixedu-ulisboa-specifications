@@ -34,6 +34,42 @@ ${portal.angularToolkit()}
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.css" />
 <script src="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.js"></script>
 
+<script type="text/javascript">
+    angular
+	    .module('angularAppCompetenceCourseMarkSheet',
+		    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ])
+	    .controller(
+		    'CompetenceCourseMarkSheetController',
+		    [
+			    '$scope',
+			    function($scope) {
+				    					    	
+					$scope.booleanvalues = [
+						{
+						    name : '<spring:message code="label.no"/>',
+						    value : false
+						},
+						{
+						    name : '<spring:message code="label.yes"/>',
+						    value : true
+						} ];
+	
+					$scope.postBack = createAngularPostbackFunction($scope);
+	
+					//Begin here of Custom Screen business JS - code
+					$scope.confirmMarkSheet = function() {
+						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}');
+						$('#actionsForm').submit();
+					}
+					
+					
+
+			   }]);
+</script>
+
+<form id="actionsForm" method="post" action=""></form>
+
+<div ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController">
 
 <%-- TITLE --%>
 <div class="page-header">
@@ -92,24 +128,25 @@ ${portal.angularToolkit()}
 			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>&nbsp;|&nbsp;
 			
 	<c:if test="${!competenceCourseMarkSheet.confirmed}">
-		<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class=""
-			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-				code="label.event.evaluation.manageMarkSheet.confirm" /></a>&nbsp;|&nbsp;
+		<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class="" ng-click="confirmMarkSheet()"
+			href="#"><spring:message code="label.event.evaluation.manageMarkSheet.confirm" /></a>
 	</c:if>
 	
 	<c:if test="${competenceCourseMarkSheet.confirmed}">
-		<span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
 			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.PRINT_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
 				code="label.event.evaluation.manageMarkSheet.print" /></a>&nbsp;|&nbsp;
 			
 		<span
 			class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class=""
 			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
-				code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>&nbsp;|&nbsp;
+				code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>
 	</c:if>
-			
-	<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
-		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>
+	
+	<c:if test="${competenceCourseMarkSheet.edition}">
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
+			href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>
+	</c:if>
 		
 			 
 <%-- TODO: analyse --%>
@@ -221,7 +258,7 @@ ${portal.angularToolkit()}
 		<tr>
 			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.date" /></th>
 			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.state" /></th>
-<%-- 			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.responsible" /></th> --%>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.responsible" /></th>
 			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.byTeacher" /></th>
 		</tr>
 	</thead>
@@ -230,7 +267,7 @@ ${portal.angularToolkit()}
 		<tr>
 			<td><joda:format value="${each.date}" style="SM" /></td>
 			<td><c:out value="${each.state.descriptionI18N.content}"></c:out></td>
-<%-- 			<td><c:out value="${each.responsible}"></c:out></td> --%>
+			<td><c:out value="${each.responsible.name}"></c:out></td>
 			<td><c:out value="${each.byTeacher ? yesLabel : noLabel}"></c:out></td>
 		</tr>
 		</c:forEach>
@@ -239,3 +276,5 @@ ${portal.angularToolkit()}
 <script type="text/javascript">
 	createDataTables('stateChangesTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 </script>
+
+</div>
