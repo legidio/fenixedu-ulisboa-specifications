@@ -103,8 +103,7 @@ ${portal.angularToolkit()}
 					    value : true
 					} ];
 
-				$scope.object = angular
-					.fromJson('${competenceCourseMarkSheetBeanJson}');
+				$scope.object = ${competenceCourseMarkSheetBeanJson};
 				$scope.form = {};
 				$scope.form.object = $scope.object;
 

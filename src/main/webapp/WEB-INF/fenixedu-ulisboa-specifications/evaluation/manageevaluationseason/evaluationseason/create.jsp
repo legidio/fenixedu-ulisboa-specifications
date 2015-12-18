@@ -124,8 +124,7 @@ ${portal.angularToolkit()}
 					    value : true
 					} ];
 
-				$scope.object = angular
-					.fromJson('${evaluationSeasonBeanJson}');
+				$scope.object = ${evaluationSeasonBeanJson};
 				$scope.postBack = createAngularPostbackFunction($scope);
 
 				//Begin here of Custom Screen business JS - code

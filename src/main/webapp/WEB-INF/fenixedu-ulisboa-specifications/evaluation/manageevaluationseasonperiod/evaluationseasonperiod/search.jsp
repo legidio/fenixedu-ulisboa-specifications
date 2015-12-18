@@ -91,7 +91,7 @@ ${portal.angularToolkit()}
 		    value : true
 		} ];
 
-		$scope.object = angular.fromJson('${beanJson}');
+		$scope.object = ${beanJson};
 		
 		//Begin here of Custom Screen business JS - code
 		
