@@ -649,11 +649,50 @@ class evaluation.markSheet.CompetenceCourseMarkSheet {
     boolean printed;
 }
 
-class evaluation.markSheet.CompetenceCourseMarkSheetStateChange  {
+class evaluation.markSheet.CompetenceCourseMarkSheetStateChange {
     CompetenceCourseMarkSheetStateEnum state;
     DateTime date;
     String reason;
     boolean byTeacher;
+}
+
+class evaluation.markSheet.CompetenceCourseMarkSheetSnapshot {
+	String competenceCourse;
+	String executionSemester;
+	String evaluationSeason;
+	String certifier;
+	LocalDate evaluationDate;
+	String checkSum;
+}
+
+class evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry {
+    int studentNumber;
+    String student;
+    Grade grade;
+    String degreeName;
+    String degreeCode;
+    String shifts;
+    String statutes;
+}
+
+relation CompetenceCourseMarkSheetStateChangeSnapshot {
+	protected evaluation.markSheet.CompetenceCourseMarkSheetSnapshot playsRole snapshot {
+		multiplicity 0..1;
+	}
+	
+	protected evaluation.markSheet.CompetenceCourseMarkSheetStateChange playsRole stateChange {
+		multiplicity 1..1;
+	}
+}
+
+relation CompetenceCourseMarkSheetSnapshotEntryRelation {
+	protected evaluation.markSheet.CompetenceCourseMarkSheetSnapshot playsRole snapshot {
+		multiplicity 1..1;
+	}
+	
+	protected evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry playsRole entry {
+		multiplicity 1..*;
+	}
 }
 
 relation CompetenceCourseMarkSheetStateChangeRelation {
