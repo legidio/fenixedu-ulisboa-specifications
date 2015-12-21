@@ -57,6 +57,7 @@ import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationComparator;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
+import org.fenixedu.ulisboa.specifications.domain.services.enrollment.EnrolmentServices;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
@@ -340,6 +341,10 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             }
 
             if (!isEnrolmentCandidateForEvaluation(enrolment)) {
+                continue;
+            }
+
+            if (!getShiftSet().isEmpty() && !EnrolmentServices.containsAnyShift(enrolment, getShiftSet())) {
                 continue;
             }
 

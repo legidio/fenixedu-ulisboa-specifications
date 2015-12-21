@@ -41,6 +41,7 @@ import org.fenixedu.academic.util.EnrolmentEvaluationState;
 import org.fenixedu.bennu.IBean;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.services.enrollment.EnrolmentServices;
 import org.fenixedu.ulisboa.specifications.domain.services.statute.StatuteServices;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.joda.time.DateTime;
@@ -69,10 +70,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         this.degreeName =
                 enrolment.getStudentCurricularPlan().getDegree().getPresentationName().replace("'", " ").replace("\"", " ");
         this.degreeCode = enrolment.getStudentCurricularPlan().getDegree().getCode();
-        this.shifts = enrolment.getRegistration().getShiftEnrolmentsSet().stream()
-                .filter(s -> s.getShift().getExecutionCourse().getAssociatedCurricularCoursesSet()
-                        .contains(enrolment.getCurricularCourse()))
-                .map(i -> i.getShift().getNome()).collect(Collectors.joining(", "));
+        this.shifts = EnrolmentServices.getShiftsFor(enrolment).stream().map(s -> s.getNome()).collect(Collectors.joining(", "));
         this.statutes = StatuteServices.getStatuteTypesDescription(enrolment.getRegistration(), enrolment.getExecutionPeriod())
                 .replace("'", " ").replace("\"", " ");
     }
