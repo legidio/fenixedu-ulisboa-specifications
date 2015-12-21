@@ -131,9 +131,6 @@ ${portal.angularToolkit()}
 <form id="searchForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController"
 action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_URL%>">
 
-	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCHPOSTBACK_URL%>${competenceCourseMarkSheet.externalId}' />
-
 	<input name="bean" type="hidden" value="{{ object }}" />
 	
 	<div class="panel panel-default">

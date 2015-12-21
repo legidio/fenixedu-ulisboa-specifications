@@ -26,14 +26,23 @@
  */
 package org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.teacher;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response.Status;
+
+import org.fenixedu.academic.domain.CompetenceCourse;
+import org.fenixedu.academic.domain.ExecutionCourse;
+import org.fenixedu.academic.domain.Professorship;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.CompetenceCourseMarkSheetBean;
+import org.fenixedu.ulisboa.specifications.service.evaluation.MarkSheetDocumentPrintService;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
@@ -88,21 +97,34 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _SEARCH_URI = "/";
     public static final String SEARCH_URL = CONTROLLER_URL + _SEARCH_URI;
 
-    @RequestMapping(value = _SEARCH_URI)
-    public String search(final Model model) {
-        final List<CompetenceCourseMarkSheet> searchResultsDataSet = filterSearch();
+    @RequestMapping(value = _SEARCH_URI + "{oid}", method = RequestMethod.GET)
+    public String search(@PathVariable("oid") final ExecutionCourse executionCourse, final Model model) {
+        checkAccess(executionCourse);
+
+        final List<CompetenceCourseMarkSheet> searchResultsDataSet = filterSearch(executionCourse);
+        
+        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
+        bean.update();
+        setCompetenceCourseMarkSheetBean(bean, model);
 
         model.addAttribute("searchcompetencecoursemarksheetResultsDataSet", searchResultsDataSet);
         return jspPage("search");
     }
 
-    private Stream<CompetenceCourseMarkSheet> getSearchUniverseSearchDataSet() {
-        // TODO
-        return new ArrayList<CompetenceCourseMarkSheet>().stream();
+    static private void checkAccess(final ExecutionCourse executionCourse) {
+        final Professorship professorship = Authenticate.getUser().getPerson().getProfessorshipByExecutionCourse(executionCourse);
+        if (professorship == null || !professorship.getPermissions().getEvaluationFinal()) {
+            throw new ULisboaSpecificationsDomainException(Status.FORBIDDEN, "message.error.notAuthorized");
+        }
     }
 
-    private List<CompetenceCourseMarkSheet> filterSearch() {
-        return getSearchUniverseSearchDataSet().collect(Collectors.toList());
+    private Stream<CompetenceCourseMarkSheet> getSearchUniverseSearchDataSet(final ExecutionCourse executionCourse) {
+        return CompetenceCourseMarkSheet.findBy(executionCourse);
+    }
+
+    private List<CompetenceCourseMarkSheet> filterSearch(final ExecutionCourse executionCourse) {
+
+        return getSearchUniverseSearchDataSet(executionCourse).collect(Collectors.toList());
     }
 
     private static final String _SEARCH_TO_VIEW_ACTION_URI = "/search/view/";
@@ -288,6 +310,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
+            bean.updateEnrolmentEvaluations();
             // TODO
             competenceCourseMarkSheet.editEvaluations();
 
@@ -300,6 +323,46 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
             return jspPage("updateevaluations");
         }
+    }
+
+    private static final String _PRINT_URI = "/print/";
+    public static final String PRINT_URL = CONTROLLER_URL + _PRINT_URI;
+
+    @RequestMapping(value = _PRINT_URI + "{oid}")
+    public void print(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final HttpServletResponse response) throws IOException {
+
+        final CompetenceCourse competenceCourse = competenceCourseMarkSheet.getCompetenceCourse();
+        final String filename = competenceCourse.getCode() + "_"
+                + competenceCourse.getName().replace(' ', '_').replace('/', '-').replace('\\', '-')
+                + competenceCourseMarkSheet.getEvaluationDate().toString("yyyy-MM-dd") + ".pdf";
+
+        writeFile(response, filename, MarkSheetDocumentPrintService.PDF,
+                MarkSheetDocumentPrintService.print(competenceCourseMarkSheet));
+    }
+
+    private static final String _CONFIRM_URI = "/confirm";
+    public static final String CONFIRM_URL = CONTROLLER_URL + _CONFIRM_URI;
+
+    @RequestMapping(value = _CONFIRM_URI + "{oid}", method = RequestMethod.POST)
+    public String confirm(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
+
+        try {
+            competenceCourseMarkSheet.confirm(false);
+
+        } catch (Exception de) {
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+
+            return jspPage("read");
+
+        }
+
+        return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
+
     }
 
 }

@@ -201,6 +201,12 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         deleteDomainObject();
     }
 
+    // @formatter: off
+    /************
+     * SERVICES
+     ************/
+    // @formatter: on
+
     @Atomic
     public static CompetenceCourseMarkSheet create(final ExecutionSemester executionSemester,
             final CompetenceCourse competenceCourse, final ExecutionCourse executionCourse,
@@ -213,14 +219,19 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         return result;
     }
 
-    // @formatter: off
-    /************
-     * SERVICES
-     * 
-     * @param competenceCourse
-     * @param executionSemester *
-     ************/
-    // @formatter: on
+    public static Stream<CompetenceCourseMarkSheet> findBy(final ExecutionCourse executionCourse) {
+        
+        final Set<CompetenceCourseMarkSheet> result = Sets.newHashSet();
+        
+        if (executionCourse != null) {
+            
+            for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
+                result.addAll(curricularCourse.getCompetenceCourse().getCompetenceCourseMarkSheetSet());
+            }
+        }
+        
+        return result.stream().filter(c -> c.getExecutionSemester() == executionCourse.getExecutionPeriod());
+    }
 
     public static Stream<CompetenceCourseMarkSheet> findBy(final ExecutionSemester executionSemester,
             final CompetenceCourse competenceCourse) {

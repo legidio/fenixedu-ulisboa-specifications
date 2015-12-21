@@ -716,7 +716,7 @@ relation CompetenceCourseMarkSheetStateChangeResponsible {
 }
 
 relation CompetenceCourseMarkSheetRelation {
-    protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
+    evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
         multiplicity *;
     }
     
