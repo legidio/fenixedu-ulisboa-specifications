@@ -168,16 +168,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         }
     }
 
-    public CompetenceCourseMarkSheet rectify(String string) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void annul(String reason) {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
     protected void checkForDeletionBlockers(Collection<String> blockers) {
         super.checkForDeletionBlockers(blockers);
@@ -280,10 +270,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
     public DateTime getStateDate() {
         return getStateChange().getDate();
-    }
-
-    public boolean getRectified() {
-        return !getRectificationSet().isEmpty();
     }
 
     @Atomic

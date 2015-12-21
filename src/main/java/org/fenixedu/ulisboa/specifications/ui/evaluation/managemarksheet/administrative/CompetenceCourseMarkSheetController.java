@@ -386,7 +386,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             final RedirectAttributes redirectAttributes) {
 
         try {
-            final CompetenceCourseMarkSheet rectification = competenceCourseMarkSheet.rectify(bean.getReason());
+            final CompetenceCourseMarkSheet rectification = null;// TODO
 
             model.addAttribute("competenceCourseMarkSheet", rectification);
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
@@ -434,7 +434,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-            competenceCourseMarkSheet.annul(bean.getReason());
+            // TODO competenceCourseMarkSheet.annul(bean.getReason());
 
         } catch (Exception de) {
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",

@@ -192,7 +192,6 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 						<th><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
 						<%-- Operations Column --%>
 						<th></th>
@@ -207,7 +206,6 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 						<td><c:out value='${searchResult.state}'/></td>
 						<td><c:out value='${searchResult.certifier.firstAndLastName}'/></td>
 						<td><c:out value='${searchResult.printed ? yesLabel : noLabel}'/></td>
-						<td><c:out value='${searchResult.rectified ? yesLabel : noLabel}'/></td>
 						<td><c:out value='${searchResult.shiftsDescription}'/></td>
 						<td>
 							<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>${searchResult.externalId}"><spring:message code='label.view'/></a>

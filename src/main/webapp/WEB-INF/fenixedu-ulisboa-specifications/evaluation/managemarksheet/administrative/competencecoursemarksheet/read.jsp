@@ -235,10 +235,6 @@ ${portal.angularToolkit()}
 						<td><c:out value="${competenceCourseMarkSheet.printed ? yesLabel : noLabel}"></c:out></td>
 					</tr>
 					<tr>
-						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.rectified ? yesLabel : noLabel}' /></td>
-					</tr>
-					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checkSum" /></th>
 						<td><c:out value='${competenceCourseMarkSheet.checkSum}' /></td>
 					</tr>

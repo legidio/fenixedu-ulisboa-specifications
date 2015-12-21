@@ -656,16 +656,6 @@ class evaluation.markSheet.CompetenceCourseMarkSheetStateChange  {
     boolean byTeacher;
 }
 
-relation CompetenceCourseMarkSheetRectification {
-	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectifies {
-		multiplicity 0..1;
-	}
-	
-	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole rectification {
-		multiplicity *;
-	}
-}
-
 relation CompetenceCourseMarkSheetStateChangeRelation {
 	protected evaluation.markSheet.CompetenceCourseMarkSheet playsRole competenceCourseMarkSheet {
 		multiplicity 1..1;
