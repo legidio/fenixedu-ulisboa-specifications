@@ -1,3 +1,5 @@
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet"%>
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices"%>
 <%@page import="org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.teacher.CompetenceCourseMarkSheetController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -42,8 +44,8 @@ ${portal.angularToolkit()}
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.create"><spring:message
-			code="label.event.create" /></a> |&nbsp;&nbsp;
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATE_URL%>"><spring:message
+			code="label.event.create" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -80,80 +82,153 @@ ${portal.angularToolkit()}
 </c:if>
 
 
-
-
-
-<c:choose>
-	<c:when test="${not empty searchcompetencecoursemarksheetResultsDataSet}">
-		<table id="searchcompetencecoursemarksheetTable" class="table responsive table-bordered table-hover" width="100%">
-			<thead>
-				<tr>
-					<%--!!!  Field names here --%>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.codeAndName" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.creationDate" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.creator" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.stateDate" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
-					<th><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
-					<%-- Operations Column --%>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-
-			</tbody>
-		</table>
-	</c:when>
-	<c:otherwise>
-		<div class="alert alert-warning" role="alert">
-
-			<p>
-				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>
-				<spring:message code="label.noResultsFound" />
-			</p>
-
-		</div>
-
-	</c:otherwise>
-</c:choose>
-
 <script>
-	var searchcompetencecoursemarksheetDataSet = [
-			<c:forEach items="${searchcompetencecoursemarksheetResultsDataSet}" var="searchResult">
-				<%-- Field access / formatting  here CHANGE_ME --%>
-				{
-				"
-		DT_RowId" : '<c:out value='${searchResult.externalId}'/>',
-"codeandname" : "<c:out value='${searchResult.codeAndName}'/>",
-"evaluationseason" : "<c:out value='${searchResult.evaluationSeason}'/>",
-"evaluationdate" : "<c:out value='${searchResult.evaluationDate}'/>",
-"certifier" : "<c:out value='${searchResult.certifier}'/>",
-"shifts" : "<c:out value='${searchResult.shifts}'/>",
-"creationdate" : "<c:out value='${searchResult.creationDate}'/>",
-"creator" : "<c:out value='${searchResult.creator}'/>",
-"state" : "<c:out value='${searchResult.state}'/>",
-"statedate" : "<c:out value='${searchResult.stateDate}'/>",
-"printed" : "<c:if test="${searchResult.printed}"><spring:message code="label.true" /></c:if><c:if test="${not searchResult.printed}"><spring:message code="label.false" /></c:if>",
-"rectified" : "<c:out value='${searchResult.rectified}'/>",
-"actions" :
-" <a  class=\"btn btn-default btn-xs\" href=\"${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>${searchResult.externalId}\"><spring:message code='label.view'/></a>" +
-                "" 
-			},
-            </c:forEach>
-		]; $(document).ready(function() { var table = $('#searchcompetencecoursemarksheetTable').DataTable({language : { url :
-		"${datatablesI18NUrl}", }, "columns": [ { data: 'codeandname' }, { data: 'evaluationseason' }, { data: 'evaluationdate' }, {
-		data: 'certifier' }, { data: 'shifts' }, { data: 'creationdate' }, { data: 'creator' }, { data: 'state' }, { data: 'statedate'
-		}, { data: 'printed' }, { data: 'rectified' }, { data: 'actions', className:'all' } ], //CHANGE_ME adjust the actions column
-		width if needed "columnDefs": [ //54 { "width": "54px", "targets": 11 } ], "data" : searchcompetencecoursemarksheetDataSet,
-		//Documentation: https://datatables.net/reference/option/dom "dom": '<"col-sm-6"l><"col-sm-3"f><"col-sm-3"T>rtip', //FilterBox =
-		YES && ExportOptions = YES //"dom": 'T<"clear">lrtip', //FilterBox = NO && ExportOptions = YES //"dom":
-		'<"col-sm-6"l><"col-sm-6"f>rtip', //FilterBox = YES && ExportOptions = NO //"dom": '<"col-sm-6"l>rtip', // FilterBox = NO &&
-		ExportOptions = NO "tableTools": { "sSwfPath":
-		"${pageContext.request.contextPath}/webjars/datatables-tools/2.2.4/swf/copy_csv_xls_pdf.swf" } });
-		table.columns.adjust().draw(); $('#searchcompetencecoursemarksheetTable tbody').on( 'click', 'tr', function () {
-		$(this).toggleClass('selected'); } ); }); </script>
+    angular
+	    .module('angularAppCompetenceCourseMarkSheet',
+		    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ])
+	    .controller(
+		    'CompetenceCourseMarkSheetController',
+		    [
+			    '$scope',
+			    function($scope) {
+			    	
+			    	
+			    	
+				$scope.booleanvalues = [
+					{
+					    name : '<spring:message code="label.no"/>',
+					    value : false
+					},
+					{
+					    name : '<spring:message code="label.yes"/>',
+					    value : true
+					} ];
+
+				$scope.object = ${competenceCourseMarkSheetBeanJson};
+				$scope.form = {};
+				$scope.form.object = $scope.object;
+
+				$scope.postBack = createAngularPostbackFunction($scope);
+
+				//Begin here of Custom Screen business JS - code
+				
+				$scope.onBeanChange = function(model) {
+					
+					$scope.object.competenceCourse = '';
+					
+					$scope.postBack(model);
+				}
+				
+				$scope.search  = function() {
+					$('#searchForm').submit();
+				}
+
+			    } ]);
+</script>
+
+
+
+<form id="searchForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController"
+action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_URL%>">
+
+	<input type="hidden" name="postback"
+		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCHPOSTBACK_URL%>${competenceCourseMarkSheet.externalId}' />
+
+	<input name="bean" type="hidden" value="{{ object }}" />
+	
+	<div class="panel panel-default">
+			<div class="panel-body">
+				<div class="form-group row">
+					<div class="col-sm-2 control-label">
+						<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
+					</div>
+	
+					<div class="col-sm-6">
+						<ui-select	id="executionSemesterSelect" name="executionSemester" ng-model="$parent.object.executionSemester" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+							<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+							<ui-select-choices	repeat="executionSemester.id as executionSemester in object.executionSemesterDataSource | filter: $select.search">
+								<span ng-bind-html="executionSemester.text | highlight: $select.search"></span>
+							</ui-select-choices> 
+						</ui-select>
+	
+					</div>
+				</div>
+				<div class="form-group row">
+					<div class="col-sm-2 control-label">
+						<spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" />
+					</div>
+					
+	
+					<div class="col-sm-6">
+
+						<ui-select	id="competenceCourseSelected" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap">
+							<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+							<ui-select-choices	repeat="competenceCourse.id as competenceCourse in object.competenceCourseDataSource | filter: $select.search">
+								<span ng-bind-html="competenceCourse.text | highlight: $select.search"></span>
+							</ui-select-choices> 
+						</ui-select>
+		
+					</div>
+				</div>
+			</div>
+			<div class="panel-footer">
+				<button type="button" class="btn btn-primary" role="button" ng-click="search()"><spring:message code="label.search" /></button> 
+			</div>
+	</div>
+	
+	
+	<c:choose>
+		<c:when test="${not empty searchcompetencecoursemarksheetResultsDataSet}">
+			<spring:message code="label.yes" var="yesLabel"/>
+			<spring:message code="label.no" var="noLabel"/>
+		
+			<table id="searchcompetencecoursemarksheetTable" class="table table-bordered table-hover" width="100%">
+				<thead>
+					<tr>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
+						<th><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
+						<%-- Operations Column --%>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="searchResult" items="${searchcompetencecoursemarksheetResultsDataSet}">
+					<tr>
+						<td><c:out value="${searchResult.competenceCourse.code}" /> - <c:out value="${searchResult.competenceCourse.nameI18N.content}" /></td>
+						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)pageContext.getAttribute("searchResult")).getEvaluationSeason()).getContent()%>"></c:out></td>
+						<td><joda:format value="${searchResult.evaluationDate}" style="S-"/></td>
+						<td><c:out value='${searchResult.state}'/></td>
+						<td><c:out value='${searchResult.certifier.firstAndLastName}'/></td>
+						<td><c:out value='${searchResult.printed ? yesLabel : noLabel}'/></td>
+						<td><c:out value='${searchResult.shiftsDescription}'/></td>
+						<td>
+							<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>${searchResult.externalId}"><spring:message code='label.view'/></a>
+						</td>
+					</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+			<script type="text/javascript">
+				createDataTables('searchcompetencecoursemarksheetTable',true /*filterable*/, false /*show tools*/, true /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
+			</script>
+					
+		</c:when>
+		
+		<c:otherwise>
+			<div class="alert alert-warning" role="alert">
+	
+				<p>
+					<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span>
+					<spring:message code="label.noResultsFound" />
+				</p>
+	
+			</div>
+	
+		</c:otherwise>
+	</c:choose>
+</form>

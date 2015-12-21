@@ -1,3 +1,5 @@
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices"%>
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet"%>
 <%@page import="org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.teacher.CompetenceCourseMarkSheetController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -31,6 +33,36 @@ ${portal.angularToolkit()}
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.css" />
 <script src="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.js"></script>
 
+<script type="text/javascript">
+    angular
+	    .module('angularAppCompetenceCourseMarkSheet',
+		    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ])
+	    .controller(
+		    'CompetenceCourseMarkSheetController',
+		    [
+			    '$scope',
+			    function($scope) {
+				    					    	
+					$scope.booleanvalues = [
+						{
+						    name : '<spring:message code="label.no"/>',
+						    value : false
+						},
+						{
+						    name : '<spring:message code="label.yes"/>',
+						    value : true
+						} ];
+	
+					$scope.postBack = createAngularPostbackFunction($scope);
+	
+					//Begin here of Custom Screen business JS - code
+
+			   }]);
+</script>
+
+<form id="actionsForm" method="post" action=""></form>
+
+<div ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController">
 
 <%-- TITLE --%>
 <div class="page-header">
@@ -43,7 +75,7 @@ ${portal.angularToolkit()}
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<form id="deleteForm"
-				action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.DELETE_URL%>{competenceCourseMarkSheet.externalId}"
+				action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.DELETE_URL%>${competenceCourseMarkSheet.externalId}"
 				method="POST">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -128,41 +160,45 @@ ${portal.angularToolkit()}
 			<spring:message code="label.details" />
 		</h3>
 	</div>
+	
+	<spring:message code="label.yes" var="yesLabel" />	
+	<spring:message code="label.no" var="noLabel" />
+
 	<div class="panel-body">
 		<form method="post" class="form-horizontal">
 			<table class="table">
 				<tbody>
 					<tr>
-						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.codeAndName" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.codeAndName}' /></td>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.competenceCourse.code}"/> - <c:out value="${competenceCourseMarkSheet.competenceCourse.nameI18N.content}"/></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.evaluationSeason}' /></td>
+						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)pageContext.getAttribute("competenceCourseMarkSheet")).getEvaluationSeason()).getContent()%>"></c:out></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.evaluationDate}' /></td>
+						<td><joda:format value="${competenceCourseMarkSheet.evaluationDate}" style="S-"/></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.state}"/></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.certifier}' /></td>
-					</tr>
-					<tr>
-						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.shifts}' /></td>
+						<td><c:out value='${competenceCourseMarkSheet.certifier.name}' /></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.printed" /></th>
-						<td><c:if test="${competenceCourseMarkSheet.printed}">
-								<spring:message code="label.true" />
-							</c:if> <c:if test="${not competenceCourseMarkSheet.printed}">
-								<spring:message code="label.false" />
-							</c:if></td>
+						<td><c:out value="${competenceCourseMarkSheet.printed ? yesLabel : noLabel}"></c:out></td>
 					</tr>
 					<tr>
-						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.rectified" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.rectified}' /></td>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checkSum" /></th>
+						<td><c:out value='${competenceCourseMarkSheet.checkSum}' /></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>
+						<td><c:out value='${competenceCourseMarkSheet.shiftsDescription}' /></td>
 					</tr>
 				</tbody>
 			</table>
@@ -170,8 +206,30 @@ ${portal.angularToolkit()}
 	</div>
 </div>
 
-<script>
-    $(document).ready(function() {
-
-    });
+<%-- State Changes --%>
+<h2><spring:message code="label.CompetenceCourseMarkSheet.stateChanges"></spring:message></h2>
+<table id="stateChangesTable" class="table responsive table-bordered table-hover" width="100%">
+	<thead>
+		<tr>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.date" /></th>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.state" /></th>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.responsible" /></th>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.byTeacher" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="each" items="${competenceCourseMarkSheet.stateChangeSet}">
+		<tr>
+			<td><joda:format value="${each.date}" style="SM" /></td>
+			<td><c:out value="${each.state.descriptionI18N.content}"></c:out></td>
+			<td><c:out value="${each.responsible.name}"></c:out></td>
+			<td><c:out value="${each.byTeacher ? yesLabel : noLabel}"></c:out></td>
+		</tr>
+		</c:forEach>
+	</tbody>
+</table>
+<script type="text/javascript">
+	createDataTables('stateChangesTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 </script>
+
+</div>
