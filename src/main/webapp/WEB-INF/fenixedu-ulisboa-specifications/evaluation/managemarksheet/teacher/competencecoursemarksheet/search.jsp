@@ -133,10 +133,10 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 	
-
-<%--	
 	<input type="hidden" name="postback"
 		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCHPOSTBACK_URL%>${executionCourse.externalId}' />
+
+<%--	
 	<div class="panel panel-default">
 			<div class="panel-body">
 				<div class="form-group row">

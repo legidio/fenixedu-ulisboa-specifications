@@ -183,7 +183,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return jspPage("read/" + getCompetenceCourseMarkSheet(model).getExternalId());
     }
 
-    @RequestMapping(value = "/read/{oid}/updateevaluations")
+    @RequestMapping(value = "/read/{executionCourseId}/{oid}/updateevaluations")
     public String processReadToUpdateEvaluations(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             final Model model, final RedirectAttributes redirectAttributes) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
@@ -191,7 +191,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
     }
 
-    @RequestMapping(value = "/read/{oid}/submitmarksheet")
+    @RequestMapping(value = "/read/{executionCourseId}/{oid}/submitmarksheet")
     public String processReadToSubmitMarkSheet(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             final Model model, final RedirectAttributes redirectAttributes) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);

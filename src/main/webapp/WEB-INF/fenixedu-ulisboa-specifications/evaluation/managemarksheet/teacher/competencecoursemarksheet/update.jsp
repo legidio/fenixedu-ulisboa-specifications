@@ -135,7 +135,7 @@ ${portal.angularToolkit()}
 
 				<div class="col-sm-4">
 					<%-- Relation to side 1 drop down rendered in input --%>
-					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="form-control" name="evaluationseason"
+					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="bootstrap" name="evaluationseason"
 						ng-model="$parent.object.evaluationSeason" theme="bootstrap" ng-disabled="disabled"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
 					<ui-select-choices
 						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
