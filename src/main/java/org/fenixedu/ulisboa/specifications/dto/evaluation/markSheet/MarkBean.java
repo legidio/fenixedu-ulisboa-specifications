@@ -28,7 +28,6 @@
 package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Enrolment;
@@ -70,7 +69,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         this.degreeName =
                 enrolment.getStudentCurricularPlan().getDegree().getPresentationName().replace("'", " ").replace("\"", " ");
         this.degreeCode = enrolment.getStudentCurricularPlan().getDegree().getCode();
-        this.shifts = EnrolmentServices.getShiftsFor(enrolment).stream().map(s -> s.getNome()).collect(Collectors.joining(", "));
+        this.shifts = EnrolmentServices.getShiftsDescription(enrolment);
         this.statutes = StatuteServices.getStatuteTypesDescription(enrolment.getRegistration(), enrolment.getExecutionPeriod())
                 .replace("'", " ").replace("\"", " ");
     }

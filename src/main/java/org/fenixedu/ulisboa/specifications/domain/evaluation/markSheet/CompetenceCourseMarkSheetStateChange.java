@@ -92,29 +92,42 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
 
     @Atomic
     public void delete() {
-        
+
+        if (getSnapshot() != null) {
+            getSnapshot().delete();
+        }
+
         super.setCompetenceCourseMarkSheet(null);
         super.setResponsible(null);
-        
+
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
         deleteDomainObject();
     }
 
     @Atomic
     public static CompetenceCourseMarkSheetStateChange createEditionState(final CompetenceCourseMarkSheet markSheet,
-            final boolean byTeacher) {
+            final boolean byTeacher, final String reason) {
 
         final CompetenceCourseMarkSheetStateChange result = new CompetenceCourseMarkSheetStateChange();
-        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findEdition(), (String) null, byTeacher);
+        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findEdition(), reason, byTeacher);
         return result;
     }
 
     @Atomic
     public static CompetenceCourseMarkSheetStateChange createConfirmedState(final CompetenceCourseMarkSheet markSheet,
-            final boolean byTeacher) {
+            final boolean byTeacher, final String reason) {
 
         final CompetenceCourseMarkSheetStateChange result = new CompetenceCourseMarkSheetStateChange();
-        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findConfirmed(), (String) null, byTeacher);
+        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findConfirmed(), reason, byTeacher);
+        return result;
+    }
+
+    @Atomic
+    public static CompetenceCourseMarkSheetStateChange createSubmitedState(final CompetenceCourseMarkSheet markSheet,
+            final boolean byTeacher, final String reason) {
+        final CompetenceCourseMarkSheetStateChange result = new CompetenceCourseMarkSheetStateChange();
+        result.init(markSheet, CompetenceCourseMarkSheetStateEnum.findSubmited(), reason, byTeacher);
+
         return result;
     }
 

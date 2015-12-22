@@ -191,22 +191,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
     }
 
-    @RequestMapping(value = "/read/{oid}/rectify")
-    public String processReadToRectify(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, final RedirectAttributes redirectAttributes) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-
-        return redirect(CREATERECTIFICATION_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
-    }
-
-    @RequestMapping(value = "/read/{oid}/annul")
-    public String processReadToAnnul(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, RedirectAttributes redirectAttributes) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-
-        return redirect(ANNULMARKSHEET_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
-    }
-
     private static final String _UPDATE_URI = "/update/";
     public static final String UPDATE_URL = CONTROLLER_URL + _UPDATE_URI;
 
@@ -325,10 +309,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
 
-        // Do validation logic ?!?!
-        //if (something_wrong){
-        //                 return new ResponseEntity<String>(<MESSAGE_FROM_BUNDLE>,HttpStatus.BAD_REQUEST);
-        //}
         this.setCompetenceCourseMarkSheetBean(bean, model);
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
@@ -399,71 +379,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
     }
 
-    private static final String _ANNULMARKSHEET_URI = "/annulmarksheet/";
-    public static final String ANNULMARKSHEET_URL = CONTROLLER_URL + _ANNULMARKSHEET_URI;
-
-    @RequestMapping(value = _ANNULMARKSHEET_URI + "{oid}", method = RequestMethod.GET)
-    public String annulmarksheet(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-
-        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet);
-        this.setCompetenceCourseMarkSheetBean(bean, model);
-
-        return jspPage("annulmarksheet");
-
-    }
-
-    private static final String _ANNULMARKSHEETPOSTBACK_URI = "/annulmarksheetpostback/";
-    public static final String ANNULMARKSHEETPOSTBACK_URL = CONTROLLER_URL + _ANNULMARKSHEETPOSTBACK_URI;
-
-    @RequestMapping(value = _ANNULMARKSHEETPOSTBACK_URI + "{oid}", method = RequestMethod.POST,
-            produces = "application/json;charset=UTF-8")
-    public @ResponseBody ResponseEntity<String> annulmarksheetpostback(
-            @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
-
-        this.setCompetenceCourseMarkSheetBean(bean, model);
-        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = _ANNULMARKSHEET_URI + "{oid}", method = RequestMethod.POST)
-    public String annulmarksheet(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
-            final RedirectAttributes redirectAttributes) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-
-        try {
-            // TODO competenceCourseMarkSheet.annul(bean.getReason());
-
-        } catch (Exception de) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
-            setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-            this.setCompetenceCourseMarkSheetBean(bean, model);
-
-            return jspPage("annulmarksheet");
-        }
-
-        return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
-    }
-
-    @RequestMapping(value = "/annulmarksheet/{oid}/annul")
-    public String processAnnulmarksheetToAnnul(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, final RedirectAttributes redirectAttributes) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-
-        return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
-    }
-
-    @RequestMapping(value = "/annulmarksheet/{oid}/cancel")
-    public String processAnnulmarksheetToCancel(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, final RedirectAttributes redirectAttributes) {
-        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-
-        return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
-    }
-
     private static final String _PRINT_URI = "/print/";
     public static final String PRINT_URL = CONTROLLER_URL + _PRINT_URI;
 
@@ -491,6 +406,55 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         try {
             competenceCourseMarkSheet.confirm(false);
+
+        } catch (Exception de) {
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+
+            return jspPage("read");
+
+        }
+
+        return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
+
+    }
+
+    private static final String _SUBMIT_URI = "/submit";
+    public static final String SUBMIT_URL = CONTROLLER_URL + _SUBMIT_URI;
+
+    @RequestMapping(value = _SUBMIT_URI + "{oid}", method = RequestMethod.POST)
+    public String submit(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final RedirectAttributes redirectAttributes) {
+
+        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
+
+        try {
+            competenceCourseMarkSheet.submit(false);
+
+        } catch (Exception de) {
+            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
+                    model);
+
+            return jspPage("read");
+
+        }
+
+        return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
+
+    }
+
+    private static final String _REVERT_TO_EDITION_URI = "/reverttoedition";
+    public static final String REVERT_TO_EDITION_URL = CONTROLLER_URL + _REVERT_TO_EDITION_URI;
+
+    @RequestMapping(value = _REVERT_TO_EDITION_URI + "{oid}", method = RequestMethod.POST)
+    public String revertToEdition(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
+            final Model model, final RedirectAttributes redirectAttributes) {
+
+        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
+
+        try {
+            //TODO: add reason
+            competenceCourseMarkSheet.revertToEdition(false, null);
 
         } catch (Exception de) {
             addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",

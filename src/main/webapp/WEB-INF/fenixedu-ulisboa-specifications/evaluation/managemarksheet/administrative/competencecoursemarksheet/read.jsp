@@ -58,8 +58,19 @@ ${portal.angularToolkit()}
 					$scope.postBack = createAngularPostbackFunction($scope);
 	
 					//Begin here of Custom Screen business JS - code
+					
+					$scope.submitMarkSheet = function() {
+						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SUBMIT_URL%>${competenceCourseMarkSheet.externalId}');
+						$('#actionsForm').submit();
+					}
+					
 					$scope.confirmMarkSheet = function() {
 						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}');
+						$('#actionsForm').submit();
+					}
+					
+					$scope.revertMarkSheetToEdition = function() {
+						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.REVERT_TO_EDITION_URL%>${competenceCourseMarkSheet.externalId}');
 						$('#actionsForm').submit();
 					}
 					
@@ -117,36 +128,37 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>"><spring:message
-			code="label.event.back" /></a>&nbsp;|&nbsp; 
+			code="label.event.back" /></a> 
 			
-	<span
-		class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.update" /></a>&nbsp;|&nbsp;
+	<c:if test="${competenceCourseMarkSheet.edition}">		
+		&nbsp;|&nbsp; <span
+			class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+				code="label.event.update" /></a>
+	
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
+				code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>
+				
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>&nbsp;<a class="" ng-click="submitMarkSheet()"
+			href="#"><spring:message code="label.event.evaluation.manageMarkSheet.submit" /></a>
 			
-	<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
-			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a>
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
+			href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>
+	</c:if>
 			
-	<c:if test="${!competenceCourseMarkSheet.confirmed}">
+	<c:if test="${competenceCourseMarkSheet.submitted}">
 		&nbsp;|&nbsp; <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class="" ng-click="confirmMarkSheet()"
 			href="#"><spring:message code="label.event.evaluation.manageMarkSheet.confirm" /></a>
 	</c:if>
 	
-	<c:if test="${competenceCourseMarkSheet.confirmed}">
+	<c:if test="${!competenceCourseMarkSheet.edition}">
 		&nbsp;|&nbsp; <span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
 			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.PRINT_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-				code="label.event.evaluation.manageMarkSheet.print" /></a>&nbsp;|&nbsp;
-			
-		<span
-			class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class=""
-			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/rectify"><spring:message
-				code="label.event.evaluation.manageMarkSheet.administrative.rectify" /></a>
-	</c:if>
-	
-	<c:if test="${competenceCourseMarkSheet.edition}">
-		&nbsp;|&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
-			href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>
+				code="label.event.evaluation.manageMarkSheet.print" /></a>
+		&nbsp;|&nbsp; <span
+			class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class="" href="#" ng-click="revertMarkSheetToEdition()"><spring:message
+				code="label.event.evaluation.manageMarkSheet.revertToEdition" /></a>
 	</c:if>
 		
 			 
@@ -236,7 +248,16 @@ ${portal.angularToolkit()}
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checkSum" /></th>
-						<td><c:out value='${competenceCourseMarkSheet.checkSum}' /></td>
+						<td>
+							<c:choose>
+								<c:when test="${empty competenceCourseMarkSheet.checkSum}">
+									-
+								</c:when>
+								<c:otherwise>
+									<c:out value='${competenceCourseMarkSheet.checkSum}' />
+								</c:otherwise>
+							</c:choose>
+						</td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.shifts" /></th>

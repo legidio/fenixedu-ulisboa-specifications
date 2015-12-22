@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.fenixedu.academic.domain.EnrolmentEvaluation;
-import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.qubdocs.util.reports.helpers.DateHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.EnumerationHelper;
@@ -15,6 +13,8 @@ import org.fenixedu.qubdocs.util.reports.helpers.NumbersHelper;
 import org.fenixedu.qubdocs.util.reports.helpers.StringsHelper;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.config.MarkSheetSettings;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetSnapshot;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry;
 import org.joda.time.DateTime;
 
 import com.qubit.terra.docs.core.DocumentGenerator;
@@ -34,11 +34,10 @@ public class MarkSheetDocumentPrintService {
 
         private static final String CURRENT_DATE_TIME_KEY = "currentDateTime";
 
-        private CompetenceCourseMarkSheet competenceCourseMarkSheet;
+        private CompetenceCourseMarkSheetSnapshot competenceCourseMarkSheet;
 
         private List<EvaluationLine> evaluations = new ArrayList<>();
 
-        //TODO: remove this object
         public static class EvaluationLine {
 
             private Integer studentNumber;
@@ -80,13 +79,12 @@ public class MarkSheetDocumentPrintService {
 
         }
 
-        public CompetenceCourseMarkSheetDataProvider(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
-            this.competenceCourseMarkSheet = competenceCourseMarkSheet;
+        public CompetenceCourseMarkSheetDataProvider(CompetenceCourseMarkSheetSnapshot snapshot) {
+            this.competenceCourseMarkSheet = snapshot;
 
-            for (final EnrolmentEvaluation enrolmentEvaluation : competenceCourseMarkSheet.getSortedEnrolmentEvaluations()) {
-                final Student student = enrolmentEvaluation.getRegistration().getStudent();
+            for (final CompetenceCourseMarkSheetSnapshotEntry entry : snapshot.getSortedEntries()) {
                 this.evaluations
-                        .add(new EvaluationLine(student.getNumber(), student.getName(), enrolmentEvaluation.getGradeValue()));
+                        .add(new EvaluationLine(entry.getStudentNumber(), entry.getStudentName(), entry.getGrade().getValue()));
             }
 
         }
@@ -144,15 +142,17 @@ public class MarkSheetDocumentPrintService {
         generator.registerHelper("money", new MoneyHelper());
     }
 
-    public static byte[] print(CompetenceCourseMarkSheet competenceCourseMarkSheet) {
+    public static byte[] print(CompetenceCourseMarkSheet markSheet) {
+        markSheet.markAsPrinted();
+        return print(markSheet.getLastSnapshot().get());
+    }
 
-        competenceCourseMarkSheet.markAsPrinted();
-
+    public static byte[] print(CompetenceCourseMarkSheetSnapshot snapshot) {
         final DocumentGenerator generator = DocumentGenerator.create(
                 new ByteArrayInputStream(MarkSheetSettings.getInstance().getTemplateFile().getContent()), DocumentGenerator.PDF);
 
         registerHelpers(generator);
-        generator.registerDataProvider(new CompetenceCourseMarkSheetDataProvider(competenceCourseMarkSheet));
+        generator.registerDataProvider(new CompetenceCourseMarkSheetDataProvider(snapshot));
 
         return generator.generateReport();
     }

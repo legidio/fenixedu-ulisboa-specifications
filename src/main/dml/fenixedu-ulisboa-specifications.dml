@@ -645,7 +645,6 @@ relation EvaluationSeasonRuleRelation {
 
 class evaluation.markSheet.CompetenceCourseMarkSheet {
     LocalDate evaluationDate;
-    String checkSum;
     boolean printed;
 }
 
@@ -657,22 +656,23 @@ class evaluation.markSheet.CompetenceCourseMarkSheetStateChange {
 }
 
 class evaluation.markSheet.CompetenceCourseMarkSheetSnapshot {
-	String competenceCourse;
+	String competenceCourseCode;
+	LocalizedString competenceCourseName;
 	String executionSemester;
-	String evaluationSeason;
+	LocalizedString evaluationSeason;
 	String certifier;
 	LocalDate evaluationDate;
 	String checkSum;
+	String shifts;
 }
 
 class evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry {
-    int studentNumber;
-    String student;
+    Integer studentNumber;
+    String studentName;
     Grade grade;
-    String degreeName;
     String degreeCode;
+    LocalizedString degreeName;
     String shifts;
-    String statutes;
 }
 
 relation CompetenceCourseMarkSheetStateChangeSnapshot {
@@ -690,7 +690,7 @@ relation CompetenceCourseMarkSheetSnapshotEntryRelation {
 		multiplicity 1..1;
 	}
 	
-	protected evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry playsRole entry {
+	evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry playsRole entry {
 		multiplicity 1..*;
 	}
 }

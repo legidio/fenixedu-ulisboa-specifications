@@ -40,6 +40,7 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.CurricularCourse;
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
@@ -47,10 +48,9 @@ import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Shift;
-import org.fenixedu.academic.domain.curriculum.EnrollmentState;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumModule;
 import org.fenixedu.academic.util.EnrolmentEvaluationState;
 import org.fenixedu.bennu.core.security.Authenticate;
@@ -196,6 +196,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             iterator.remove();
             stateChange.delete();
         }
+        
 
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
         deleteDomainObject();
@@ -215,21 +216,21 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
         final CompetenceCourseMarkSheet result = new CompetenceCourseMarkSheet();
         result.init(executionSemester, competenceCourse, executionCourse, evaluationSeason, evaluationDate, certifier, shifts);
-        CompetenceCourseMarkSheetStateChange.createEditionState(result, byTeacher);
+        CompetenceCourseMarkSheetStateChange.createEditionState(result, byTeacher, null);
         return result;
     }
 
     public static Stream<CompetenceCourseMarkSheet> findBy(final ExecutionCourse executionCourse) {
-        
+
         final Set<CompetenceCourseMarkSheet> result = Sets.newHashSet();
-        
+
         if (executionCourse != null) {
-            
+
             for (final CurricularCourse curricularCourse : executionCourse.getAssociatedCurricularCoursesSet()) {
                 result.addAll(curricularCourse.getCompetenceCourse().getCompetenceCourseMarkSheetSet());
             }
         }
-        
+
         return result.stream().filter(c -> c.getExecutionSemester() == executionCourse.getExecutionPeriod());
     }
 
@@ -435,8 +436,8 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     @Atomic
     public void confirm(boolean byTeacher) {
 
-        if (isConfirmed()) {
-            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.already.confirmed");
+        if (!isSubmitted()) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.must.be.submitted.to.confirm");
         }
 
         if (getEnrolmentEvaluationSet().isEmpty()) {
@@ -444,17 +445,67 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
                     "error.CompetenceCourseMarkSheet.enrolmentEvaluations.required.to.confirm.markSheet");
         }
 
-        //TODO: handle rectification marksheets
         for (final EnrolmentEvaluation evaluation : getEnrolmentEvaluationSet()) {
+            //TODO: force evaluation checksum generation
             evaluation.confirmSubmission(EnrolmentEvaluationState.FINAL_OBJ, Authenticate.getUser().getPerson(), null);
-
-            final Grade finalGrade = evaluation.getEnrolment().getGrade();
-            evaluation.getEnrolment()
-                    .setEnrollmentState(finalGrade.isEmpty() ? EnrollmentState.ENROLLED : finalGrade.getEnrolmentState());
+            EnrolmentServices.updateState(evaluation.getEnrolment());
         }
 
-        CompetenceCourseMarkSheetStateChange.createConfirmedState(this, byTeacher);
+        CompetenceCourseMarkSheetStateChange.createConfirmedState(this, byTeacher, null);
 
+    }
+
+    @Atomic
+    public void submit(boolean byTeacher) {
+
+        if (!isEdition()) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.must.be.edition.to.confirm");
+        }
+
+        final CompetenceCourseMarkSheetStateChange stateChange =
+                CompetenceCourseMarkSheetStateChange.createSubmitedState(this, byTeacher, null);
+
+        final CompetenceCourseMarkSheetSnapshot snapshot =
+                CompetenceCourseMarkSheetSnapshot.create(stateChange, getCompetenceCourse().getCode(),
+                        getCompetenceCourse().getNameI18N().toLocalizedString(), getExecutionSemester().getQualifiedName(),
+                        getEvaluationSeason().getName(), getCertifier().getName(), getEvaluationDate());
+
+        for (final EnrolmentEvaluation evaluation : getSortedEnrolmentEvaluations()) {
+            final Student student = evaluation.getRegistration().getStudent();
+            final Degree degree = evaluation.getStudentCurricularPlan().getDegree();
+            snapshot.addEntry(student.getNumber(), student.getName(), evaluation.getGrade(), degree.getCode(),
+                    degree.getNameI18N().toLocalizedString(), EnrolmentServices.getShiftsDescription(evaluation.getEnrolment()));
+        }
+
+        snapshot.finalize();
+    }
+
+    @Atomic
+    public void revertToEdition(boolean byTeacher, String reason) {
+
+        if (isEdition()) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.already.in.edition");
+        }
+
+        for (final EnrolmentEvaluation evaluation : getEnrolmentEvaluationSet()) {
+            evaluation.setEnrolmentEvaluationState(EnrolmentEvaluationState.TEMPORARY_OBJ);
+            evaluation.setWhenDateTime(new DateTime());
+            evaluation.setPerson(Authenticate.getUser().getPerson());
+            evaluation.setPersonResponsibleForGrade(null);
+            evaluation.setExamDateYearMonthDay(null);
+            evaluation.setGradeAvailableDateYearMonthDay(null);
+            EnrolmentServices.updateState(evaluation.getEnrolment());
+        }
+
+        CompetenceCourseMarkSheetStateChange.createEditionState(this, byTeacher, reason);
+    }
+
+    public String getCheckSum() {
+        if (isEdition()) {
+            return null;
+        }
+
+        return getLastSnapshot().get().getCheckSum();
     }
 
     public SortedSet<EnrolmentEvaluation> getSortedEnrolmentEvaluations() {
@@ -469,6 +520,19 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
         return result;
 
+    }
+
+    private Optional<CompetenceCourseMarkSheetStateChange> getLastStateBy(CompetenceCourseMarkSheetStateEnum type) {
+        return getStateChangeSet().stream().filter(s -> s.getState() == type)
+                .max(CompetenceCourseMarkSheetStateChange::compareTo);
+
+    }
+
+    public Optional<CompetenceCourseMarkSheetSnapshot> getLastSnapshot() {
+        final Optional<CompetenceCourseMarkSheetStateChange> lastStateChange =
+                getLastStateBy(CompetenceCourseMarkSheetStateEnum.findSubmited());
+
+        return Optional.of(lastStateChange.isPresent() ? lastStateChange.get().getSnapshot() : null);
     }
 
 }

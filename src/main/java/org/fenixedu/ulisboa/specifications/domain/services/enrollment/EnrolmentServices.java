@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.academic.domain.Shift;
+import org.fenixedu.academic.domain.curriculum.EnrollmentState;
 
 public class EnrolmentServices {
 
@@ -17,6 +19,19 @@ public class EnrolmentServices {
 
     static public boolean containsAnyShift(final Enrolment enrolment, final Collection<Shift> shifts) {
         return getShiftsFor(enrolment).stream().anyMatch(s -> shifts.contains(s));
+    }
+
+    static public String getShiftsDescription(final Enrolment enrolment) {
+        return getShiftsFor(enrolment).stream().map(s -> s.getNome()).collect(Collectors.joining(", "));
+    }
+
+    static public EnrollmentState calculateState(final Enrolment enrolment) {
+        final Grade finalGrade = enrolment.getGrade();
+        return finalGrade.isEmpty() ? EnrollmentState.ENROLLED : finalGrade.getEnrolmentState();
+    }
+
+    static public void updateState(final Enrolment enrolment) {
+        enrolment.setEnrollmentState(calculateState(enrolment));
     }
 
 }
