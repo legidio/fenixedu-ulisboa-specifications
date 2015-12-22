@@ -184,19 +184,23 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     }
 
     @RequestMapping(value = "/read/{executionCourseId}/{oid}/updateevaluations")
-    public String processReadToUpdateEvaluations(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, final RedirectAttributes redirectAttributes) {
+    public String processReadToUpdateEvaluations(@PathVariable("executionCourseId") ExecutionCourse executionCourse,
+            @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final RedirectAttributes redirectAttributes) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
-        return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
+        return redirect(UPDATEEVALUATIONS_URL + executionCourse.getExternalId() + "/"
+                + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
     }
 
     @RequestMapping(value = "/read/{executionCourseId}/{oid}/submitmarksheet")
-    public String processReadToSubmitMarkSheet(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, final RedirectAttributes redirectAttributes) {
+    public String processReadToSubmitMarkSheet(@PathVariable("executionCourseId") ExecutionCourse executionCourse,
+            @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final RedirectAttributes redirectAttributes) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
-        return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
+        return redirect(READ_URL + executionCourse.getExternalId() + "/" + getCompetenceCourseMarkSheet(model).getExternalId(),
+                model, redirectAttributes);
     }
 
     private static final String _UPDATE_URI = "/update/";
