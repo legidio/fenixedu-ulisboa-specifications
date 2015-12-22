@@ -44,7 +44,7 @@ ${portal.angularToolkit()}
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATE_URL%>"><spring:message
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATE_URL%>${executionCourse.externalId}"><spring:message
 			code="label.event.create" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -133,6 +133,10 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 	
+
+<%--	
+	<input type="hidden" name="postback"
+		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCHPOSTBACK_URL%>${executionCourse.externalId}' />
 	<div class="panel panel-default">
 			<div class="panel-body">
 				<div class="form-group row">
@@ -172,7 +176,7 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 				<button type="button" class="btn btn-primary" role="button" ng-click="search()"><spring:message code="label.search" /></button> 
 			</div>
 	</div>
-	
+ --%>
 	
 	<c:choose>
 		<c:when test="${not empty searchcompetencecoursemarksheetResultsDataSet}">
@@ -204,7 +208,7 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 						<td><c:out value='${searchResult.printed ? yesLabel : noLabel}'/></td>
 						<td><c:out value='${searchResult.shiftsDescription}'/></td>
 						<td>
-							<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>${searchResult.externalId}"><spring:message code='label.view'/></a>
+							<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_TO_VIEW_ACTION_URL%>${executionCourse.externalId}/${searchResult.externalId}"><spring:message code='label.view'/></a>
 						</td>
 					</tr>
 					</c:forEach>

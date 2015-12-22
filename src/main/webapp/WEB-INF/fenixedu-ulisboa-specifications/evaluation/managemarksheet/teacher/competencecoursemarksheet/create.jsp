@@ -43,8 +43,8 @@ ${portal.angularToolkit()}
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_URL%>${executionCourse.externalId}"><spring:message
+			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -109,10 +109,10 @@ ${portal.angularToolkit()}
 
 <form name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
 	ng-controller="CompetenceCourseMarkSheetController"
-	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.create'>
+	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATE_URL%>${executionCourse.externalId}'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.createpostback' />
+		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATEPOSTBACK_URL%>${executionCourse.externalId}' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 	<div class="panel panel-default">
@@ -122,9 +122,13 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_competenceCourse" class="form-control" type="text" ng-model="object.competenceCourse"
-						name="competencecourse" required />
+				<div class="col-sm-6">
+					<ui-select	id="competenceCourseSelect" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap" on-select="classback($model)" on-remove="callback($model)">
+						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="competenceCourse.id as competenceCourse in object.competenceCourseDataSource | filter: $select.search">
+							<span ng-bind-html="competenceCourse.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 			<div class="form-group row">
@@ -132,9 +136,9 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" />
 				</div>
 
-				<div class="col-sm-4">
+				<div class="col-sm-6">
 					<%-- Relation to side 1 drop down rendered in input --%>
-					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="form-control" name="evaluationseason"
+					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="bootstrap" name="evaluationseason"
 						ng-model="$parent.object.evaluationSeason" theme="bootstrap" ng-disabled="disabled"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
 					<ui-select-choices
 						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
@@ -146,18 +150,8 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" />
 				</div>
 
-				<%-- <div class="col-sm-4">
-	<input id="competenceCourseMarkSheet_evaluationDate" class="form-control" type="text" name="evaluationdate"  bennu-datetime  />
-</div> --%>
-			</div>
-			<div class="form-group row">
-				<div class="col-sm-2 control-label">
-					<spring:message code="label.CompetenceCourseMarkSheet.certifier" />
-				</div>
-
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_certifier" class="form-control" type="text" ng-model="object.certifier" name="certifier"
-						required />
+				<div class="col-sm-6">
+					<input class="form-control" type="text" bennu-date="object.evaluationDate" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -165,7 +159,7 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.shifts" />
 				</div>
 
-				<div class="col-sm-10">
+				<div class="col-sm-6">
 					<input id="competenceCourseMarkSheet_shifts" class="form-control" type="text" ng-model="object.shifts" name="shifts" />
 				</div>
 			</div>

@@ -28,28 +28,36 @@ package org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.teache
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response.Status;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.Professorship;
+import org.fenixedu.academic.ui.struts.action.teacher.ManageExecutionCourseDA;
+import org.fenixedu.bennu.core.domain.exceptions.AuthorizationException;
 import org.fenixedu.bennu.core.security.Authenticate;
-import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.bennu.portal.domain.MenuFunctionality;
+import org.fenixedu.bennu.portal.model.Functionality;
+import org.fenixedu.bennu.portal.servlet.BennuPortalDispatcher;
+import org.fenixedu.bennu.portal.servlet.PortalLayoutInjector;
+import org.fenixedu.bennu.struts.portal.RenderersAnnotationProcessor;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.CompetenceCourseMarkSheetBean;
 import org.fenixedu.ulisboa.specifications.service.evaluation.MarkSheetDocumentPrintService;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
-import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -57,9 +65,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Component("org.fenixedu.ulisboa.specifications.evaluation.manageMarkSheet.teacher")
-@SpringFunctionality(app = FenixeduUlisboaSpecificationsController.class,
-        title = "label.title.evaluation.manageMarkSheet.teacher", accessGroup = "role(TEACHER)")
+import com.google.common.collect.Maps;
+
+@Controller
 @RequestMapping(CompetenceCourseMarkSheetController.CONTROLLER_URL)
 public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecificationsBaseController {
 
@@ -97,25 +105,17 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _SEARCH_URI = "/";
     public static final String SEARCH_URL = CONTROLLER_URL + _SEARCH_URI;
 
-    @RequestMapping(value = _SEARCH_URI + "{oid}", method = RequestMethod.GET)
-    public String search(@PathVariable("oid") final ExecutionCourse executionCourse, final Model model) {
-        checkAccess(executionCourse);
-
+    @RequestMapping(value = _SEARCH_URI + "{executionCourseId}", method = RequestMethod.GET)
+    public String search(@PathVariable("executionCourseId") final ExecutionCourse executionCourse, final Model model) {
         final List<CompetenceCourseMarkSheet> searchResultsDataSet = filterSearch(executionCourse);
-        
+
         final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
         bean.update();
         setCompetenceCourseMarkSheetBean(bean, model);
 
         model.addAttribute("searchcompetencecoursemarksheetResultsDataSet", searchResultsDataSet);
-        return jspPage("search");
-    }
 
-    static private void checkAccess(final ExecutionCourse executionCourse) {
-        final Professorship professorship = Authenticate.getUser().getPerson().getProfessorshipByExecutionCourse(executionCourse);
-        if (professorship == null || !professorship.getPermissions().getEvaluationFinal()) {
-            throw new ULisboaSpecificationsDomainException(Status.FORBIDDEN, "message.error.notAuthorized");
-        }
+        return jspPage("search");
     }
 
     private Stream<CompetenceCourseMarkSheet> getSearchUniverseSearchDataSet(final ExecutionCourse executionCourse) {
@@ -130,17 +130,32 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _SEARCH_TO_VIEW_ACTION_URI = "/search/view/";
     public static final String SEARCH_TO_VIEW_ACTION_URL = CONTROLLER_URL + _SEARCH_TO_VIEW_ACTION_URI;
 
-    @RequestMapping(value = _SEARCH_TO_VIEW_ACTION_URI + "{oid}")
-    public String processSearchToViewAction(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            final Model model, final RedirectAttributes redirectAttributes) {
+    @RequestMapping(value = _SEARCH_TO_VIEW_ACTION_URI + "{executionCourseId}/{oid}")
+    public String processSearchToViewAction(@PathVariable("executionCourseId") final ExecutionCourse executionCourse,
+            @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final RedirectAttributes redirectAttributes) {
 
-        return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
+        return redirect(READ_URL + executionCourse.getExternalId() + "/" + competenceCourseMarkSheet.getExternalId(), model,
+                redirectAttributes);
+    }
+
+    private static final String _SEARCHPOSTBACK_URI = "/searchpostback/";
+    public static final String SEARCHPOSTBACK_URL = CONTROLLER_URL + _SEARCHPOSTBACK_URI;
+
+    @RequestMapping(value = _SEARCHPOSTBACK_URI + "{executionCourseId}", method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8")
+    public @ResponseBody ResponseEntity<String> searchpostback(
+            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
+
+        bean.update();
+        this.setCompetenceCourseMarkSheetBean(bean, model);
+        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
     private static final String _READ_URI = "/read/";
     public static final String READ_URL = CONTROLLER_URL + _READ_URI;
 
-    @RequestMapping(value = _READ_URI + "{oid}")
+    @RequestMapping(value = _READ_URI + "{executionCourseId}/{oid}")
     public String read(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
         return jspPage("read");
@@ -187,7 +202,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _UPDATE_URI = "/update/";
     public static final String UPDATE_URL = CONTROLLER_URL + _UPDATE_URI;
 
-    @RequestMapping(value = _UPDATE_URI + "{oid}", method = RequestMethod.GET)
+    @RequestMapping(value = _UPDATE_URI + "{executionCourseId}/{oid}", method = RequestMethod.GET)
     public String update(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
@@ -201,7 +216,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _UPDATEPOSTBACK_URI = "/updatepostback/";
     public static final String UPDATEPOSTBACK_URL = CONTROLLER_URL + _UPDATEPOSTBACK_URI;
 
-    @RequestMapping(value = _UPDATEPOSTBACK_URI + "{oid}", method = RequestMethod.POST,
+    @RequestMapping(value = _UPDATEPOSTBACK_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST,
             produces = "application/json;charset=UTF-8")
     public @ResponseBody ResponseEntity<String> updatepostback(
             @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
@@ -211,7 +226,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
-    @RequestMapping(value = _UPDATE_URI + "{oid}", method = RequestMethod.POST)
+    @RequestMapping(value = _UPDATE_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
     public String update(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
             final RedirectAttributes redirectAttributes) {
@@ -232,21 +247,23 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
     }
 
-    private static final String _CREATE_URI = "/create";
+    private static final String _CREATE_URI = "/create/";
     public static final String CREATE_URL = CONTROLLER_URL + _CREATE_URI;
 
-    @RequestMapping(value = _CREATE_URI, method = RequestMethod.GET)
-    public String create(final Model model) {
-        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
+    @RequestMapping(value = _CREATE_URI + "{executionCourseId}", method = RequestMethod.GET)
+    public String create(@PathVariable("executionCourseId") final ExecutionCourse executionCourse, final Model model) {
+        final CompetenceCourseMarkSheetBean bean =
+                new CompetenceCourseMarkSheetBean(executionCourse, Authenticate.getUser().getPerson());
         this.setCompetenceCourseMarkSheetBean(bean, model);
 
         return jspPage("create");
     }
 
-    private static final String _CREATEPOSTBACK_URI = "/createpostback";
+    private static final String _CREATEPOSTBACK_URI = "/createpostback/";
     public static final String CREATEPOSTBACK_URL = CONTROLLER_URL + _CREATEPOSTBACK_URI;
 
-    @RequestMapping(value = _CREATEPOSTBACK_URI, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = _CREATEPOSTBACK_URI + "{executionCourseId}", method = RequestMethod.POST,
+            produces = "application/json;charset=UTF-8")
     public @ResponseBody ResponseEntity<String> createpostback(
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
 
@@ -254,9 +271,10 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
-    @RequestMapping(value = _CREATE_URI, method = RequestMethod.POST)
-    public String create(@RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean,
-            final Model model, final RedirectAttributes redirectAttributes) {
+    @RequestMapping(value = _CREATE_URI + "{executionCourseId}", method = RequestMethod.POST)
+    public String create(@PathVariable("executionCourseId") ExecutionCourse executionCourse,
+            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
+            final RedirectAttributes redirectAttributes) {
 
         try {
             final CompetenceCourseMarkSheet markSheet = CompetenceCourseMarkSheet.create(bean.getExecutionSemester(),
@@ -264,8 +282,8 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
                     bean.getCertifier(), bean.getShifts(), true);
 
             model.addAttribute("competenceCourseMarkSheet", markSheet);
-            return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model,
-                    redirectAttributes);
+            return redirect(UPDATEEVALUATIONS_URL + executionCourse.getExternalId() + "/"
+                    + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
 
         } catch (Exception de) {
 
@@ -279,7 +297,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _UPDATEEVALUATIONS_URI = "/updateevaluations/";
     public static final String UPDATEEVALUATIONS_URL = CONTROLLER_URL + _UPDATEEVALUATIONS_URI;
 
-    @RequestMapping(value = _UPDATEEVALUATIONS_URI + "{oid}", method = RequestMethod.GET)
+    @RequestMapping(value = _UPDATEEVALUATIONS_URI + "{executionCourseId}/{oid}", method = RequestMethod.GET)
     public String updateevaluations(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             final Model model) {
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
@@ -293,7 +311,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _UPDATEEVALUATIONSPOSTBACK_URI = "/updateevaluationspostback/";
     public static final String UPDATEEVALUATIONSPOSTBACK_URL = CONTROLLER_URL + _UPDATEEVALUATIONSPOSTBACK_URI;
 
-    @RequestMapping(value = _UPDATEEVALUATIONSPOSTBACK_URI + "{oid}", method = RequestMethod.POST,
+    @RequestMapping(value = _UPDATEEVALUATIONSPOSTBACK_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST,
             produces = "application/json;charset=UTF-8")
     public @ResponseBody ResponseEntity<String> updateevaluationspostback(
             @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
@@ -303,7 +321,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
     }
 
-    @RequestMapping(value = _UPDATEEVALUATIONS_URI + "{oid}", method = RequestMethod.POST)
+    @RequestMapping(value = _UPDATEEVALUATIONS_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
     public String updateevaluations(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
             final RedirectAttributes redirectAttributes) {
@@ -328,7 +346,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _PRINT_URI = "/print/";
     public static final String PRINT_URL = CONTROLLER_URL + _PRINT_URI;
 
-    @RequestMapping(value = _PRINT_URI + "{oid}")
+    @RequestMapping(value = _PRINT_URI + "{executionCourseId}/{oid}")
     public void print(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final HttpServletResponse response) throws IOException {
 
@@ -344,7 +362,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _CONFIRM_URI = "/confirm";
     public static final String CONFIRM_URL = CONTROLLER_URL + _CONFIRM_URI;
 
-    @RequestMapping(value = _CONFIRM_URI + "{oid}", method = RequestMethod.POST)
+    @RequestMapping(value = _CONFIRM_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
     public String confirm(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final RedirectAttributes redirectAttributes) {
 
@@ -363,6 +381,37 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
 
+    }
+
+    @ModelAttribute
+    private void setFunctionalityAndExecutionCourseContext(
+            final @PathVariable("executionCourseId") ExecutionCourse executionCourse, final Model model,
+            final HttpServletRequest request) {
+
+        final Functionality functionality = RenderersAnnotationProcessor.getFunctionalityForType(ManageExecutionCourseDA.class);
+        final MenuFunctionality menuItem =
+                MenuFunctionality.findFunctionality(functionality.getProvider(), functionality.getKey());
+        if (menuItem == null || !menuItem.isAvailableForCurrentUser()) {
+            throw AuthorizationException.unauthorized();
+        }
+
+        BennuPortalDispatcher.selectFunctionality(request, menuItem);
+
+        final Map<String, Object> requestContext = Maps.newHashMap();
+        requestContext.put("professorship", findProfessorship(executionCourse));
+        requestContext.put("executionCourse", executionCourse);
+        PortalLayoutInjector.addContextExtension(requestContext);
+
+        model.addAttribute("executionCourse", executionCourse);
+    }
+
+    private Professorship findProfessorship(final ExecutionCourse executionCourse) {
+        final Professorship result = Authenticate.getUser().getPerson().getProfessorshipByExecutionCourse(executionCourse);
+        if (result == null || !result.getPermissions().getEvaluationFinal()) {
+            throw new ULisboaSpecificationsDomainException(Status.FORBIDDEN, "message.error.notAuthorized");
+        }
+
+        return result;
     }
 
 }

@@ -108,16 +108,16 @@ ${portal.angularToolkit()}
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONTROLLER_URL%>"><spring:message
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_URL%>${executionCourse.externalId}"><spring:message
 			code="label.event.back" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
 		href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a> |&nbsp;&nbsp; <span
 		class="glyphicon glyphicon-pencil" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}"><spring:message
 			code="label.event.update" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}/updateevaluations"><spring:message
 			code="label.event.evaluation.manageMarkSheet.updateEvaluations" /></a> |&nbsp;&nbsp; <span class="glyphicon glyphicon-cog"
 		aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/submitmarksheet"><spring:message
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}/submitmarksheet"><spring:message
 			code="label.event.evaluation.manageMarkSheet.teacher.submitMarkSheet" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
@@ -174,7 +174,7 @@ ${portal.angularToolkit()}
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
-						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)pageContext.getAttribute("competenceCourseMarkSheet")).getEvaluationSeason()).getContent()%>"></c:out></td>
+						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)pageContext.findAttribute("competenceCourseMarkSheet")).getEvaluationSeason()).getContent()%>"></c:out></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
@@ -205,31 +205,5 @@ ${portal.angularToolkit()}
 		</form>
 	</div>
 </div>
-
-<%-- State Changes --%>
-<h2><spring:message code="label.CompetenceCourseMarkSheet.stateChanges"></spring:message></h2>
-<table id="stateChangesTable" class="table responsive table-bordered table-hover" width="100%">
-	<thead>
-		<tr>
-			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.date" /></th>
-			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.state" /></th>
-			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.responsible" /></th>
-			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.byTeacher" /></th>
-		</tr>
-	</thead>
-	<tbody>
-		<c:forEach var="each" items="${competenceCourseMarkSheet.stateChangeSet}">
-		<tr>
-			<td><joda:format value="${each.date}" style="SM" /></td>
-			<td><c:out value="${each.state.descriptionI18N.content}"></c:out></td>
-			<td><c:out value="${each.responsible.name}"></c:out></td>
-			<td><c:out value="${each.byTeacher ? yesLabel : noLabel}"></c:out></td>
-		</tr>
-		</c:forEach>
-	</tbody>
-</table>
-<script type="text/javascript">
-	createDataTables('stateChangesTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
-</script>
 
 </div>

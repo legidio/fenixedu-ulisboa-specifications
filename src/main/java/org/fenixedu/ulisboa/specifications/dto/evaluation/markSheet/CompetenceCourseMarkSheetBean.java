@@ -280,6 +280,16 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         update();
     }
 
+    public CompetenceCourseMarkSheetBean(final ExecutionCourse executionCourse, final Person certifier) {
+        setExecutionSemester(executionCourse.getExecutionPeriod());
+        setCompetenceCourse(executionCourse.getCompetenceCourses().size() == 1 ? executionCourse.getCompetenceCourses().iterator()
+                .next() : null);
+        setCertifier(certifier);
+        setExecutionCourse(executionCourse);
+
+        update();
+    }
+
     public void update() {
         setExecutionSemesterDataSource(ExecutionSemester.readNotClosedExecutionPeriods().stream()
                 .sorted(ExecutionSemester.COMPARATOR_BY_BEGIN_DATE.reversed()).collect(Collectors.toList()));
@@ -326,7 +336,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
                 }
             }
         }
-        
+
         Collections.sort(result);
 
         return result;
@@ -352,7 +362,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
             if (!markBean.hasGradeValue()) {
                 continue;
             }
-            
+
             markBean.createOrUpdateEnrolmentEvaluation(getCompetenceCourseMarkSheet());
         }
 
