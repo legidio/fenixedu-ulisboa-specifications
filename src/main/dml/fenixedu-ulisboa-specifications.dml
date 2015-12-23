@@ -676,11 +676,11 @@ class evaluation.markSheet.CompetenceCourseMarkSheetSnapshotEntry {
 }
 
 relation CompetenceCourseMarkSheetStateChangeSnapshot {
-	protected evaluation.markSheet.CompetenceCourseMarkSheetSnapshot playsRole snapshot {
+	evaluation.markSheet.CompetenceCourseMarkSheetSnapshot playsRole snapshot {
 		multiplicity 0..1;
 	}
 	
-	protected evaluation.markSheet.CompetenceCourseMarkSheetStateChange playsRole stateChange {
+	evaluation.markSheet.CompetenceCourseMarkSheetStateChange playsRole stateChange {
 		multiplicity 1..1;
 	}
 }

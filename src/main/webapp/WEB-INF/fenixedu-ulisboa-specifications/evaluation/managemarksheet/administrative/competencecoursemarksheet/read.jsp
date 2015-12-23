@@ -60,18 +60,37 @@ ${portal.angularToolkit()}
 					//Begin here of Custom Screen business JS - code
 					
 					$scope.submitMarkSheet = function() {
-						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SUBMIT_URL%>${competenceCourseMarkSheet.externalId}');
-						$('#actionsForm').submit();
+						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SUBMIT_URL%>${competenceCourseMarkSheet.externalId}', 
+								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmSubmit" />', 
+								'<spring:message code="label.event.evaluation.manageMarkSheet.submit" />');
 					}
 					
-					$scope.confirmMarkSheet = function() {
-						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}');
-						$('#actionsForm').submit();
+					$scope.confirmMarkSheet = function() {						
+						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}', 
+								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmConfirm" />', 
+								'<spring:message code="label.event.evaluation.manageMarkSheet.confirm" />');
+						
 					}
 					
-					$scope.revertMarkSheetToEdition = function() {
-						$('#actionsForm').attr('action', '${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.REVERT_TO_EDITION_URL%>${competenceCourseMarkSheet.externalId}');
-						$('#actionsForm').submit();
+					$scope.revertMarkSheetToEdition = function() {						
+						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.REVERT_TO_EDITION_URL%>${competenceCourseMarkSheet.externalId}', 
+								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmRevertToEdition" />', 
+								'<spring:message code="label.event.evaluation.manageMarkSheet.revertToEdition" />');
+					}
+					
+					$scope.deleteMarkSheet = function() {	
+						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.DELETE_URL%>${competenceCourseMarkSheet.externalId}', 
+								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmDelete" />', 
+								'<spring:message code="label.delete" />');
+						
+						
+					}
+					
+					$scope.showConfirmation = function(url,message,actionText) {
+						$('#confirmationForm').attr('action', url);
+						$('#confirmationMessage').html(message);
+						$('#confirmationButton').html(actionText);
+						$('#confirmationModal').modal('toggle')
 					}
 					
 					
@@ -79,7 +98,6 @@ ${portal.angularToolkit()}
 			   }]);
 </script>
 
-<form id="actionsForm" method="post" action=""></form>
 
 <div ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController">
 
@@ -90,12 +108,10 @@ ${portal.angularToolkit()}
 		<small></small>
 	</h1>
 </div>
-<div class="modal fade" id="deleteModal">
+<div class="modal fade" id="confirmationModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form id="deleteForm"
-				action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.DELETE_URL%>${competenceCourseMarkSheet.externalId}"
-				method="POST">
+			<form id="confirmationForm"	action="#" method="post">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
@@ -105,16 +121,14 @@ ${portal.angularToolkit()}
 					</h4>
 				</div>
 				<div class="modal-body">
-					<p>
-						<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmDelete" />
-					</p>
+					<p id="confirmationMessage"></p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default" data-dismiss="modal">
 						<spring:message code="label.close" />
 					</button>
-					<button id="deleteButton" class="btn btn-danger" type="submit">
-						<spring:message code="label.delete" />
+					<button id="confirmationButton" class="btn btn-danger" type="submit">
+						
 					</button>
 				</div>
 			</form>
@@ -124,6 +138,8 @@ ${portal.angularToolkit()}
 	<!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+
+
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
@@ -143,8 +159,14 @@ ${portal.angularToolkit()}
 		&nbsp;|&nbsp; <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>&nbsp;<a class="" ng-click="submitMarkSheet()"
 			href="#"><spring:message code="label.event.evaluation.manageMarkSheet.submit" /></a>
 			
-		&nbsp;|&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class=""
-			href="#" data-toggle="modal" data-target="#deleteModal"><spring:message code="label.event.delete" /></a>
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>&nbsp;<a class="" href="#" 
+			ng-click="deleteMarkSheet()"><spring:message code="label.event.delete" /></a>
+	</c:if>
+	
+	<c:if test="${!competenceCourseMarkSheet.edition}">
+		&nbsp;|&nbsp; <span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.PRINT_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+				code="label.event.evaluation.manageMarkSheet.print" /></a>
 	</c:if>
 			
 	<c:if test="${competenceCourseMarkSheet.submitted}">
@@ -153,11 +175,8 @@ ${portal.angularToolkit()}
 	</c:if>
 	
 	<c:if test="${!competenceCourseMarkSheet.edition}">
-		&nbsp;|&nbsp; <span class="glyphicon glyphicon-print" aria-hidden="true"></span>&nbsp;<a class=""
-			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.PRINT_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-				code="label.event.evaluation.manageMarkSheet.print" /></a>
 		&nbsp;|&nbsp; <span
-			class="glyphicon glyphicon-edit" aria-hidden="true"></span>&nbsp;<a class="" href="#" ng-click="revertMarkSheetToEdition()"><spring:message
+			class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp; <a class="" href="#" ng-click="revertMarkSheetToEdition()"><spring:message
 				code="label.event.evaluation.manageMarkSheet.revertToEdition" /></a>
 	</c:if>
 		
@@ -236,7 +255,7 @@ ${portal.angularToolkit()}
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
-						<td><c:out value="${competenceCourseMarkSheet.state}"/></td>
+						<td><span class="label label-primary"><c:out value="${competenceCourseMarkSheet.state}"/></span></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.certifier" /></th>
@@ -250,11 +269,11 @@ ${portal.angularToolkit()}
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.checkSum" /></th>
 						<td>
 							<c:choose>
-								<c:when test="${empty competenceCourseMarkSheet.checkSum}">
+								<c:when test="${empty competenceCourseMarkSheet.formattedCheckSum}">
 									-
 								</c:when>
 								<c:otherwise>
-									<c:out value='${competenceCourseMarkSheet.checkSum}' />
+									<c:out value='${competenceCourseMarkSheet.formattedCheckSum}' />
 								</c:otherwise>
 							</c:choose>
 						</td>
@@ -293,6 +312,32 @@ ${portal.angularToolkit()}
 </table>
 <script type="text/javascript">
 	createDataTables('stateChangesTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
+</script>
+
+<%-- Previous Versions --%>
+<h2><spring:message code="label.CompetenceCourseMarkSheet.previousSnapshots"></spring:message></h2>
+<table id="previousSnapshotsTable" class="table responsive table-bordered table-hover" width="100%">
+	<thead>
+		<tr>
+			<th><spring:message code="label.CompetenceCourseMarkSheetStateChange.date" /></th>
+			<th> </th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:forEach var="each" items="${competenceCourseMarkSheet.previousSnapshots}">
+		<tr>
+			<td><joda:format value="${each.stateChange.date}" style="SM" /></td>
+			<td>
+				<a  class="btn btn-default btn-xs" href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.PRINT_SNAPSHOT_URL%>${each.externalId}">
+					<spring:message code='label.event.evaluation.manageMarkSheet.print'/>
+				</a>
+			</td>
+		</tr>
+		</c:forEach>
+	</tbody>
+</table>
+<script type="text/javascript">
+	createDataTables('previousSnapshotsTable',false /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 </script>
 
 </div>

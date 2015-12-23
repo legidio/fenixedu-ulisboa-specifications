@@ -74,7 +74,6 @@ public class CompetenceCourseMarkSheetSnapshot extends CompetenceCourseMarkSheet
     public void delete() {
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
 
-
         final Iterator<CompetenceCourseMarkSheetSnapshotEntry> iterator = getEntrySet().iterator();
         while (iterator.hasNext()) {
             final CompetenceCourseMarkSheetSnapshotEntry entry = iterator.next();
@@ -146,7 +145,32 @@ public class CompetenceCourseMarkSheetSnapshot extends CompetenceCourseMarkSheet
 
         return result;
     }
+
+    public String getFormattedCheckSum() {
+        
+        if (StringUtils.isEmpty(getCheckSum())) {
+            return null;
+        }
+
+        final StringBuilder result = new StringBuilder();
+        int counter = 0;
+        for (final Character c : getCheckSum().toCharArray()) {
+            result.append(c);
+            if (++counter % 2 == 0) {
+                result.append(" ");
+            }
+        }
+
+        if (result.toString().endsWith(" ")) {
+            result.delete(result.length() - 1, result.length());
+        }
+
+        return result.toString().toUpperCase();
+    }
     
-    
+    public boolean isLastSnapshot() {
+        return getStateChange().getCompetenceCourseMarkSheet().getLastSnapshot().get() == this;
+        
+    }
 
 }

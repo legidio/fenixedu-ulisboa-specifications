@@ -102,13 +102,33 @@ ${portal.angularToolkit()}
 
 				$scope.object = ${competenceCourseMarkSheetBeanJson};
 				$scope.postBack = createAngularPostbackFunction($scope);
+				
+				$scope.fillEmptyGradesWithValue = function() {
+					$.each( $scope.object.evaluations, function( index, evaluation ){
+						if (evaluation.gradeValue == undefined || evaluation.gradeValue == '') {
+							$scope.object.evaluations[index].gradeValue = $scope.defaultGrade;
+						}
+					});
+					
+				}
+				
+				$scope.clearGrades = function() {
+					$.each( $scope.object.evaluations, function( index, evaluation ){
+						$scope.object.evaluations[index].gradeValue = undefined;
+					});
+					
+				}
+				
+				$scope.submitGrades = function() {
+					$('#updateEvaluationsForm').submit();
+				}
 
-				//Begin here of Custom Screen business JS - code
 
 			    } ]);
 </script>
 
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
+
+<form id="updateEvaluationsForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
 	ng-controller="CompetenceCourseMarkSheetController"
 	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONS_URL%>${competenceCourseMarkSheet.externalId}'>
 
@@ -116,9 +136,19 @@ ${portal.angularToolkit()}
 		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONSPOSTBACK_URL%>${competenceCourseMarkSheet.externalId}' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
+	
 
 	<div class="panel panel-default">
 		<div class="panel-body">
+
+			<div class="form-group row">
+				<div class="col-sm-6">
+					<input type="text" name="defaultGrade" ng-model="defaultGrade" size="6" maxlength="6"/>
+					<button class="btn glyphicon glyphicon-cog" type="button" ng-click="fillEmptyGradesWithValue()"> <spring:message code="label.fill" /></button>
+				</div>
+			</div>
+			
+			
 			<table id="evaluationsTable" class="table responsive table-bordered table-hover" width="100%">
 				<thead>
 					<tr>
@@ -146,7 +176,7 @@ ${portal.angularToolkit()}
 			
 		</div>
 		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<button type="button" class="btn btn-primary" role="button" ng-click="submitGrades()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>

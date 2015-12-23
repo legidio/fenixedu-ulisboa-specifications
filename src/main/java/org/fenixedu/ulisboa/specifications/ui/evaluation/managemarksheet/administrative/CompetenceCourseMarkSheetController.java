@@ -37,6 +37,7 @@ import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetSnapshot;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.CompetenceCourseMarkSheetBean;
 import org.fenixedu.ulisboa.specifications.service.evaluation.MarkSheetDocumentPrintService;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
@@ -393,6 +394,20 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         writeFile(response, filename, MarkSheetDocumentPrintService.PDF,
                 MarkSheetDocumentPrintService.print(competenceCourseMarkSheet));
+    }
+
+    private static final String _PRINT_SNAPSHOT_URI = "/printsnapshot/";
+    public static final String PRINT_SNAPSHOT_URL = CONTROLLER_URL + _PRINT_SNAPSHOT_URI;
+
+    @RequestMapping(value = _PRINT_SNAPSHOT_URI + "{oid}")
+    public void printSnapshot(@PathVariable("oid") final CompetenceCourseMarkSheetSnapshot snapshot, final Model model,
+            final HttpServletResponse response) throws IOException {
+
+        final String filename = snapshot.getCompetenceCourseCode() + "_"
+                + snapshot.getCompetenceCourseName().getContent().replace(' ', '_').replace('/', '-').replace('\\', '-')
+                + snapshot.getEvaluationDate().toString("yyyy-MM-dd") + ".pdf";
+
+        writeFile(response, filename, MarkSheetDocumentPrintService.PDF, MarkSheetDocumentPrintService.print(snapshot));
     }
 
     private static final String _CONFIRM_URI = "/confirm";

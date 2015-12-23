@@ -196,7 +196,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             iterator.remove();
             stateChange.delete();
         }
-        
 
         ULisboaSpecificationsDomainException.throwWhenDeleteBlocked(getDeletionBlockers());
         deleteDomainObject();
@@ -347,6 +346,10 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             }
 
             final Enrolment enrolment = (Enrolment) curriculumModule;
+            
+            if (enrolment.isAnnulled()) {
+                continue;
+            }
 
             if (!season.isImprovement() && !enrolment.isValid(executionSemester)) {
                 continue;
@@ -508,6 +511,14 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         return getLastSnapshot().get().getCheckSum();
     }
 
+    public String getFormattedCheckSum() {
+        if (isEdition()) {
+            return null;
+        }
+
+        return getLastSnapshot().get().getFormattedCheckSum();
+    }
+
     public SortedSet<EnrolmentEvaluation> getSortedEnrolmentEvaluations() {
 
         final Comparator<EnrolmentEvaluation> byStudentName =
@@ -533,6 +544,24 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
                 getLastStateBy(CompetenceCourseMarkSheetStateEnum.findSubmited());
 
         return Optional.of(lastStateChange.isPresent() ? lastStateChange.get().getSnapshot() : null);
+    }
+
+    public Collection<CompetenceCourseMarkSheetSnapshot> getSnapshots() {
+        return getStateChangeSet().stream().filter(s -> s.getState() == CompetenceCourseMarkSheetStateEnum.findSubmited())
+                .map(s -> s.getSnapshot()).collect(Collectors.toSet());
+
+    }
+
+    public Collection<CompetenceCourseMarkSheetSnapshot> getPreviousSnapshots() {
+
+        final Collection<CompetenceCourseMarkSheetSnapshot> snapshots = getSnapshots();
+        if (snapshots.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        final CompetenceCourseMarkSheetSnapshot lastSnapshot = getLastSnapshot().get();
+        return snapshots.stream().filter(s -> s != lastSnapshot).collect(Collectors.toSet());
+
     }
 
 }
