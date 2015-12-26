@@ -107,6 +107,10 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationDate.required");
         }
 
+        if (getExecutionCourse() == null) {
+            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.executionCourse.required");
+        }
+
         // TODO legidio, needed in future? 
         // checkIfTeacherIsResponsibleOrCoordinator;
         checkIfEvaluationDateIsInExamsPeriod();
@@ -346,7 +350,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             }
 
             final Enrolment enrolment = (Enrolment) curriculumModule;
-            
+
             if (enrolment.isAnnulled()) {
                 continue;
             }

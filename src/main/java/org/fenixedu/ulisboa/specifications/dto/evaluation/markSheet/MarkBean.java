@@ -30,6 +30,7 @@ package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.Grade;
@@ -103,7 +104,12 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     }
 
     public void setGradeValue(String gradeValue) {
-        this.gradeValue = gradeValue;
+        this.gradeValue = NumberUtils.isNumber(gradeValue) ? cleanupNumber(gradeValue) : gradeValue;
+    }
+
+    private String cleanupNumber(String toCleanup) {
+        final Double parsedValue = Double.valueOf(toCleanup);
+        return parsedValue % 1 == 0 ? String.valueOf(parsedValue.intValue()) : toCleanup;
     }
 
     public String getDegreeName() {
@@ -164,7 +170,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     }
 
     public boolean hasGradeValue() {
-        return !StringUtils.isEmpty(getGradeValue());
+        return !StringUtils.isBlank(getGradeValue());
     }
 
     private GradeScale getGradeScale() {
@@ -173,8 +179,33 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     }
 
     @Atomic
-    public void createOrUpdateEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
-        final EnrolmentEvaluation enrolmentEvaluation = findOrCreateEnrolmentEvaluation(markSheet);
+    public void updateEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
+
+        final EnrolmentEvaluation evaluation = findEnrolmentEvaluation(markSheet);
+        if (evaluation == null) {
+            if (hasGradeValue()) {
+                setEnrolmentEvaluationData(markSheet, new EnrolmentEvaluation(getEnrolment(), markSheet.getEvaluationSeason()));
+            }
+        } else {
+            if (!hasGradeValue()) {
+                evaluation.setGrade(Grade.createEmptyGrade());
+                evaluation.setEnrolmentEvaluationState(EnrolmentEvaluationState.TEMPORARY_OBJ);
+                evaluation.setCompetenceCourseMarkSheet(null);
+            } else {
+                setEnrolmentEvaluationData(markSheet, evaluation);
+            }
+        }
+
+    }
+
+    private EnrolmentEvaluation findEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
+        final Optional<EnrolmentEvaluation> foundEvaluation =
+                getEnrolment().getEnrolmentEvaluation(markSheet.getEvaluationSeason(), markSheet.getExecutionSemester(), false);
+
+        return foundEvaluation.isPresent() ? foundEvaluation.get() : null;
+    }
+
+    private void setEnrolmentEvaluationData(CompetenceCourseMarkSheet markSheet, EnrolmentEvaluation enrolmentEvaluation) {
         enrolmentEvaluation.setWhenDateTime(new DateTime());
         enrolmentEvaluation.setGrade(Grade.createGrade(getGradeValue(), getGradeScale()));
         enrolmentEvaluation.setEnrolmentEvaluationState(EnrolmentEvaluationState.TEMPORARY_OBJ);
@@ -183,16 +214,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
         enrolmentEvaluation.setPersonResponsibleForGrade(markSheet.getCertifier());
         enrolmentEvaluation.setExamDateYearMonthDay(markSheet.getEvaluationDate().toDateTimeAtStartOfDay().toYearMonthDay());
         enrolmentEvaluation.setGradeAvailableDateYearMonthDay(new YearMonthDay());
-
         enrolmentEvaluation.setCompetenceCourseMarkSheet(markSheet);
-    }
-
-    protected EnrolmentEvaluation findOrCreateEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
-        final Optional<EnrolmentEvaluation> foundEvaluation =
-                getEnrolment().getEnrolmentEvaluation(markSheet.getEvaluationSeason(), markSheet.getExecutionSemester(), false);
-
-        return foundEvaluation.isPresent() ? foundEvaluation.get() : new EnrolmentEvaluation(getEnrolment(),
-                markSheet.getEvaluationSeason());
     }
 
 }

@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
@@ -40,6 +41,7 @@ import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.Competenc
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetSnapshot;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.CompetenceCourseMarkSheetBean;
 import org.fenixedu.ulisboa.specifications.service.evaluation.MarkSheetDocumentPrintService;
+import org.fenixedu.ulisboa.specifications.service.evaluation.MarkSheetImportExportService;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsBaseController;
 import org.fenixedu.ulisboa.specifications.ui.FenixeduUlisboaSpecificationsController;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
@@ -52,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Component("org.fenixedu.ulisboa.specifications.evaluation.manageMarkSheet.administrative")
@@ -481,6 +484,43 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
 
+    }
+
+    private static final String _EXPORT_EXCEL_URI = "/exportexcel/";
+    public static final String EXPORT_EXCEL_URL = CONTROLLER_URL + _EXPORT_EXCEL_URI;
+
+    @RequestMapping(value = _EXPORT_EXCEL_URI + "{oid}", method = RequestMethod.GET)
+    public void exportExcel(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+            final HttpServletResponse response) throws IOException {
+
+        final CompetenceCourse competenceCourse = competenceCourseMarkSheet.getCompetenceCourse();
+        final String filename = competenceCourse.getCode() + "_"
+                + competenceCourse.getName().replace(' ', '_').replace('/', '-').replace('\\', '-')
+                + competenceCourseMarkSheet.getEvaluationDate().toString("yyyy-MM-dd")
+                + MarkSheetImportExportService.XLSX_EXTENSION;
+
+        writeFile(response, filename, MarkSheetImportExportService.XLSX_MIME_TYPE,
+                MarkSheetImportExportService.exportToXLSX(new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet)));
+    }
+
+    private static final String _IMPORT_EXCEL_URI = "/importexcel/";
+    public static final String IMPORT_EXCEL_URL = CONTROLLER_URL + _IMPORT_EXCEL_URI;
+
+    @RequestMapping(value = _IMPORT_EXCEL_URI + "{oid}", method = RequestMethod.POST)
+    public String importExcel(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
+            @RequestParam(value = "file", required = true) MultipartFile markSheetFile, final Model model,
+            final RedirectAttributes redirectAttributes) throws IOException {
+
+        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet);
+        MarkSheetImportExportService.importFromXLSX(FilenameUtils.getName(markSheetFile.getOriginalFilename()),
+                markSheetFile.getBytes(), bean);
+
+        setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
+        setCompetenceCourseMarkSheetBean(bean, model);
+
+        //TODO: do something with result
+
+        return jspPage("updateevaluations");
     }
 
 }

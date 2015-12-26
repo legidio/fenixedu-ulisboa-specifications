@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -323,6 +324,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         final List<MarkBean> result = Lists.newArrayList();
 
         if (getCompetenceCourseMarkSheet() != null) {
+
             for (final Enrolment enrolment : getCompetenceCourseMarkSheet().getEnrolmentsNotInAnyMarkSheet()) {
 
                 if (getExecutionCourse() != null) {
@@ -335,6 +337,16 @@ public class CompetenceCourseMarkSheetBean implements IBean {
                     result.add(new MarkBean(enrolment));
                 }
             }
+
+            getCompetenceCourseMarkSheet().getEnrolmentEvaluationSet().forEach(e ->
+            {
+
+                final MarkBean markBean = new MarkBean(e.getEnrolment());
+                markBean.setGradeValue(e.getGradeValue());
+                result.add(markBean);
+
+            });
+
         }
 
         Collections.sort(result);
@@ -359,11 +371,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         validateEvaluations();
 
         for (final MarkBean markBean : getEvaluations()) {
-            if (!markBean.hasGradeValue()) {
-                continue;
-            }
-
-            markBean.createOrUpdateEnrolmentEvaluation(getCompetenceCourseMarkSheet());
+            markBean.updateEnrolmentEvaluation(getCompetenceCourseMarkSheet());
         }
 
     }

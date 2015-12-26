@@ -32,55 +32,6 @@ ${portal.angularToolkit()}
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.css" />
 <script src="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.js"></script>
 
-
-<%-- TITLE --%>
-<div class="page-header">
-	<h1>
-		<spring:message code="label.evaluation.manageMarkSheet.updateEvaluations" />
-		<small></small>
-	</h1>
-</div>
-
-<%-- NAVIGATION --%>
-<div class="well well-sm" style="display: inline-block">
-	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
-		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.back" /></a>
-</div>
-<c:if test="${not empty infoMessages}">
-	<div class="alert alert-info" role="alert">
-
-		<c:forEach items="${infoMessages}" var="message">
-			<p>
-				<span class="glyphicon glyphicon glyphicon-ok-sign" aria-hidden="true">&nbsp;</span> ${message}
-			</p>
-		</c:forEach>
-
-	</div>
-</c:if>
-<c:if test="${not empty warningMessages}">
-	<div class="alert alert-warning" role="alert">
-
-		<c:forEach items="${warningMessages}" var="message">
-			<p>
-				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span> ${message}
-			</p>
-		</c:forEach>
-
-	</div>
-</c:if>
-<c:if test="${not empty errorMessages}">
-	<div class="alert alert-danger" role="alert">
-
-		<c:forEach items="${errorMessages}" var="message">
-			<p>
-				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span> ${message}
-			</p>
-		</c:forEach>
-
-	</div>
-</c:if>
-
 <script>
     angular
 	    .module('angularAppCompetenceCourseMarkSheet',
@@ -122,14 +73,107 @@ ${portal.angularToolkit()}
 				$scope.submitGrades = function() {
 					$('#updateEvaluationsForm').submit();
 				}
+				
+				$scope.importExcel = function() {
+					$('#importExcelModal').modal('toggle')
+				}
 
 
 			    } ]);
 </script>
 
+<div ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController">
 
-<form id="updateEvaluationsForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
-	ng-controller="CompetenceCourseMarkSheetController"
+<%-- TITLE --%>
+<div class="page-header">
+	<h1>
+		<spring:message code="label.evaluation.manageMarkSheet.updateEvaluations" />
+		<small></small>
+	</h1>
+</div>
+
+<%-- NAVIGATION --%>
+<div class="well well-sm" style="display: inline-block">
+	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
+		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+			code="label.event.back" /></a>
+			
+	&nbsp;|&nbsp; <span class="glyphicon glyphicon-export" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.EXPORT_EXCEL_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+				code="label.event.evaluation.manageMarkSheet.exportExcel" /></a>
+	
+	&nbsp;|&nbsp; <span class="glyphicon glyphicon-import" aria-hidden="true"></span>&nbsp;<a class=""
+			href="#" ng-click="importExcel()"><spring:message
+				code="label.event.evaluation.manageMarkSheet.importExcel" /></a>
+	
+</div>
+<c:if test="${not empty infoMessages}">
+	<div class="alert alert-info" role="alert">
+
+		<c:forEach items="${infoMessages}" var="message">
+			<p>
+				<span class="glyphicon glyphicon glyphicon-ok-sign" aria-hidden="true">&nbsp;</span> ${message}
+			</p>
+		</c:forEach>
+
+	</div>
+</c:if>
+<c:if test="${not empty warningMessages}">
+	<div class="alert alert-warning" role="alert">
+
+		<c:forEach items="${warningMessages}" var="message">
+			<p>
+				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span> ${message}
+			</p>
+		</c:forEach>
+
+	</div>
+</c:if>
+<c:if test="${not empty errorMessages}">
+	<div class="alert alert-danger" role="alert">
+
+		<c:forEach items="${errorMessages}" var="message">
+			<p>
+				<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true">&nbsp;</span> ${message}
+			</p>
+		</c:forEach>
+
+	</div>
+</c:if>
+
+<div class="modal fade" id="importExcelModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="POST" action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.IMPORT_EXCEL_URL%>${competenceCourseMarkSheet.externalId}" enctype="multipart/form-data">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<spring:message code="label.event.evaluation.manageMarkSheet.importExcel" />
+					</h4>
+				</div>
+				<div class="modal-body">
+					<input type="file" name="file" required />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<spring:message code="label.cancel" />
+					</button>
+					<button class="btn btn-danger" type="submit">
+						<spring:message code="label.upload" />
+					</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<form id="updateEvaluationsForm" name='form' method="post" class="form-horizontal"
 	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONS_URL%>${competenceCourseMarkSheet.externalId}'>
 
 	<input type="hidden" name="postback"
@@ -181,3 +225,4 @@ ${portal.angularToolkit()}
 	</div>
 </form>
 
+</div>
