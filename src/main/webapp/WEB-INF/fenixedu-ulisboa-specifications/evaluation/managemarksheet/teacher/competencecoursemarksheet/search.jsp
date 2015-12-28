@@ -215,7 +215,7 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 				</tbody>
 			</table>
 			<script type="text/javascript">
-				createDataTables('searchcompetencecoursemarksheetTable',true /*filterable*/, false /*show tools*/, true /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
+				createDataTables('searchcompetencecoursemarksheetTable',true /*filterable*/, false /*show tools*/, false /*paging*/, "${pageContext.request.contextPath}","${datatablesI18NUrl}");
 			</script>
 					
 		</c:when>
