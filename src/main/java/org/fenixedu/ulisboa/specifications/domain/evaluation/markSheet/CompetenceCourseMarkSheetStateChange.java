@@ -161,8 +161,4 @@ public class CompetenceCourseMarkSheetStateChange extends CompetenceCourseMarkSh
         return getState().isConfirmed();
     }
 
-    public boolean isCancelled() {
-        return getState().isCancelled();
-    }
-
 }

@@ -36,9 +36,7 @@ public enum CompetenceCourseMarkSheetStateEnum {
 
     SUBMITTED,
 
-    CONFIRMED,
-
-    CANCELLED,
+    CONFIRMED
 
     ;
 
@@ -58,10 +56,6 @@ public enum CompetenceCourseMarkSheetStateEnum {
         return CONFIRMED;
     }
 
-    static public CompetenceCourseMarkSheetStateEnum findCancelled() {
-        return CANCELLED;
-    }
-
     public boolean isEdition() {
         return this == EDITION;
     }
@@ -72,10 +66,6 @@ public enum CompetenceCourseMarkSheetStateEnum {
 
     public boolean isConfirmed() {
         return this == CONFIRMED;
-    }
-
-    public boolean isCancelled() {
-        return this == CANCELLED;
     }
 
 }

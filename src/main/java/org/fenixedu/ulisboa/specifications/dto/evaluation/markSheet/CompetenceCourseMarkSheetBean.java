@@ -27,6 +27,7 @@
 
 package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,6 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -45,6 +45,7 @@ import org.fenixedu.bennu.IBean;
 import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetStateEnum;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
 import org.joda.time.LocalDate;
@@ -75,6 +76,9 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
     private Set<Shift> shifts;
     private List<TupleDataSourceBean> shiftsDataSource;
+
+    private CompetenceCourseMarkSheetStateEnum markSheetState;
+    private List<TupleDataSourceBean> markSheetStateDataSource;
 
     private String reason;
 
@@ -262,6 +266,23 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         this.evaluations = evaluations;
     }
 
+    public CompetenceCourseMarkSheetStateEnum getMarkSheetState() {
+        return markSheetState;
+    }
+
+    public List<TupleDataSourceBean> getMarkSheetStateDataSource() {
+        return markSheetStateDataSource;
+    }
+
+    public void setMarkSheetState(CompetenceCourseMarkSheetStateEnum markSheetState) {
+        this.markSheetState = markSheetState;
+    }
+
+    public void setMarkSheetStateDataSource(List<CompetenceCourseMarkSheetStateEnum> value) {
+        this.markSheetStateDataSource = value.stream()
+                .map(x -> new TupleDataSourceBean(x.name(), x.getDescriptionI18N().getContent())).collect(Collectors.toList());
+    }
+
     public CompetenceCourseMarkSheetBean() {
         update();
     }
@@ -307,6 +328,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
         setShiftsDataSource(getFilteredExecutionCourses(getExecutionCourse()).flatMap(e -> e.getAssociatedShifts().stream())
                 .collect(Collectors.toList()));
+
+        setMarkSheetStateDataSource(Arrays.asList(CompetenceCourseMarkSheetStateEnum.values()));
 
     }
 

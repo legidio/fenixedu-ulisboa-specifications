@@ -113,6 +113,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
         // TODO legidio, needed in future? 
         // checkIfTeacherIsResponsibleOrCoordinator;
+        // only validate rules if last state was submitted by teacher
         checkIfEvaluationDateIsInExamsPeriod();
         checkIfEvaluationsDateIsEqualToMarkSheetEvaluationDate();
     }
@@ -238,14 +239,15 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
     }
 
     public static Stream<CompetenceCourseMarkSheet> findBy(final ExecutionSemester executionSemester,
-            final CompetenceCourse competenceCourse) {
+            final CompetenceCourse competenceCourse, final CompetenceCourseMarkSheetStateEnum markSheetState) {
 
         final Set<CompetenceCourseMarkSheet> result = Sets.newHashSet();
         if (executionSemester != null) {
             result.addAll(executionSemester.getCompetenceCourseMarkSheetSet());
         }
 
-        return result.stream().filter(c -> competenceCourse == null || c.getCompetenceCourse() == competenceCourse);
+        return result.stream().filter(c -> competenceCourse == null || c.getCompetenceCourse() == competenceCourse)
+                .filter(c -> markSheetState == null || c.isInState(markSheetState));
     }
 
     private CompetenceCourseMarkSheetStateChange getFirstStateChange() {
@@ -266,10 +268,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
     public boolean isConfirmed() {
         return getStateChange().isConfirmed();
-    }
-
-    public boolean isCancelled() {
-        return getStateChange().isCancelled();
     }
 
     public DateTime getCreationDate() {
@@ -566,6 +564,10 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         final CompetenceCourseMarkSheetSnapshot lastSnapshot = getLastSnapshot().get();
         return snapshots.stream().filter(s -> s != lastSnapshot).collect(Collectors.toSet());
 
+    }
+
+    public boolean isInState(CompetenceCourseMarkSheetStateEnum markSheetState) {
+        return getStateChange().getState() == markSheetState;
     }
 
 }
