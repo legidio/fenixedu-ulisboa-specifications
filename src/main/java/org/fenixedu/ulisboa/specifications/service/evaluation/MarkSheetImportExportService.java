@@ -16,7 +16,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.fenixedu.ulisboa.specifications.domain.exceptions.ULisboaSpecificationsDomainException;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.CompetenceCourseMarkSheetBean;
 import org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet.MarkBean;
 import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
@@ -99,25 +99,30 @@ public class MarkSheetImportExportService {
         }
     }
 
-    static public void importFromXLSX(final String filename, byte[] content, CompetenceCourseMarkSheetBean bean) {
+    static public CompetenceCourseMarkSheetBean importFromXLSX(CompetenceCourseMarkSheet competenceCourseMarkSheet,
+            final String filename, byte[] content) {
 
         if (!filename.endsWith(XLSX_EXTENSION)) {
-            throw new ULisboaSpecificationsDomainException("error.MarkSheetImportExportService.invalid.file.extension");
+            throw new RuntimeException(ULisboaSpecificationsUtil
+                    .bundle("error.MarkSheetImportExportService.invalid.file.extension", XLSX_EXTENSION));
         }
 
         XSSFWorkbook workbook = null;
         try {
+
+            final CompetenceCourseMarkSheetBean result = new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet);
 
             workbook = new XSSFWorkbook(new ByteArrayInputStream(content));
             final XSSFSheet sheet = workbook.getSheetAt(0);
 
             final Row headerRow = sheet.getRow(0);
             if (headerRow.getPhysicalNumberOfCells() != EXPECTED_COLUMNS) {
-                throw new ULisboaSpecificationsDomainException("error.MarkSheetImportExportService.unexpected.number.of.columns");
+                throw new RuntimeException(ULisboaSpecificationsUtil.bundle(
+                        "error.MarkSheetImportExportService.unexpected.number.of.columns", String.valueOf(EXPECTED_COLUMNS)));
             }
 
             final ImmutableMap<String, MarkBean> indexedMarkBeans =
-                    Maps.uniqueIndex(bean.getEvaluations(), e -> buildMarkIndexKey(e.getStudentNumber(), e.getStudentName()));
+                    Maps.uniqueIndex(result.getEvaluations(), e -> buildMarkIndexKey(e.getStudentNumber(), e.getStudentName()));
 
             final Iterator<Row> rowIterator = sheet.rowIterator();
             while (rowIterator.hasNext()) {
@@ -128,18 +133,20 @@ public class MarkSheetImportExportService {
                     continue;
                 }
 
-                final Integer studentNumber = Double.valueOf(getCellValueAsString(row.getCell(0))).intValue();
-                final String studentName = getCellValueAsString(row.getCell(1));
-                final String gradeValue = getCellValueAsString(row.getCell(2));
+                final Integer studentNumber = Double.valueOf(getCellValueAsString(row, 0)).intValue();
+                final String studentName = getCellValueAsString(row, 1);
+                final String gradeValue = getCellValueAsString(row, 2);
 
                 final String key = buildMarkIndexKey(studentNumber, studentName);
                 if (!indexedMarkBeans.containsKey(key)) {
-                    throw new ULisboaSpecificationsDomainException("error.MarkSheetImportExportService.student.not.found",
-                            studentNumber.toString(), studentName);
+                    throw new RuntimeException(ULisboaSpecificationsUtil.bundle(
+                            "error.MarkSheetImportExportService.student.not.found", studentNumber.toString(), studentName));
                 }
 
                 indexedMarkBeans.get(key).setGradeValue(gradeValue);
             }
+
+            return result;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -149,8 +156,9 @@ public class MarkSheetImportExportService {
 
     }
 
-    private static String getCellValueAsString(final Cell cell) {
+    private static String getCellValueAsString(final Row row, final int cellIndex) {
 
+        final Cell cell = row.getCell(cellIndex);
         if (cell == null) {
             return null;
         }
@@ -164,8 +172,8 @@ public class MarkSheetImportExportService {
         case Cell.CELL_TYPE_NUMERIC:
             return String.valueOf(cell.getNumericCellValue());
         default:
-            throw new ULisboaSpecificationsDomainException("error.MarkSheetImportExportService.invalid.cell.type",
-                    String.valueOf(cell.getRowIndex()));
+            throw new RuntimeException(ULisboaSpecificationsUtil.bundle("error.MarkSheetImportExportService.invalid.cell.type",
+                    String.valueOf(row.getRowNum() + 1), String.valueOf(cellIndex + 1)));
         }
 
     }

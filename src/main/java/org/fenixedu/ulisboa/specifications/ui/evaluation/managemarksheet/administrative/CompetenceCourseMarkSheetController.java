@@ -181,8 +181,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             return redirect(CONTROLLER_URL, model, redirectAttributes);
 
         } catch (Exception ex) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.delete") + "\"" + ex.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(ex.getLocalizedMessage(), model);
         }
 
         return jspPage("read/" + getCompetenceCourseMarkSheet(model).getExternalId());
@@ -237,8 +236,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(de.getLocalizedMessage(), model);
             setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
             this.setCompetenceCourseMarkSheetBean(bean, model);
 
@@ -284,8 +282,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(de.getLocalizedMessage(), model);
             this.setCompetenceCourseMarkSheetBean(bean, model);
             return jspPage("create");
         }
@@ -326,14 +323,10 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         try {
             bean.updateEnrolmentEvaluations();
-            // TODO
-            competenceCourseMarkSheet.editEvaluations();
 
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
-            setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
+            addErrorMessage(de.getLocalizedMessage(), model);
             this.setCompetenceCourseMarkSheetBean(bean, model);
 
             return jspPage("updateevaluations");
@@ -377,8 +370,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {
 
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.create") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(de.getLocalizedMessage(), model);
             this.setCompetenceCourseMarkSheetBean(bean, model);
             return jspPage("createrectification");
         }
@@ -427,8 +419,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             competenceCourseMarkSheet.confirm(false);
 
         } catch (Exception de) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(de.getLocalizedMessage(), model);
 
             return jspPage("read");
 
@@ -451,8 +442,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             competenceCourseMarkSheet.submit(false);
 
         } catch (Exception de) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(de.getLocalizedMessage(), model);
 
             return jspPage("read");
 
@@ -476,8 +466,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             competenceCourseMarkSheet.revertToEdition(false, null);
 
         } catch (Exception de) {
-            addErrorMessage(ULisboaSpecificationsUtil.bundle("label.error.update") + "\"" + de.getLocalizedMessage() + "\"",
-                    model);
+            addErrorMessage(de.getLocalizedMessage(), model);
 
             return jspPage("read");
 
@@ -512,16 +501,24 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             @RequestParam(value = "file", required = true) MultipartFile markSheetFile, final Model model,
             final RedirectAttributes redirectAttributes) throws IOException {
 
-        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet);
-        MarkSheetImportExportService.importFromXLSX(FilenameUtils.getName(markSheetFile.getOriginalFilename()),
-                markSheetFile.getBytes(), bean);
+        CompetenceCourseMarkSheetBean bean = null;
+        try {
+            bean = MarkSheetImportExportService.importFromXLSX(competenceCourseMarkSheet,
+                    FilenameUtils.getName(markSheetFile.getOriginalFilename()), markSheetFile.getBytes());
+            bean.updateEnrolmentEvaluations();
+
+            addInfoMessage(ULisboaSpecificationsUtil.bundle("label.event.evaluation.manageMarkSheet.importExcel.success"), model);
+
+        } catch (Exception e) {
+            addErrorMessage(e.getLocalizedMessage(), model);
+        }
 
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
-        setCompetenceCourseMarkSheetBean(bean, model);
-
-        //TODO: do something with result
+        setCompetenceCourseMarkSheetBean(bean == null ? new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet) : bean,
+                model);
 
         return jspPage("updateevaluations");
+
     }
 
 }

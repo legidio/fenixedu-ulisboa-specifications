@@ -176,7 +176,7 @@ ${portal.angularToolkit()}
 	
 	<c:if test="${!competenceCourseMarkSheet.edition}">
 		&nbsp;|&nbsp; <span
-			class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp; <a class="" href="#" ng-click="revertMarkSheetToEdition()"><spring:message
+			class="glyphicon glyphicon-retweet" aria-hidden="true"></span>&nbsp; <a class="" href="#" ng-click="revertMarkSheetToEdition()"><spring:message
 				code="label.event.evaluation.manageMarkSheet.revertToEdition" /></a>
 	</c:if>
 		

@@ -333,8 +333,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         try {
             bean.updateEnrolmentEvaluations();
-            // TODO
-            competenceCourseMarkSheet.editEvaluations();
 
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
         } catch (Exception de) {

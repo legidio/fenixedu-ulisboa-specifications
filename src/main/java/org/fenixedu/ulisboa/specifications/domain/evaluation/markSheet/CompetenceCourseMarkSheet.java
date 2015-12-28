@@ -162,18 +162,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         checkRules();
     }
 
-    public void editEvaluations() {
-        // TODO Auto-generated method stub
-
-        if (getEvaluationDate() == null) {
-            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.evaluationDate.required");
-        }
-
-        if (getEnrolmentEvaluationSet().isEmpty()) {
-            throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.enrolmentEvaluations.required");
-        }
-    }
-
     @Override
     protected void checkForDeletionBlockers(Collection<String> blockers) {
         super.checkForDeletionBlockers(blockers);
