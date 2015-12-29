@@ -143,7 +143,7 @@ ${portal.angularToolkit()}
 <div class="modal fade" id="importExcelModal">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form method="POST" action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.IMPORT_EXCEL_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}" enctype="multipart/form-data">
+			<form method="POST" action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.IMPORT_EXCEL_URL%>${competenceCourseMarkSheet.externalId}" enctype="multipart/form-data">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal"
 						aria-label="Close">

@@ -197,8 +197,9 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _DELETE_URI = "/delete/";
     public static final String DELETE_URL = CONTROLLER_URL + _DELETE_URI;
 
-    @RequestMapping(value = _DELETE_URI + "{oid}", method = RequestMethod.POST)
-    public String delete(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
+    @RequestMapping(value = _DELETE_URI + "{executionCourseId}/{id}", method = RequestMethod.POST)
+    public String delete(@PathVariable("executionCourseId") final ExecutionCourse executionCourse,
+            @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final RedirectAttributes redirectAttributes) {
 
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
@@ -212,7 +213,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             addErrorMessage(ex.getLocalizedMessage(), model);
         }
 
-        return jspPage("read/" + getCompetenceCourseMarkSheet(model).getExternalId());
+        return jspPage("read/" + executionCourse.getExternalId() + "/" + getCompetenceCourseMarkSheet(model).getExternalId());
     }
 
     @RequestMapping(value = "/read/{executionCourseId}/{oid}/updateevaluations")
@@ -419,7 +420,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _SUBMIT_URI = "/submit/";
     public static final String SUBMIT_URL = CONTROLLER_URL + _SUBMIT_URI;
 
-    @RequestMapping(value = _SUBMIT_URI + "{oid}", method = RequestMethod.POST)
+    @RequestMapping(value = _SUBMIT_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
     public String submit(@PathVariable("executionCourseId") final ExecutionCourse executionCourse,
             @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final RedirectAttributes redirectAttributes) {
