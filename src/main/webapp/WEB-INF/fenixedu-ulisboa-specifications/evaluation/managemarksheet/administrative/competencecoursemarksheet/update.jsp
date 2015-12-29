@@ -165,10 +165,24 @@ ${portal.angularToolkit()}
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
+					<spring:message code="label.CompetenceCourseMarkSheet.gradeScale" />
+				</div>
+				
+				<div class="col-sm-4">
+					<ui-select	id="gradeScaleSelect" name="gradeScale" ng-model="$parent.object.gradeScale" theme="bootstrap">
+						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="gradeScale.id as gradeScale in object.gradeScaleDataSource | filter: $select.search">
+							<span ng-bind-html="gradeScale.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.certifier" />
 				</div>
 
-				<div class="col-sm-6">
+				<div class="col-sm-4">
 					<ui-select	id="certifierSelect" name="certifier" ng-model="$parent.object.certifier" theme="bootstrap">
 						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
 						<ui-select-choices	repeat="certifier.id as certifier in object.certifierDataSource | filter: $select.search">

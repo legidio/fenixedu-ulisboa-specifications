@@ -104,7 +104,12 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     }
 
     public void setGradeValue(String gradeValue) {
-        this.gradeValue = NumberUtils.isNumber(gradeValue) ? cleanupNumber(gradeValue) : gradeValue;
+        this.gradeValue = gradeValue;
+        cleanupGrade();
+    }
+
+    private void cleanupGrade() {
+        this.gradeValue = NumberUtils.isNumber(this.gradeValue) ? cleanupNumber(this.gradeValue) : this.gradeValue;
     }
 
     private String cleanupNumber(String toCleanup) {
@@ -180,6 +185,8 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
 
     @Atomic
     public void updateEnrolmentEvaluation(CompetenceCourseMarkSheet markSheet) {
+
+        cleanupGrade();
 
         final EnrolmentEvaluation evaluation = findEnrolmentEvaluation(markSheet);
         if (evaluation == null) {

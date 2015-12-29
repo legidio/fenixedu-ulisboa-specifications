@@ -89,14 +89,14 @@ public class MarkSheetImportExportService {
         try {
             final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             workbook.write(baos);
+          
             return baos.toByteArray();
+            
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            IOUtils.closeQuietly(workbook);
-        }
+        } 
     }
 
     static public CompetenceCourseMarkSheetBean importFromXLSX(CompetenceCourseMarkSheet competenceCourseMarkSheet,
@@ -150,9 +150,7 @@ public class MarkSheetImportExportService {
 
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            IOUtils.closeQuietly(workbook);
-        }
+        } 
 
     }
 

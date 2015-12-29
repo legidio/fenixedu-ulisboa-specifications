@@ -29,6 +29,8 @@
 package org.fenixedu.ulisboa.specifications.domain;
 
 
+enum org.fenixedu.academic.domain.GradeScale                                                                           as GradeScaleSpecifications;
+
 enum org.fenixedu.ulisboa.specifications.domain.serviceRequests.UIComponentType as UIComponentType;
 enum org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetStateEnum as CompetenceCourseMarkSheetStateEnum;
 
@@ -646,6 +648,7 @@ relation EvaluationSeasonRuleRelation {
 class evaluation.markSheet.CompetenceCourseMarkSheet {
     LocalDate evaluationDate;
     boolean printed;
+    GradeScaleSpecifications gradeScale;
 }
 
 class evaluation.markSheet.CompetenceCourseMarkSheetStateChange {

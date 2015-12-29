@@ -230,6 +230,10 @@ ${portal.angularToolkit()}
 			<table class="table">
 				<tbody>
 					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.creationDate" /></th>
+						<td><joda:format value="${competenceCourseMarkSheet.creationDate}" style="SM" /></td>
+					</tr>
+					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.executionSemester" /></th>
 						<td><c:out value="${competenceCourseMarkSheet.executionSemester.qualifiedName}"/></td>
 					</tr>
