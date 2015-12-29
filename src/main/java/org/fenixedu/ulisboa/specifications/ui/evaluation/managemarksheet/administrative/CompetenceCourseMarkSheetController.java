@@ -82,7 +82,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return (CompetenceCourseMarkSheetBean) model.asMap().get("competenceCourseMarkSheetBean");
     }
 
-    private void setCompetenceCourseMarkSheetBean(CompetenceCourseMarkSheetBean bean, final Model model) {
+    private void setCompetenceCourseMarkSheetBean(final CompetenceCourseMarkSheetBean bean, final Model model) {
         model.addAttribute("competenceCourseMarkSheetBeanJson", getBeanJson(bean));
         model.addAttribute("competenceCourseMarkSheetBean", bean);
     }
@@ -91,7 +91,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return (CompetenceCourseMarkSheet) model.asMap().get("competenceCourseMarkSheet");
     }
 
-    private void setCompetenceCourseMarkSheet(CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model) {
+    private void setCompetenceCourseMarkSheet(final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model) {
         model.addAttribute("competenceCourseMarkSheet", competenceCourseMarkSheet);
     }
 
@@ -101,14 +101,13 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     @RequestMapping(value = _SEARCH_URI)
     public String search(@RequestParam(value = "executionsemester", required = false) ExecutionSemester executionSemester,
             @RequestParam(value = "competencecourse", required = false) CompetenceCourse competenceCourse, final Model model) {
-        List<CompetenceCourseMarkSheet> searchcompetencecoursemarksheetResultsDataSet =
-                filterSearch(executionSemester, competenceCourse, null);
+        final List<CompetenceCourseMarkSheet> searchResultsDataSet = filterSearch(executionSemester, competenceCourse, null);
 
         final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
         bean.update();
         setCompetenceCourseMarkSheetBean(bean, model);
 
-        model.addAttribute("searchcompetencecoursemarksheetResultsDataSet", searchcompetencecoursemarksheetResultsDataSet);
+        model.addAttribute("searchcompetencecoursemarksheetResultsDataSet", searchResultsDataSet);
         return jspPage("search");
     }
 
@@ -124,7 +123,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return jspPage("search");
     }
 
-    private static final String _SEARCHPOSTBACK_URI = "/searchpostback";
+    private static final String _SEARCHPOSTBACK_URI = "/searchpostback/";
     public static final String SEARCHPOSTBACK_URL = CONTROLLER_URL + _SEARCHPOSTBACK_URI;
 
     @RequestMapping(value = _SEARCHPOSTBACK_URI, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -171,7 +170,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
     @RequestMapping(value = _DELETE_URI + "{oid}", method = RequestMethod.POST)
     public String delete(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
-            RedirectAttributes redirectAttributes) {
+            final RedirectAttributes redirectAttributes) {
 
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
         try {
@@ -190,6 +189,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     @RequestMapping(value = "/read/{oid}/updateevaluations")
     public String processReadToUpdateEvaluations(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             final Model model, final RedirectAttributes redirectAttributes) {
+
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         return redirect(UPDATEEVALUATIONS_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
@@ -230,7 +230,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-
             competenceCourseMarkSheet.edit(bean.getEvaluationDate(), bean.getCertifier());
 
             return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
@@ -244,18 +243,18 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
     }
 
-    private static final String _CREATE_URI = "/create";
+    private static final String _CREATE_URI = "/create/";
     public static final String CREATE_URL = CONTROLLER_URL + _CREATE_URI;
 
     @RequestMapping(value = _CREATE_URI, method = RequestMethod.GET)
     public String create(final Model model) {
-        CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
+        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
         this.setCompetenceCourseMarkSheetBean(bean, model);
 
         return jspPage("create");
     }
 
-    private static final String _CREATEPOSTBACK_URI = "/createpostback";
+    private static final String _CREATEPOSTBACK_URI = "/createpostback/";
     public static final String CREATEPOSTBACK_URL = CONTROLLER_URL + _CREATEPOSTBACK_URI;
 
     @RequestMapping(value = _CREATEPOSTBACK_URI, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -383,7 +382,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
 
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
-
     }
 
     private static final String _SUBMIT_URI = "/submit";
@@ -406,7 +404,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
 
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
-
     }
 
     private static final String _REVERT_TO_EDITION_URI = "/reverttoedition";
@@ -430,7 +427,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
 
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
-
     }
 
     private static final String _EXPORT_EXCEL_URI = "/exportexcel/";

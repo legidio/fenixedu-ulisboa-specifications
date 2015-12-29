@@ -100,14 +100,28 @@ ${portal.angularToolkit()}
 					} ];
 
 				$scope.object = ${competenceCourseMarkSheetBeanJson};
+				$scope.form = {};
+				$scope.form.object = $scope.object;
+
 				$scope.postBack = createAngularPostbackFunction($scope);
 
 				//Begin here of Custom Screen business JS - code
+				
+				$scope.object.shifts = [];
+
+				$scope.onBeanChange = function(model) {
+					$scope.postBack(model);
+				}
+
+				$scope.createMarksheet = function() {
+					$('#createForm').submit();
+				}
+								
 
 			    } ]);
 </script>
 
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
+<form id="createForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
 	ng-controller="CompetenceCourseMarkSheetController"
 	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATE_URL%>${executionCourse.externalId}'>
 
@@ -115,20 +129,25 @@ ${portal.angularToolkit()}
 		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CREATEPOSTBACK_URL%>${executionCourse.externalId}' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
+	
 	<div class="panel panel-default">
 		<div class="panel-body">
+			<div class="form-group row">
+				<div class="col-sm-2 control-label">
+					<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
+				</div>
+
+				<div class="col-sm-6">
+					<c:out value="${competenceCourseMarkSheetBean.executionSemester.qualifiedName}"/>
+				</div>
+			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" />
 				</div>
 
 				<div class="col-sm-6">
-					<ui-select	id="competenceCourseSelect" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap" on-select="classback($model)" on-remove="callback($model)">
-						<ui-select-match>{{$select.selected.text}}</ui-select-match> 
-						<ui-select-choices	repeat="competenceCourse.id as competenceCourse in object.competenceCourseDataSource | filter: $select.search">
-							<span ng-bind-html="competenceCourse.text | highlight: $select.search"></span>
-						</ui-select-choices> 
-					</ui-select>
+					<c:out value="${competenceCourseMarkSheetBean.competenceCourse.code}" /> - <c:out value="${competenceCourseMarkSheetBean.competenceCourse.name}" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -136,13 +155,14 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" />
 				</div>
 
-				<div class="col-sm-6">
-					<%-- Relation to side 1 drop down rendered in input --%>
-					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="bootstrap" name="evaluationseason"
-						ng-model="$parent.object.evaluationSeason" theme="bootstrap" ng-disabled="disabled"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices
-						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
-					<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+				<div class="col-sm-4">
+					<ui-select	id="evaluationSeasonSelect" name="evaluationSeason" ng-model="$parent.object.evaluationSeason" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
+							<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
+
 				</div>
 			</div>
 			<div class="form-group row">
@@ -150,8 +170,22 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" />
 				</div>
 
+				<div class="col-sm-4">
+					<input class="form-control" type="text" bennu-date="object.evaluationDate" required="true"/>
+				</div>
+			</div>
+			<div class="form-group row">
+				<div class="col-sm-2 control-label">
+					<spring:message code="label.CompetenceCourseMarkSheet.certifier" />
+				</div>
+
 				<div class="col-sm-6">
-					<input class="form-control" type="text" bennu-date="object.evaluationDate" />
+					<ui-select	id="certifierSelect" name="certifier" ng-model="$parent.object.certifier" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
+						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="certifier.id as certifier in object.certifierDataSource | filter: $select.search">
+							<span ng-bind-html="certifier.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 			<div class="form-group row">
@@ -160,19 +194,18 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-6">
-					<input id="competenceCourseMarkSheet_shifts" class="form-control" type="text" ng-model="object.shifts" name="shifts" />
+					<ui-select	id="shiftsSelect" name="shifts" ng-model="$parent.object.shifts" theme="bootstrap"  on-select="onBeanChange($model)" on-remove="onBeanChange($model)" multiple="true">
+						<ui-select-match>{{$item.text}}</ui-select-match> 
+						<ui-select-choices	repeat="shift.id as shift in object.shiftsDataSource | filter: $select.search">
+							<span ng-bind-html="shift.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
 		</div>
 		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<button type="button" class="btn btn-primary" role="button" ng-click="createMarksheet()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>
 
-<script>
-    $(document).ready(function() {
-
-	// Put here the initializing code for page
-    });
-</script>

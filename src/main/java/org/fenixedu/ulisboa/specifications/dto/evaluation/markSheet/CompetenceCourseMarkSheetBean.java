@@ -84,6 +84,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
     private List<MarkBean> evaluations;
 
+    private boolean byTeacher = false;
+
     public CompetenceCourseMarkSheet getCompetenceCourseMarkSheet() {
         return competenceCourseMarkSheet;
     }
@@ -179,13 +181,20 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         this.certifier = certifier;
     }
 
-    public void setCertifierDataSource(List<Person> value) {
+    public void updateCertifierDataSource() {
 
         final Set<Person> competenceCourseTeachers = Sets.newHashSet();
         competenceCourseTeachers.addAll(getFilteredExecutionCourses(getExecutionCourse())
                 .flatMap(e -> e.getProfessorshipsSet().stream()).map(p -> p.getPerson()).collect(Collectors.toSet()));
 
-        this.certifierDataSource = value.stream().sorted(Person.COMPARATOR_BY_NAME).map(x -> {
+        Set<Person> available = Sets.newHashSet();
+        if (isByTeacher()) {
+            available = competenceCourseTeachers;
+        } else {
+            available.addAll(Bennu.getInstance().getTeachersSet().stream().map(t -> t.getPerson()).collect(Collectors.toSet()));
+        }
+
+        this.certifierDataSource = available.stream().sorted(Person.COMPARATOR_BY_NAME).map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
             tuple.setText(
@@ -260,6 +269,14 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         this.evaluations = evaluations;
     }
 
+    public boolean isByTeacher() {
+        return byTeacher;
+    }
+
+    public void setByTeacher(boolean byTeacher) {
+        this.byTeacher = byTeacher;
+    }
+
     public CompetenceCourseMarkSheetStateEnum getMarkSheetState() {
         return markSheetState;
     }
@@ -317,14 +334,12 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
         setEvaluationSeasonDataSource(EvaluationSeasonServices.findByActive(true).collect(Collectors.toList()));
 
-        setCertifierDataSource(Bennu.getInstance().getTeachersSet().stream().map(t -> t.getPerson())
-                .sorted(Person.COMPARATOR_BY_NAME).collect(Collectors.toList()));
+        updateCertifierDataSource();
 
         setShiftsDataSource(getFilteredExecutionCourses(getExecutionCourse()).flatMap(e -> e.getAssociatedShifts().stream())
                 .collect(Collectors.toList()));
 
         setMarkSheetStateDataSource(Arrays.asList(CompetenceCourseMarkSheetStateEnum.values()));
-
     }
 
     private Stream<ExecutionCourse> getFilteredExecutionCourses(final ExecutionCourse toFilter) {
