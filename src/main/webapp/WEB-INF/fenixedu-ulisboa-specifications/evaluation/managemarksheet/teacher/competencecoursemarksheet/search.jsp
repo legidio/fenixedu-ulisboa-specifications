@@ -131,52 +131,10 @@ ${portal.angularToolkit()}
 <form id="searchForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController"
 action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCH_URL%>">
 
-	<input name="bean" type="hidden" value="{{ object }}" />
-	
 	<input type="hidden" name="postback"
 		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.SEARCHPOSTBACK_URL%>${executionCourse.externalId}' />
 
-<%--	
-	<div class="panel panel-default">
-			<div class="panel-body">
-				<div class="form-group row">
-					<div class="col-sm-2 control-label">
-						<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
-					</div>
-	
-					<div class="col-sm-6">
-						<ui-select	id="executionSemesterSelect" name="executionSemester" ng-model="$parent.object.executionSemester" theme="bootstrap" on-select="onBeanChange($model)" on-remove="onBeanChange($model)">
-							<ui-select-match>{{$select.selected.text}}</ui-select-match> 
-							<ui-select-choices	repeat="executionSemester.id as executionSemester in object.executionSemesterDataSource | filter: $select.search">
-								<span ng-bind-html="executionSemester.text | highlight: $select.search"></span>
-							</ui-select-choices> 
-						</ui-select>
-	
-					</div>
-				</div>
-				<div class="form-group row">
-					<div class="col-sm-2 control-label">
-						<spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" />
-					</div>
-					
-	
-					<div class="col-sm-6">
-
-						<ui-select	id="competenceCourseSelected" name="competenceCourse" ng-model="$parent.object.competenceCourse" theme="bootstrap">
-							<ui-select-match>{{$select.selected.text}}</ui-select-match> 
-							<ui-select-choices	repeat="competenceCourse.id as competenceCourse in object.competenceCourseDataSource | filter: $select.search">
-								<span ng-bind-html="competenceCourse.text | highlight: $select.search"></span>
-							</ui-select-choices> 
-						</ui-select>
-		
-					</div>
-				</div>
-			</div>
-			<div class="panel-footer">
-				<button type="button" class="btn btn-primary" role="button" ng-click="search()"><spring:message code="label.search" /></button> 
-			</div>
-	</div>
- --%>
+	<input name="bean" type="hidden" value="{{ object }}" />
 	
 	<c:choose>
 		<c:when test="${not empty searchcompetencecoursemarksheetResultsDataSet}">
