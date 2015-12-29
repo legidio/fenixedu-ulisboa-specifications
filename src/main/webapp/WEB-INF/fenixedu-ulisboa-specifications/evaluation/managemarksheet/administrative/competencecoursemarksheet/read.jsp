@@ -180,14 +180,6 @@ ${portal.angularToolkit()}
 				code="label.event.evaluation.manageMarkSheet.revertToEdition" /></a>
 	</c:if>
 		
-			 
-<%-- TODO: analyse --%>
-<!-- 		&nbsp;|&nbsp; -->
-<!-- 	<span class="glyphicon glyphicon-ban-circle" -->
-<!-- 		aria-hidden="true"></span>&nbsp;<a class="" -->
-<%-- 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${competenceCourseMarkSheet.externalId}/annul"><spring:message --%>
-<%-- 			code="label.event.evaluation.manageMarkSheet.administrative.annul" /></a> --%>
-
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
