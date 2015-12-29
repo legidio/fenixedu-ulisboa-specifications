@@ -1,3 +1,5 @@
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices"%>
+<%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet"%>
 <%@page
 	import="org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.administrative.CompetenceCourseMarkSheetController"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
@@ -149,7 +151,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-4">
-					<span><c:out value="${competenceCourseMarkSheet.evaluationSeason.name.content}" /></span>
+					<c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)request.getAttribute("competenceCourseMarkSheet")).getEvaluationSeason()).getContent()%>"/>
 				</div>
 			</div>
 			<div class="form-group row">
