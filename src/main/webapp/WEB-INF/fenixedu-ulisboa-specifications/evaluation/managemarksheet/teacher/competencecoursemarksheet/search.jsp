@@ -81,6 +81,30 @@ ${portal.angularToolkit()}
 	</div>
 </c:if>
 
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<h3 class="panel-title">
+			<spring:message code="label.details" />
+		</h3>
+	</div>
+	
+	<div class="panel-body">
+		<form method="post" class="form-horizontal">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.executionSemester" /></th>
+						<td><c:out value="${executionCourse.executionPeriod.qualifiedName}"/></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
+						<td><c:out value="${executionCourse.nameI18N.content}"/></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
+	</div>
+</div>
 
 <script>
     angular
@@ -144,7 +168,6 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 			<table id="searchcompetencecoursemarksheetTable" class="table table-bordered table-hover" width="100%">
 				<thead>
 					<tr>
-						<th><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
 						<th><spring:message code="label.CompetenceCourseMarkSheet.state" /></th>
@@ -158,7 +181,6 @@ action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController
 				<tbody>
 					<c:forEach var="searchResult" items="${searchcompetencecoursemarksheetResultsDataSet}">
 					<tr>
-						<td><c:out value="${searchResult.competenceCourse.code}" /> - <c:out value="${searchResult.competenceCourse.nameI18N.content}" /></td>
 						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)pageContext.getAttribute("searchResult")).getEvaluationSeason()).getContent()%>"></c:out></td>
 						<td><joda:format value="${searchResult.evaluationDate}" style="S-"/></td>
 						<td><c:out value='${searchResult.state}'/></td>
