@@ -44,7 +44,7 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+			code="label.event.back" /></a>
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -100,32 +100,46 @@ ${portal.angularToolkit()}
 					} ];
 
 				$scope.object = ${competenceCourseMarkSheetBeanJson};
+
 				$scope.postBack = createAngularPostbackFunction($scope);
 
 				//Begin here of Custom Screen business JS - code
+				$scope.updateMarkSheet = function(){
+					$('#updateForm').submit();
+				}
+				
 
 			    } ]);
 </script>
 
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
+<form id="updateForm" name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
 	ng-controller="CompetenceCourseMarkSheetController"
-	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${competenceCourseMarkSheet.externalId}'>
+	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATE_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEPOSTBACK_URL%>${competenceCourseMarkSheet.externalId}' />
+		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEPOSTBACK_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 
 	<div class="panel panel-default">
 		<div class="panel-body">
+		
+			<div class="form-group row">
+				<div class="col-sm-2 control-label">
+					<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
+				</div>
+
+				<div class="col-sm-6">
+					<c:out value="${competenceCourseMarkSheet.executionSemester.qualifiedName}" />
+				</div>
+			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_competenceCourse" class="form-control" type="text" ng-model="object.competenceCourse"
-						name="competencecourse" required />
+				<div class="col-sm-6">
+					<c:out value="${competenceCourseMarkSheet.competenceCourse.code}" /> - <c:out value="${competenceCourseMarkSheet.competenceCourse.name}" />
 				</div>
 			</div>
 			<div class="form-group row">
@@ -134,12 +148,7 @@ ${portal.angularToolkit()}
 				</div>
 
 				<div class="col-sm-4">
-					<%-- Relation to side 1 drop down rendered in input --%>
-					<ui-select id="competenceCourseMarkSheet_evaluationSeason" class="bootstrap" name="evaluationseason"
-						ng-model="$parent.object.evaluationSeason" theme="bootstrap" ng-disabled="disabled"> <ui-select-match>{{$select.selected.text}}</ui-select-match>
-					<ui-select-choices
-						repeat="evaluationSeason.id as evaluationSeason in object.evaluationSeasonDataSource | filter: $select.search">
-					<span ng-bind-html="evaluationSeason.text | highlight: $select.search"></span> </ui-select-choices> </ui-select>
+					<span><c:out value="${competenceCourseMarkSheet.evaluationSeason.name.content}" /></span>
 				</div>
 			</div>
 			<div class="form-group row">
@@ -147,29 +156,30 @@ ${portal.angularToolkit()}
 					<spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" />
 				</div>
 
-				<%-- <div class="col-sm-4">
-	<input id="competenceCourseMarkSheet_evaluationDate" class="form-control" type="text" name="evaluationdate"  bennu-datetime  />
-</div> --%>
+				<div class="col-sm-4">
+					<input class="form-control" type="text" bennu-date="object.evaluationDate" required="true"/>
+				</div>
 			</div>
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.certifier" />
 				</div>
 
-				<div class="col-sm-10">
-					<input id="competenceCourseMarkSheet_certifier" class="form-control" type="text" ng-model="object.certifier" name="certifier"
-						required />
+				<div class="col-sm-6">
+					<ui-select	id="certifierSelect" name="certifier" ng-model="$parent.object.certifier" theme="bootstrap">
+						<ui-select-match allow-clear="true">{{$select.selected.text}}</ui-select-match> 
+						<ui-select-choices	repeat="certifier.id as certifier in object.certifierDataSource | filter: $select.search">
+							<span ng-bind-html="certifier.text | highlight: $select.search"></span>
+						</ui-select-choices> 
+					</ui-select>
 				</div>
 			</div>
+
 		</div>
 		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<button type="button" class="btn btn-primary" role="button" ng-click="updateMarkSheet()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>
 
-<script>
-    $(document).ready(function() {
 
-    });
-</script>

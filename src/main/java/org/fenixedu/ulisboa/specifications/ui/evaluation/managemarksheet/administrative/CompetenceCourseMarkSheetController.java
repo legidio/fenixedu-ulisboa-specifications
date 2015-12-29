@@ -362,7 +362,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         writeFile(response, filename, MarkSheetDocumentPrintService.PDF, MarkSheetDocumentPrintService.print(snapshot));
     }
 
-    private static final String _CONFIRM_URI = "/confirm";
+    private static final String _CONFIRM_URI = "/confirm/";
     public static final String CONFIRM_URL = CONTROLLER_URL + _CONFIRM_URI;
 
     @RequestMapping(value = _CONFIRM_URI + "{oid}", method = RequestMethod.POST)
@@ -384,7 +384,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
     }
 
-    private static final String _SUBMIT_URI = "/submit";
+    private static final String _SUBMIT_URI = "/submit/";
     public static final String SUBMIT_URL = CONTROLLER_URL + _SUBMIT_URI;
 
     @RequestMapping(value = _SUBMIT_URI + "{oid}", method = RequestMethod.POST)
@@ -406,7 +406,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         return redirect(READ_URL + competenceCourseMarkSheet.getExternalId(), model, redirectAttributes);
     }
 
-    private static final String _REVERT_TO_EDITION_URI = "/reverttoedition";
+    private static final String _REVERT_TO_EDITION_URI = "/reverttoedition/";
     public static final String REVERT_TO_EDITION_URL = CONTROLLER_URL + _REVERT_TO_EDITION_URI;
 
     @RequestMapping(value = _REVERT_TO_EDITION_URI + "{oid}", method = RequestMethod.POST)

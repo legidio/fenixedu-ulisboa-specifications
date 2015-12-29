@@ -234,6 +234,8 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet);
+        bean.setByTeacher(true);
+        bean.updateCertifierDataSource();
         this.setCompetenceCourseMarkSheetBean(bean, model);
 
         return jspPage("update");
@@ -390,7 +392,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
                 MarkSheetDocumentPrintService.print(competenceCourseMarkSheet));
     }
 
-    private static final String _CONFIRM_URI = "/confirm";
+    private static final String _CONFIRM_URI = "/confirm/";
     public static final String CONFIRM_URL = CONTROLLER_URL + _CONFIRM_URI;
 
     @RequestMapping(value = _CONFIRM_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
@@ -414,7 +416,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
                 redirectAttributes);
     }
 
-    private static final String _SUBMIT_URI = "/submit";
+    private static final String _SUBMIT_URI = "/submit/";
     public static final String SUBMIT_URL = CONTROLLER_URL + _SUBMIT_URI;
 
     @RequestMapping(value = _SUBMIT_URI + "{oid}", method = RequestMethod.POST)

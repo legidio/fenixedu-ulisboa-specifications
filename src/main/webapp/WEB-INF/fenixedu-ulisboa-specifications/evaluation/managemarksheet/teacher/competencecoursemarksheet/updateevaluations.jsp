@@ -31,6 +31,57 @@ ${portal.angularToolkit()}
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.css" />
 <script src="${pageContext.request.contextPath}/webjars/angular-ui-select/0.11.2/select.min.js"></script>
 
+<script>
+    angular
+	    .module('angularAppCompetenceCourseMarkSheet',
+		    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ])
+	    .controller(
+		    'CompetenceCourseMarkSheetController',
+		    [
+			    '$scope',
+			    function($scope) {
+				$scope.booleanvalues = [
+					{
+					    name : '<spring:message code="label.no"/>',
+					    value : false
+					},
+					{
+					    name : '<spring:message code="label.yes"/>',
+					    value : true
+					} ];
+
+				$scope.object = ${competenceCourseMarkSheetBeanJson};
+				$scope.postBack = createAngularPostbackFunction($scope);
+				
+				$scope.fillEmptyGradesWithValue = function() {
+					$.each( $scope.object.evaluations, function( index, evaluation ){
+						if (evaluation.gradeValue == undefined || evaluation.gradeValue == '') {
+							$scope.object.evaluations[index].gradeValue = $scope.defaultGrade;
+						}
+					});
+					
+				}
+				
+				$scope.clearGrades = function() {
+					$.each( $scope.object.evaluations, function( index, evaluation ){
+						$scope.object.evaluations[index].gradeValue = undefined;
+					});
+					
+				}
+				
+				$scope.submitGrades = function() {
+					$('#updateEvaluationsForm').submit();
+				}
+				
+				$scope.importExcel = function() {
+					$('#importExcelModal').modal('toggle')
+				}
+
+
+			    } ]);
+</script>
+
+<div ng-app="angularAppCompetenceCourseMarkSheet" ng-controller="CompetenceCourseMarkSheetController">
 
 <%-- TITLE --%>
 <div class="page-header">
@@ -44,7 +95,16 @@ ${portal.angularToolkit()}
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
 		href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.READ_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}"><spring:message
-			code="label.event.back" /></a> |&nbsp;&nbsp;
+			code="label.event.back" /></a>
+			
+	&nbsp;|&nbsp; <span class="glyphicon glyphicon-export" aria-hidden="true"></span>&nbsp;<a class=""
+			href="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.EXPORT_EXCEL_URL%>${competenceCourseMarkSheet.externalId}"><spring:message
+				code="label.event.evaluation.manageMarkSheet.exportExcel" /></a>
+	
+	&nbsp;|&nbsp; <span class="glyphicon glyphicon-import" aria-hidden="true"></span>&nbsp;<a class=""
+			href="#" ng-click="importExcel()"><spring:message
+				code="label.event.evaluation.manageMarkSheet.importExcel" /></a>
+	
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
@@ -80,52 +140,88 @@ ${portal.angularToolkit()}
 	</div>
 </c:if>
 
-<script>
-    angular
-	    .module('angularAppCompetenceCourseMarkSheet',
-		    [ 'ngSanitize', 'ui.select', 'bennuToolkit' ])
-	    .controller(
-		    'CompetenceCourseMarkSheetController',
-		    [
-			    '$scope',
-			    function($scope) {
-				$scope.booleanvalues = [
-					{
-					    name : '<spring:message code="label.no"/>',
-					    value : false
-					},
-					{
-					    name : '<spring:message code="label.yes"/>',
-					    value : true
-					} ];
+<div class="modal fade" id="importExcelModal">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="POST" action="${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.IMPORT_EXCEL_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}" enctype="multipart/form-data">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">
+						<spring:message code="label.event.evaluation.manageMarkSheet.importExcel" />
+					</h4>
+				</div>
+				<div class="modal-body">
+					<input type="file" name="file" required />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">
+						<spring:message code="label.cancel" />
+					</button>
+					<button class="btn btn-danger" type="submit">
+						<spring:message code="label.upload" />
+					</button>
+				</div>
+			</form>
+		</div>
+		<!-- /.modal-content -->
+	</div>
+	<!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
 
-				$scope.object = ${competenceCourseMarkSheetBeanJson};
-				$scope.postBack = createAngularPostbackFunction($scope);
-
-				//Begin here of Custom Screen business JS - code
-
-			    } ]);
-</script>
-
-<form name='form' method="post" class="form-horizontal" ng-app="angularAppCompetenceCourseMarkSheet"
-	ng-controller="CompetenceCourseMarkSheetController"
-	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONS_URL%>${competenceCourseMarkSheet.externalId}'>
+<form id="updateEvaluationsForm" name='form' method="post" class="form-horizontal"
+	action='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONS_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}'>
 
 	<input type="hidden" name="postback"
-		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONSPOSTBACK_URL%>${competenceCourseMarkSheet.externalId}' />
+		value='${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.UPDATEEVALUATIONSPOSTBACK_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}' />
 
 	<input name="bean" type="hidden" value="{{ object }}" />
+	
 
 	<div class="panel panel-default">
-		<div class="panel-body"></div>
+		<div class="panel-body">
+
+			<div class="form-group row">
+				<div class="col-sm-6">
+					<input type="text" name="defaultGrade" ng-model="defaultGrade" size="6" maxlength="6"/>
+					<button class="btn glyphicon glyphicon-cog" type="button" ng-click="fillEmptyGradesWithValue()"> <spring:message code="label.fill" /></button>
+				</div>
+			</div>
+			
+			
+			<table id="evaluationsTable" class="table responsive table-bordered table-hover" width="100%">
+				<thead>
+					<tr>
+						<th><spring:message code="label.MarkBean.studentNumber" /></th>
+						<th><spring:message code="label.MarkBean.studentName" /></th>
+						<th><spring:message code="label.MarkBean.degreeCode" /></th>
+						<th><spring:message code="label.MarkBean.statutes" /></th>
+						<th><spring:message code="label.MarkBean.shifts" /></th>
+						<th><spring:message code="label.MarkBean.gradeValue" /></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="evaluation in object.evaluations">
+						<td>{{evaluation.studentNumber}}</td>
+						<td>{{evaluation.studentName}}</td>
+						<td>{{evaluation.degreeCode}}</td>
+						<td>{{evaluation.statutes}}</td>
+						<td>{{evaluation.shifts}}</td>
+						<td><input type="text" name="grade" ng-model="evaluation.gradeValue" size="6" maxlength="6"/>
+							<span class="alert alert-danger btn-xs" ng-show="evaluation.errorMessage != null">{{evaluation.errorMessage}}</span>
+						 </td>
+					</tr>
+				</tbody>
+			</table>
+			
+		</div>
 		<div class="panel-footer">
-			<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />" />
+			<button type="button" class="btn btn-primary" role="button" ng-click="submitGrades()"><spring:message code="label.submit" /></button>
 		</div>
 	</div>
 </form>
 
-<script>
-    $(document).ready(function() {
-
-    });
-</script>
+</div>
