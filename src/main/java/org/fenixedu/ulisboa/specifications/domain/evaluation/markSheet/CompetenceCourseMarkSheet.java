@@ -170,8 +170,11 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
                     "error.CompetenceCourseMarkSheet.markSheet.can.only.be.updated.in.edition.state");
         }
 
-        getEnrolmentEvaluationSet()
-                .forEach(e -> e.setExamDateYearMonthDay(evaluationDate.toDateTimeAtStartOfDay().toYearMonthDay()));
+        getEnrolmentEvaluationSet().forEach(e ->
+        {
+            e.setExamDateYearMonthDay(evaluationDate == null ? null : evaluationDate.toDateTimeAtStartOfDay().toYearMonthDay());
+            e.setPersonResponsibleForGrade(certifier);
+        });
 
         init(getExecutionSemester(), getCompetenceCourse(), getExecutionCourse(), getEvaluationSeason(), evaluationDate,
                 gradeScale, certifier, getShiftSet());
@@ -458,7 +461,9 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
         for (final EnrolmentEvaluation evaluation : getEnrolmentEvaluationSet()) {
             //TODO: force evaluation checksum generation
-            evaluation.confirmSubmission(EnrolmentEvaluationState.FINAL_OBJ, Authenticate.getUser().getPerson(), null);
+            evaluation.setWhenDateTime(new DateTime());
+            evaluation.setEnrolmentEvaluationState(EnrolmentEvaluationState.FINAL_OBJ);
+            evaluation.setPerson(Authenticate.getUser().getPerson());
             EnrolmentServices.updateState(evaluation.getEnrolment());
         }
 
@@ -500,11 +505,6 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
         for (final EnrolmentEvaluation evaluation : getEnrolmentEvaluationSet()) {
             evaluation.setEnrolmentEvaluationState(EnrolmentEvaluationState.TEMPORARY_OBJ);
-            evaluation.setWhenDateTime(new DateTime());
-            evaluation.setPerson(Authenticate.getUser().getPerson());
-            evaluation.setPersonResponsibleForGrade(null);
-            evaluation.setExamDateYearMonthDay(null);
-            evaluation.setGradeAvailableDateYearMonthDay(null);
             EnrolmentServices.updateState(evaluation.getEnrolment());
         }
 
