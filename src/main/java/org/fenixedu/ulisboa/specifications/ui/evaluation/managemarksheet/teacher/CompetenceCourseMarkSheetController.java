@@ -404,7 +404,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-            competenceCourseMarkSheet.confirm(false);
+            competenceCourseMarkSheet.confirm(true);
 
         } catch (Exception de) {
             addErrorMessage(de.getLocalizedMessage(), model);
@@ -428,7 +428,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-            competenceCourseMarkSheet.submit(false);
+            competenceCourseMarkSheet.submit(true);
 
         } catch (Exception de) {
             addErrorMessage(de.getLocalizedMessage(), model);

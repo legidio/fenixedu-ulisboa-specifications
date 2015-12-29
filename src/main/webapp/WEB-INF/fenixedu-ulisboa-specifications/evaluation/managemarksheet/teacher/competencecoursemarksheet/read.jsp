@@ -63,12 +63,6 @@ ${portal.angularToolkit()}
 								'<spring:message code="label.event.evaluation.manageMarkSheet.submit" />');
 					}
 					
-					$scope.confirmMarkSheet = function() {						
-						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}', 
-								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmConfirm" />', 
-								'<spring:message code="label.event.evaluation.manageMarkSheet.confirm" />');
-					}
-					
 					$scope.deleteMarkSheet = function() {	
 						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.DELETE_URL%>${executionCourse.externalId}/${competenceCourseMarkSheet.externalId}', 
 								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmDelete" />', 
@@ -156,17 +150,6 @@ ${portal.angularToolkit()}
 				code="label.event.evaluation.manageMarkSheet.print" /></a>
 	</c:if>
 			
-	<c:if test="${competenceCourseMarkSheet.submitted}">
-		&nbsp;|&nbsp; <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<a class="" ng-click="confirmMarkSheet()"
-			href="#"><spring:message code="label.event.evaluation.manageMarkSheet.confirm" /></a>
-	</c:if>
-	
-	<c:if test="${!competenceCourseMarkSheet.edition}">
-		&nbsp;|&nbsp; <span
-			class="glyphicon glyphicon-retweet" aria-hidden="true"></span>&nbsp; <a class="" href="#" ng-click="revertMarkSheetToEdition()"><spring:message
-				code="label.event.evaluation.manageMarkSheet.revertToEdition" /></a>
-	</c:if>
-		
 </div>
 <c:if test="${not empty infoMessages}">
 	<div class="alert alert-info" role="alert">
