@@ -333,49 +333,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         }
     }
 
-    private static final String _CREATERECTIFICATION_URI = "/createrectification";
-    public static final String CREATERECTIFICATION_URL = CONTROLLER_URL + _CREATERECTIFICATION_URI;
-
-    @RequestMapping(value = _CREATERECTIFICATION_URI, method = RequestMethod.GET)
-    public String createrectification(final Model model) {
-
-        final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean();
-        this.setCompetenceCourseMarkSheetBean(bean, model);
-
-        return jspPage("createrectification");
-    }
-
-    private static final String _CREATERECTIFICATIONPOSTBACK_URI = "/createrectificationpostback";
-    public static final String CREATERECTIFICATIONPOSTBACK_URL = CONTROLLER_URL + _CREATERECTIFICATIONPOSTBACK_URI;
-
-    @RequestMapping(value = _CREATERECTIFICATIONPOSTBACK_URI, method = RequestMethod.POST,
-            produces = "application/json;charset=UTF-8")
-    public @ResponseBody ResponseEntity<String> createrectificationpostback(
-            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model) {
-
-        bean.update();
-        this.setCompetenceCourseMarkSheetBean(bean, model);
-        return new ResponseEntity<String>(getBeanJson(bean), HttpStatus.OK);
-    }
-
-    @RequestMapping(value = _CREATERECTIFICATION_URI + "{oid}", method = RequestMethod.POST)
-    public String createrectification(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
-            @RequestParam(value = "bean", required = false) final CompetenceCourseMarkSheetBean bean, final Model model,
-            final RedirectAttributes redirectAttributes) {
-
-        try {
-            final CompetenceCourseMarkSheet rectification = null;// TODO
-
-            model.addAttribute("competenceCourseMarkSheet", rectification);
-            return redirect(READ_URL + getCompetenceCourseMarkSheet(model).getExternalId(), model, redirectAttributes);
-        } catch (Exception de) {
-
-            addErrorMessage(de.getLocalizedMessage(), model);
-            this.setCompetenceCourseMarkSheetBean(bean, model);
-            return jspPage("createrectification");
-        }
-    }
-
     private static final String _PRINT_URI = "/print/";
     public static final String PRINT_URL = CONTROLLER_URL + _PRINT_URI;
 
