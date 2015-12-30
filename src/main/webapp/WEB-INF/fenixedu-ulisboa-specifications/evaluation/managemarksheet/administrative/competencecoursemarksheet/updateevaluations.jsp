@@ -181,10 +181,46 @@ ${portal.angularToolkit()}
 
 	<input name="bean" type="hidden" value="{{ object }}" />
 	
+	<div class="panel panel-primary">
+	
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				<spring:message code="label.details" />
+			</h3>
+		</div>
+	
+		<div class="panel-body">
+			<table class="table">
+				<tbody>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.executionSemester" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.executionSemester.qualifiedName}"/></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.competenceCourse" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.competenceCourse.code}"/> - <c:out value="${competenceCourseMarkSheet.competenceCourse.nameI18N.content}"/></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
+						<td><c:out value="${competenceCourseMarkSheet.evaluationSeason.name.content}"></c:out></td>
+					</tr>
+					<tr>
+						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
+						<td><joda:format value="${competenceCourseMarkSheet.evaluationDate}" style="S-"/></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
 
 	<div class="panel panel-default">
 		<div class="panel-body">
-
+		
+			<div class="alert alert-info" role="alert">
+				<spring:message code="label.evaluation.manageMarkSheet.updateEvaluations.instructions" />
+			</div>
+		
 			<div class="form-group row">
 				<div class="col-sm-6">
 					<input type="text" name="defaultGrade" ng-model="defaultGrade" size="6" maxlength="6"/>
