@@ -110,8 +110,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setEvaluationSeasonDataSource(List<EvaluationSeason> value) {
-        this.evaluationSeasonDataSource = value.stream().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR).map(x ->
-        {
+        this.evaluationSeasonDataSource = value.stream().sorted(EvaluationSeasonServices.SEASON_ORDER_COMPARATOR).map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
             tuple.setText(EvaluationSeasonServices.getDescriptionI18N(x).getContent());
@@ -140,8 +139,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setExecutionSemesterDataSource(List<ExecutionSemester> value) {
-        this.executionSemesterDataSource = value.stream().map(x ->
-        {
+        this.executionSemesterDataSource = value.stream().map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
             tuple.setText(x.getQualifiedName());
@@ -164,8 +162,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setCompetenceCourseDataSource(List<CompetenceCourse> value) {
-        this.competenceCourseDataSource = value.stream().sorted(CompetenceCourse.COMPETENCE_COURSE_COMPARATOR_BY_NAME).map(x ->
-        {
+        this.competenceCourseDataSource = value.stream().sorted(CompetenceCourse.COMPETENCE_COURSE_COMPARATOR_BY_NAME).map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
             tuple.setText(x.getCode() + " - " + (x.getName().replace("'", " ").replace("\"", " ")));
@@ -200,12 +197,11 @@ public class CompetenceCourseMarkSheetBean implements IBean {
             available.addAll(Bennu.getInstance().getTeachersSet().stream().map(t -> t.getPerson()).collect(Collectors.toSet()));
         }
 
-        this.certifierDataSource = available.stream().sorted(Person.COMPARATOR_BY_NAME).map(x ->
-        {
+        this.certifierDataSource = available.stream().sorted(Person.COMPARATOR_BY_NAME).map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
-            tuple.setText(
-                    (competenceCourseTeachers.contains(x) ? "* " : "") + x.getFirstAndLastName() + " (" + x.getUsername() + ")");
+            tuple.setText((!isByTeacher() && competenceCourseTeachers.contains(x) ? "* " : "") + x.getFirstAndLastName() + " ("
+                    + x.getUsername() + ")");
 
             return tuple;
 
@@ -225,8 +221,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setShiftsDataSource(List<Shift> value) {
-        this.shiftsDataSource = value.stream().sorted(Shift.SHIFT_COMPARATOR_BY_NAME).map(x ->
-        {
+        this.shiftsDataSource = value.stream().sorted(Shift.SHIFT_COMPARATOR_BY_NAME).map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
             tuple.setText(x.getNome());
@@ -249,8 +244,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
     }
 
     public void setExecutionCourseDataSource(List<ExecutionCourse> value) {
-        this.executionCourseDataSource = value.stream().sorted(ExecutionCourse.EXECUTION_COURSE_NAME_COMPARATOR).map(x ->
-        {
+        this.executionCourseDataSource = value.stream().sorted(ExecutionCourse.EXECUTION_COURSE_NAME_COMPARATOR).map(x -> {
             TupleDataSourceBean tuple = new TupleDataSourceBean();
             tuple.setId(x.getExternalId());
 
@@ -282,8 +276,9 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         return byTeacher;
     }
 
-    public void setByTeacher(boolean byTeacher) {
-        this.byTeacher = byTeacher;
+    public void setByTeacher(final boolean input) {
+        this.byTeacher = input;
+        updateCertifierDataSource();
     }
 
     public CompetenceCourseMarkSheetStateEnum getMarkSheetState() {
@@ -389,8 +384,7 @@ public class CompetenceCourseMarkSheetBean implements IBean {
             getCompetenceCourseMarkSheet().getExecutionCourseEnrolmentsNotInAnyMarkSheet()
                     .forEach(e -> result.add(new MarkBean(e)));
 
-            getCompetenceCourseMarkSheet().getEnrolmentEvaluationSet().forEach(e ->
-            {
+            getCompetenceCourseMarkSheet().getEnrolmentEvaluationSet().forEach(e -> {
 
                 final MarkBean markBean = new MarkBean(e.getEnrolment());
                 markBean.setGradeValue(e.getGradeValue());

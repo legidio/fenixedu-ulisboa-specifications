@@ -236,7 +236,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
 
         final CompetenceCourseMarkSheetBean bean = new CompetenceCourseMarkSheetBean(competenceCourseMarkSheet);
         bean.setByTeacher(true);
-        bean.updateCertifierDataSource();
         this.setCompetenceCourseMarkSheetBean(bean, model);
 
         return jspPage("update");
@@ -289,7 +288,6 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         final CompetenceCourseMarkSheetBean bean =
                 new CompetenceCourseMarkSheetBean(executionCourse, Authenticate.getUser().getPerson());
         bean.setByTeacher(true);
-        bean.updateCertifierDataSource();
         this.setCompetenceCourseMarkSheetBean(bean, model);
 
         return jspPage("create");

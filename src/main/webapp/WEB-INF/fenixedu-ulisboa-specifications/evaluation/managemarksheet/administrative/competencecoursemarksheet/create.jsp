@@ -152,6 +152,11 @@ ${portal.angularToolkit()}
 	
 	<div class="panel panel-default">
 		<div class="panel-body">
+		
+			<div class="alert alert-info" role="alert">
+				<spring:message code="label.evaluation.manageMarkSheet.create.update.instructions" />
+			</div>
+		
 			<div class="form-group row">
 				<div class="col-sm-2 control-label">
 					<spring:message code="label.CompetenceCourseMarkSheet.executionSemester" />
