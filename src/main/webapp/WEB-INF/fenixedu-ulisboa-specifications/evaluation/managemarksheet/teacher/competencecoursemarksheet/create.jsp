@@ -105,8 +105,6 @@ ${portal.angularToolkit()}
 
 				$scope.postBack = createAngularPostbackFunction($scope);
 
-				//Begin here of Custom Screen business JS - code
-				
 				$scope.object.shifts = [];
 
 				$scope.onBeanChange = function(model) {

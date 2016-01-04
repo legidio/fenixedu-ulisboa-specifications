@@ -197,7 +197,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _DELETE_URI = "/delete/";
     public static final String DELETE_URL = CONTROLLER_URL + _DELETE_URI;
 
-    @RequestMapping(value = _DELETE_URI + "{executionCourseId}/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = _DELETE_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
     public String delete(@PathVariable("executionCourseId") final ExecutionCourse executionCourse,
             @PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final RedirectAttributes redirectAttributes) {
@@ -265,8 +265,8 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
         setCompetenceCourseMarkSheet(competenceCourseMarkSheet, model);
 
         try {
-            competenceCourseMarkSheet.edit(bean.getEvaluationDate(), competenceCourseMarkSheet.getGradeScale(),
-                    bean.getCertifier());
+
+            competenceCourseMarkSheet.edit(bean.getEvaluationDate(), bean.getGradeScale(), bean.getCertifier());
 
             return redirect(
                     READ_URL + executionCourse.getExternalId() + "/" + getCompetenceCourseMarkSheet(model).getExternalId(), model,

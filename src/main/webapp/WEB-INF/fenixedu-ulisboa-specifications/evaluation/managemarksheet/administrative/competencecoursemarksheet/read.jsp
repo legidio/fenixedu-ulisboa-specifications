@@ -1,5 +1,4 @@
 <%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.season.EvaluationSeasonServices"%>
-<%@page import="org.fenixedu.academic.domain.EnrolmentEvaluation"%>
 <%@page import="org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet"%>
 <%@page
 	import="org.fenixedu.ulisboa.specifications.ui.evaluation.managemarksheet.administrative.CompetenceCourseMarkSheetController"%>
@@ -69,7 +68,6 @@ ${portal.angularToolkit()}
 						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.CONFIRM_URL%>${competenceCourseMarkSheet.externalId}', 
 								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmConfirm" />', 
 								'<spring:message code="label.event.evaluation.manageMarkSheet.confirm" />');
-						
 					}
 					
 					$scope.revertMarkSheetToEdition = function() {						
@@ -82,8 +80,6 @@ ${portal.angularToolkit()}
 						$scope.showConfirmation('${pageContext.request.contextPath}<%=CompetenceCourseMarkSheetController.DELETE_URL%>${competenceCourseMarkSheet.externalId}', 
 								'<spring:message code="label.evaluation.manageMarkSheet.administrative.readCompetenceCourseMarkSheet.confirmDelete" />', 
 								'<spring:message code="label.delete" />');
-						
-						
 					}
 					
 					$scope.showConfirmation = function(url,message,actionText) {
@@ -138,8 +134,6 @@ ${portal.angularToolkit()}
 	<!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
-
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display: inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class=""
@@ -243,7 +237,7 @@ ${portal.angularToolkit()}
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationSeason" /></th>
-						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)request.getAttribute("competenceCourseMarkSheet")).getEvaluationSeason()).getContent()%>"></c:out></td>
+						<td><c:out value="<%=EvaluationSeasonServices.getDescriptionI18N(((CompetenceCourseMarkSheet)request.getAttribute("competenceCourseMarkSheet")).getEvaluationSeason()).getContent()%>"/></td>
 					</tr>
 					<tr>
 						<th scope="row" class="col-xs-3"><spring:message code="label.CompetenceCourseMarkSheet.evaluationDate" /></th>
