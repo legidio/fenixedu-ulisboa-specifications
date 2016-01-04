@@ -118,6 +118,11 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
             throw new ULisboaSpecificationsDomainException("error.CompetenceCourseMarkSheet.gradeScale.required");
         }
 
+        if (getExecutionCourseEnrolmentsNotInAnyMarkSheet().isEmpty()) {
+            throw new ULisboaSpecificationsDomainException(
+                    "error.CompetenceCourseMarkSheet.no.enrolments.found.for.grade.submission");
+        }
+
         // TODO legidio, needed in future? 
         // checkIfTeacherIsResponsibleOrCoordinator;
         // only validate rules if last state was submitted by teacher
@@ -308,7 +313,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         return getShiftSet().stream().map(i -> i.getNome()).collect(Collectors.joining(", "));
     }
 
-    public Set<Enrolment> getEnrolmentsNotInAnyMarkSheet() {
+    private Set<Enrolment> getEnrolmentsNotInAnyMarkSheet() {
         final Set<Enrolment> result = Sets.newHashSet();
 
         final ExecutionSemester executionSemester = getExecutionSemester();
@@ -337,6 +342,34 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
 
                         result.add(enrolment);
                     }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Set<Enrolment> getExecutionCourseEnrolmentsNotInAnyMarkSheet() {
+
+        final Set<Enrolment> result = Sets.newHashSet();
+        for (final Enrolment enrolment : getEnrolmentsNotInAnyMarkSheet()) {
+
+            if (getCompetenceCourse().isAnual()
+                    && getExecutionSemester() == getExecutionSemester().getExecutionYear().getLastExecutionPeriod()) {
+
+                final ExecutionCourse otherExecutionCourse =
+                        enrolment.getExecutionCourseFor(getExecutionSemester().getExecutionYear().getFirstExecutionPeriod());
+                if (otherExecutionCourse != null && otherExecutionCourse.getAssociatedCurricularCoursesSet()
+                        .containsAll(getExecutionCourse().getAssociatedCurricularCoursesSet())) {
+
+                    if (enrolment.getAttendsByExecutionCourse(otherExecutionCourse) != null) {
+                        result.add(enrolment);
+                    }
+                }
+
+            } else {
+                if (enrolment.getAttendsByExecutionCourse(getExecutionCourse()) != null) {
+                    result.add(enrolment);
                 }
             }
         }

@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.CompetenceCourse;
-import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -387,33 +386,8 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
         if (getCompetenceCourseMarkSheet() != null) {
 
-            for (final Enrolment enrolment : getCompetenceCourseMarkSheet().getEnrolmentsNotInAnyMarkSheet()) {
-
-                if (getExecutionCourse() != null) {
-
-                    if (getCompetenceCourse().isAnual()
-                            && getExecutionSemester() == getExecutionSemester().getExecutionYear().getLastExecutionPeriod()) {
-
-                        final ExecutionCourse otherExecutionCourse = enrolment
-                                .getExecutionCourseFor(getExecutionSemester().getExecutionYear().getFirstExecutionPeriod());
-                        if (otherExecutionCourse != null && otherExecutionCourse.getAssociatedCurricularCoursesSet()
-                                .containsAll(getExecutionCourse().getAssociatedCurricularCoursesSet())) {
-
-                            if (enrolment.getAttendsByExecutionCourse(otherExecutionCourse) != null) {
-                                result.add(new MarkBean(enrolment));
-                            }
-                        }
-
-                    } else {
-                        if (enrolment.getAttendsByExecutionCourse(getExecutionCourse()) != null) {
-                            result.add(new MarkBean(enrolment));
-                        }
-                    }
-
-                } else {
-                    result.add(new MarkBean(enrolment));
-                }
-            }
+            getCompetenceCourseMarkSheet().getExecutionCourseEnrolmentsNotInAnyMarkSheet()
+                    .forEach(e -> result.add(new MarkBean(e)));
 
             getCompetenceCourseMarkSheet().getEnrolmentEvaluationSet().forEach(e ->
             {
