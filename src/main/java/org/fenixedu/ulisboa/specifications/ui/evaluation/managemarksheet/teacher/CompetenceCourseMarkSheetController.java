@@ -207,7 +207,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
             competenceCourseMarkSheet.delete();
 
             addInfoMessage(ULisboaSpecificationsUtil.bundle("label.success.delete"), model);
-            return redirect(CONTROLLER_URL, model, redirectAttributes);
+            return redirect(SEARCH_URL + executionCourse.getExternalId(), model, redirectAttributes);
 
         } catch (Exception ex) {
             addErrorMessage(ex.getLocalizedMessage(), model);
@@ -445,7 +445,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _EXPORT_EXCEL_URI = "/exportexcel/";
     public static final String EXPORT_EXCEL_URL = CONTROLLER_URL + _EXPORT_EXCEL_URI;
 
-    @RequestMapping(value = _EXPORT_EXCEL_URI + "{oid}", method = RequestMethod.GET)
+    @RequestMapping(value = _EXPORT_EXCEL_URI + "{executionCourseId}/{oid}", method = RequestMethod.GET)
     public void exportExcel(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet, final Model model,
             final HttpServletResponse response) throws IOException {
 
@@ -462,7 +462,7 @@ public class CompetenceCourseMarkSheetController extends FenixeduUlisboaSpecific
     private static final String _IMPORT_EXCEL_URI = "/importexcel/";
     public static final String IMPORT_EXCEL_URL = CONTROLLER_URL + _IMPORT_EXCEL_URI;
 
-    @RequestMapping(value = _IMPORT_EXCEL_URI + "{oid}", method = RequestMethod.POST)
+    @RequestMapping(value = _IMPORT_EXCEL_URI + "{executionCourseId}/{oid}", method = RequestMethod.POST)
     public String importExcel(@PathVariable("oid") final CompetenceCourseMarkSheet competenceCourseMarkSheet,
             @RequestParam(value = "file", required = true) MultipartFile markSheetFile, final Model model,
             final RedirectAttributes redirectAttributes) throws IOException {

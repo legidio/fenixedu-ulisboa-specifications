@@ -169,7 +169,7 @@ public class MarkBean implements IBean, Comparable<MarkBean> {
     protected void validateGrade() {
         if (hasGradeValue() && !getGradeScale().belongsTo(gradeValue)) {
             setErrorMessage(ULisboaSpecificationsUtil.bundle("error.MarkBean.gradeValue.does.not.belong.to.scale",
-                    GradeScale.TYPE20.getDescription()));
+                    getGradeScale().getDescription()));
         }
 
     }
