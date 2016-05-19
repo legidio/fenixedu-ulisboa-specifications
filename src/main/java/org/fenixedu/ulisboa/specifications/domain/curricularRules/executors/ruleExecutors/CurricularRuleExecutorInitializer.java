@@ -23,18 +23,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu Specifications.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.fenixedu.ulisboa.specifications.domain.curricularRules;
+package org.fenixedu.ulisboa.specifications.domain.curricularRules.executors.ruleExecutors;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import org.fenixedu.academic.domain.CurricularCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.curricularRules.CurricularRule;
+import org.fenixedu.academic.domain.curricularRules.CurricularRuleNotPersistent;
+import org.fenixedu.academic.domain.curricularRules.ICurricularRule;
+import org.fenixedu.academic.domain.curricularRules.ICurricularRule.CurricularRuleExecutorFinder;
 import org.fenixedu.academic.domain.curricularRules.executors.ruleExecutors.CurricularRuleExecutor;
 import org.fenixedu.academic.domain.curricularRules.executors.ruleExecutors.CurricularRuleExecutor.CurricularRuleApprovalExecutor;
+import org.fenixedu.academic.domain.curricularRules.executors.ruleExecutors.CurricularRuleExecutorFactory;
 import org.fenixedu.academic.domain.enrolment.EnrolmentContext;
 import org.fenixedu.ulisboa.specifications.ULisboaConfiguration;
 import org.fenixedu.ulisboa.specifications.domain.CompetenceCourseServices;
+import org.fenixedu.ulisboa.specifications.domain.curricularRules.CurriculumAggregatorApproval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +50,54 @@ abstract public class CurricularRuleExecutorInitializer {
 
     static private final Logger logger = LoggerFactory.getLogger(CurricularRuleExecutorInitializer.class);
 
+    private static Map<Class<? extends ICurricularRule>, CurricularRuleExecutor> executors =
+            new HashMap<Class<? extends ICurricularRule>, CurricularRuleExecutor>();
+
     static public void init() {
+
+        registerCurricularRuleExecutors();
+
+        CurricularRule.setCurricularRuleExecutorFinder(CURRICULAR_RULE_EXECUTOR_FINDER);
+        CurricularRuleNotPersistent.setCurricularRuleExecutorFinder(CURRICULAR_RULE_EXECUTOR_FINDER);
+        logger.info("CurricularRuleExecutorFinder: Overriding default");
 
         CurricularRuleExecutor.setCurricularRuleApprovalExecutor(CURRICULAR_RULE_APPROVAL_EXECUTOR);
         logger.info("CurricularRuleApprovalExecutor: Overriding default");
+    }
+
+    static final private void registerCurricularRuleExecutors() {
+        put(CurriculumAggregatorApproval.class, new CurriculumAggregatorApprovalExecutor());
+    }
+
+    static public CurricularRuleExecutor put(final Class<? extends ICurricularRule> clazz,
+            final CurricularRuleExecutor curricularRuleExecutor) {
+        if (!executors.containsKey(clazz)) {
+            executors.put(clazz, curricularRuleExecutor);
+        }
+
+        return curricularRuleExecutor;
+    }
+
+    static private Supplier<CurricularRuleExecutorFinder> CURRICULAR_RULE_EXECUTOR_FINDER =
+            () -> new CurricularRuleExecutorFinder() {
+
+                @Override
+                public CurricularRuleExecutor find(final ICurricularRule input) {
+                    return findExecutor(input);
+                }
+            };
+
+    static private CurricularRuleExecutor findExecutor(final ICurricularRule curricularRule) {
+        return findExecutor(curricularRule.getClass());
+    }
+
+    static private CurricularRuleExecutor findExecutor(final Class<? extends ICurricularRule> clazz) {
+        CurricularRuleExecutor result = executors.get(clazz);
+        if (result == null) {
+            result = CurricularRuleExecutorFactory.findExecutor(clazz);
+        }
+
+        return result;
     }
 
     static private Supplier<CurricularRuleApprovalExecutor> CURRICULAR_RULE_APPROVAL_EXECUTOR =
@@ -79,5 +131,14 @@ abstract public class CurricularRuleExecutorInitializer {
                     }
                 }
             };
+
+    public static CurricularRuleExecutor register(final Class<? extends ICurricularRule> clazz,
+            final CurricularRuleExecutor curricularRuleExecutor) {
+        if (!executors.containsKey(clazz)) {
+            executors.put(clazz, curricularRuleExecutor);
+        }
+
+        return curricularRuleExecutor;
+    }
 
 }
