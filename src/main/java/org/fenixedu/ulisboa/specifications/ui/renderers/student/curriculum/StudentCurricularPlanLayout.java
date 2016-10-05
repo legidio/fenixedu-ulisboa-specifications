@@ -69,7 +69,6 @@ import org.fenixedu.ulisboa.specifications.domain.services.CurriculumLineService
 import org.fenixedu.ulisboa.specifications.domain.services.enrollment.EnrolmentServices;
 import org.fenixedu.ulisboa.specifications.domain.services.evaluation.EnrolmentEvaluationServices;
 import org.fenixedu.ulisboa.specifications.domain.studentCurriculum.CurriculumAggregatorServices;
-import org.fenixedu.ulisboa.specifications.util.ULisboaSpecificationsUtil;
 import org.joda.time.YearMonthDay;
 
 import com.google.common.base.Strings;
@@ -299,7 +298,10 @@ public class StudentCurricularPlanLayout extends Layout {
     }
 
     protected StringBuilder createGroupName(final String text, final CurriculumGroup curriculumGroup) {
-        final StringBuilder groupName = new StringBuilder(text);
+        final StringBuilder groupName = new StringBuilder();
+        groupName.append("<span class=\"bold\">").append(text).append("</span>");
+        groupName.append(" [");
+
         if (curriculumGroup != null && curriculumGroup.getDegreeModule() != null) {
 
             final CreditsLimit creditsLimit = (CreditsLimit) curriculumGroup
@@ -334,6 +336,8 @@ public class StudentCurricularPlanLayout extends Layout {
                 groupName.append(creditsLimit.getMaximumCredits());
                 groupName.append(")</span>");
             }
+
+            groupName.append(" ]");
 
             if (isViewerAllowedToViewFullStudentCurriculum(studentCurricularPlan) && studentCurricularPlan.isBolonhaDegree()
                     && creditsLimit != null) {
@@ -631,7 +635,6 @@ public class StudentCurricularPlanLayout extends Layout {
         }
     }
 
-    // qubExtension
     private void generateEnrolmentRowConditionally(final HtmlTable mainTable, final Enrolment enrolment, final int level) {
 
         if (renderer.isToShowAllEnrolmentStates()) {
@@ -645,7 +648,10 @@ public class StudentCurricularPlanLayout extends Layout {
                 generateEnrolmentRow(mainTable, enrolment, level, true, false, false);
             }
         } else {
-            throw new RuntimeException("Unexpected enrolment state filter type");
+            // qubExtension
+            if (enrolment.isEnroled()) {
+                generateEnrolmentRow(mainTable, enrolment, level, true, false, false);
+            }
         }
     }
 
