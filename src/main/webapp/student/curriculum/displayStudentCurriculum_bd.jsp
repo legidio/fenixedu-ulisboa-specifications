@@ -18,6 +18,10 @@
     along with FenixEdu Academic.  If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.fenixedu.academic.domain.StudentCurricularPlan"%>
+<%@page import="org.apache.commons.collections.comparators.ReverseComparator"%>
+<%@page import="java.util.Comparator"%>
+<%@page import="java.util.Collections"%>
 <%@page import="java.util.List"%>
 <%@page import="org.apache.struts.util.LabelValueBean"%>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html" %>
@@ -166,7 +170,7 @@
 		</tr>
 		<tr>
 			<th style="vertical-align: middle;"><bean:message key="organize.by" bundle="STUDENT_RESOURCES" /></th>
-				<e:labelValues id="organizationTypes" enumeration="org.fenixedu.academic.ui.renderers.student.curriculum.StudentCurricularPlanRenderer$OrganizationType" bundle="ENUMERATION_RESOURCES" />
+				<e:labelValues id="organizationTypes" enumeration="org.fenixedu.ulisboa.specifications.ui.renderers.student.curriculum.StudentCurricularPlanRenderer$OrganizationType" bundle="APPLICATION_RESOURCES" />
 				<logic:iterate id="organizationType" name="organizationTypes">
 					<bean:define id="label" name="organizationType" property="label" />
 					<bean:define id="value" name="organizationType" property="value" />
@@ -197,48 +201,19 @@
     </logic:empty>
     
     <logic:notEmpty name="selectedStudentCurricularPlans">
-    		<bean:define id="organizedBy" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="organizedBy" type="java.lang.String" />
-    		<bean:define id="enrolmentStateFilterType" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="select" type="java.lang.String" />
-    		<bean:define id="detailed" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="detailed" type="java.lang.Boolean" />
-    		<bean:define id="viewType" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="viewType" type="java.lang.String" />
+		<bean:define id="organizedBy" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="organizedBy" type="java.lang.String" />
+		<bean:define id="enrolmentStateFilterType" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="select" type="java.lang.String" />
+		<bean:define id="detailed" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="detailed" type="java.lang.Boolean" />
+		<bean:define id="viewType" name="studentCurricularPlanAndEnrollmentsSelectionForm" property="viewType" type="java.lang.String" />
     			
+        <% 
+        final List<StudentCurricularPlan> plans = (List<StudentCurricularPlan>) request.getAttribute("selectedStudentCurricularPlans");
+        Collections.sort(plans, new ReverseComparator(StudentCurricularPlan.STUDENT_CURRICULAR_PLAN_COMPARATOR_BY_START_DATE));
+        %>
+                
     	<logic:iterate id="studentCurricularPlan" name="selectedStudentCurricularPlans" indexId="index">
     		
-    		<logic:greaterThan name="index" value="0">
-    			<div class="mvert3"></div>
-    		</logic:greaterThan>
-    
-    		<bean:define id="dateFormated">
-    			<dt:format pattern="dd.MM.yyyy">
-    				<bean:write name="studentCurricularPlan" property="startDate.time"/>
-    			</dt:format>
-    		</bean:define>
-    
-    		<div class="mvert2 mtop0">
-    			<p class="mvert05">
-    				<strong>
-    					<bean:message key="label.curricularplan" bundle="STUDENT_RESOURCES" />: 
-    				</strong> 
-    				<bean:write name="studentCurricularPlan" property="presentationName"/>
-    				<logic:present name="studentCurricularPlan" property="specialization">
-    					- <bean:message name="studentCurricularPlan" property="specialization.name" bundle="ENUMERATION_RESOURCES"/>
-    				</logic:present>
-    			</p>
-    			<logic:notEmpty name="studentCurricularPlan" property="majorBranchNames">
-    				<p class="mvert05">
-    					<strong>
-    						<bean:message key="label.RegistrationHistoryReport.primaryBranch" bundle="ACADEMIC_OFFICE_RESOURCES" />:
-    					</strong> 
-    					<bean:write name="studentCurricularPlan" property="majorBranchNames"/>
-    				</p>
-    			</logic:notEmpty>
-    			<p class="mvert05">
-    				<strong>
-    					<bean:message key="label.beginDate" bundle="STUDENT_RESOURCES" />: 
-    				</strong> 
-    				<bean:write name="dateFormated"/>
-    			</p>
-    		</div>
+			<div class="mvert3"></div>
     
     		<fr:edit name="studentCurricularPlan" nested="true">
     			<fr:layout>
@@ -261,12 +236,14 @@
     td.scplancolident {
         border: none !important;
     }
+    .wrongCreditsDistributionError {margin: 1em 0; padding: 0.2em 0.5em 0.2em 0.5em; background-color: #A60000; color: #ffffff; }
 </style>
 <script type="text/javascript">
 function load()
 {
     if (document.referrer.indexOf("viewStudentCurriculum") < 0) 
     {
+        // TODO legidio
     }
 }
 window.onload = load();
