@@ -286,6 +286,7 @@ public class CompetenceCourseMarkSheet extends CompetenceCourseMarkSheet_Base {
         setExecutionSemester(null);
         setCompetenceCourse(null);
         setExecutionCourse(null);
+        setCourseEvaluation(null);
         setEvaluationSeason(null);
         setCertifier(null);
         getShiftSet().clear();

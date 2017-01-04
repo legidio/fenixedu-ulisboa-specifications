@@ -27,6 +27,7 @@
 
 package org.fenixedu.ulisboa.specifications.dto.evaluation.markSheet;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.CompetenceCourse;
+import org.fenixedu.academic.domain.Evaluation;
 import org.fenixedu.academic.domain.EvaluationSeason;
 import org.fenixedu.academic.domain.ExecutionCourse;
 import org.fenixedu.academic.domain.ExecutionSemester;
@@ -49,6 +51,7 @@ import org.fenixedu.bennu.TupleDataSourceBean;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.fenixedu.ulisboa.specifications.domain.evaluation.EvaluationServices;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.config.MarkSheetSettings;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheet;
 import org.fenixedu.ulisboa.specifications.domain.evaluation.markSheet.CompetenceCourseMarkSheetChangeRequestStateEnum;
@@ -84,6 +87,9 @@ public class CompetenceCourseMarkSheetBean implements IBean {
 
     private ExecutionCourse executionCourse;
     private List<TupleDataSourceBean> executionCourseDataSource;
+
+    private Evaluation courseEvaluation;
+    private List<TupleDataSourceBean> courseEvaluationDataSource;
 
     private Person certifier;
     private Set<Person> responsibles = Sets.newHashSet();
@@ -423,6 +429,33 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         }).collect(Collectors.toList());
     }
 
+    public Evaluation getCourseEvaluation() {
+        return courseEvaluation;
+    }
+
+    public void setCourseEvaluation(Evaluation courseEvaluation) {
+        this.courseEvaluation = courseEvaluation;
+    }
+
+    public List<TupleDataSourceBean> getCourseEvaluationDataSource() {
+        return this.courseEvaluationDataSource;
+    }
+
+    public void setCourseEvaluationDataSource(final Set<Evaluation> value) {
+
+        this.courseEvaluationDataSource = value.stream().map(x -> {
+            final TupleDataSourceBean tuple = new TupleDataSourceBean();
+            tuple.setId(x.getExternalId());
+
+            final String name = x.getPresentationName();
+            tuple.setText(name.replace("'", " ").replace("\"", " ") + " ["
+                    + new SimpleDateFormat("dd/MM/yyyy HH:mm").format(x.getEvaluationDate()) + "]");
+
+            return tuple;
+
+        }).collect(Collectors.toList());
+    }
+
     public String getReason() {
         return reason;
     }
@@ -574,6 +607,10 @@ public class CompetenceCourseMarkSheetBean implements IBean {
         updateCompetenceCourseDataSource();
 
         setExecutionCourseDataSource(getFilteredExecutionCourses(null).collect(Collectors.toSet()));
+
+        setCourseEvaluationDataSource(getFilteredExecutionCourses(getExecutionCourse())
+                .flatMap(e -> EvaluationServices.findCourseEvaluations(e, getEvaluationSeason()).stream())
+                .collect(Collectors.toSet()));
 
         setEvaluationSeasonDataSource(EvaluationSeasonServices.findByActive(true).collect(Collectors.toSet()));
 
