@@ -1,15 +1,11 @@
 package org.fenixedu.ulisboa.specifications.ui.blue_record;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.spring.portal.BennuSpringController;
-import org.fenixedu.ulisboa.specifications.domain.services.student.StudentServices;
 import org.fenixedu.ulisboa.specifications.domain.student.access.StudentAccessServices;
 import org.fenixedu.ulisboa.specifications.ui.firstTimeCandidacy.misc.CgdDataAuthorizationController;
 import org.springframework.ui.Model;
@@ -116,33 +112,7 @@ public class CgdDataAuthorizationControllerBlueRecord extends CgdDataAuthorizati
 
     @Override
     public boolean isFormIsFilled(final ExecutionYear executionYear, final Student student) {
-        final Registration firstTimeRegistration = findFirstTimeRegistration(executionYear);
-
-        if (firstTimeRegistration == null) {
-            return true;
-        }
-
-        if (firstTimeRegistration.getPerson().getPersonUlisboaSpecifications() != null
-                && firstTimeRegistration.getPerson().getPersonUlisboaSpecifications().isSharingDataWithCGDAnswered()) {
-            return true;
-        }
-
-        return hasCgdCard(firstTimeRegistration.getPerson());
-    }
-
-    private boolean hasCgdCard(final Person person) {
-        return !person.getCgdCardsSet().isEmpty();
-    }
-
-    @Override
-    protected Student getStudent(final Model model) {
-        return AccessControl.getPerson().getStudent();
-    }
-
-    private Registration findFirstTimeRegistration(final ExecutionYear executionYear) {
-        final List<Registration> registrations = StudentServices.findActiveFirstTimeRegistrationsOrWithEnrolments(executionYear,
-                AccessControl.getPerson().getStudent());
-        return registrations.stream().filter(r -> r.getRegistrationYear() == executionYear).findFirst().orElse(null);
+        return super.isFormIsFilled(executionYear, student);
     }
 
     @Override

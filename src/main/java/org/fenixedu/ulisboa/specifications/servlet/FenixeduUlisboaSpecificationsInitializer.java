@@ -43,6 +43,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Grade;
 import org.fenixedu.academic.domain.GradeScale;
 import org.fenixedu.academic.domain.GradeScale.GradeScaleLogic;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Qualification;
 import org.fenixedu.academic.domain.SchoolClass;
 import org.fenixedu.academic.domain.curricularPeriod.CurricularPeriod;
@@ -54,11 +55,15 @@ import org.fenixedu.academic.domain.evaluation.EvaluationComparator;
 import org.fenixedu.academic.domain.evaluation.config.MarkSheetSettings;
 import org.fenixedu.academic.domain.evaluation.season.EvaluationSeasonServices;
 import org.fenixedu.academic.domain.exceptions.DomainException;
+import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.person.services.PersonServices;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.studentCurriculum.Credits;
 import org.fenixedu.academic.domain.studentCurriculum.Dismissal;
 import org.fenixedu.academic.dto.evaluation.markSheet.MarkBean;
+import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorization;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 import org.fenixedu.bennu.core.servlets.ExceptionHandlerFilter;
@@ -74,6 +79,7 @@ import org.fenixedu.ulisboa.specifications.ULisboaConfiguration;
 import org.fenixedu.ulisboa.specifications.authentication.ULisboaAuthenticationRedirector;
 import org.fenixedu.ulisboa.specifications.domain.ExtendedDegreeInfo;
 import org.fenixedu.ulisboa.specifications.domain.MaximumNumberOfCreditsForEnrolmentPeriodEnforcer;
+import org.fenixedu.ulisboa.specifications.domain.PersonUlisboaSpecifications;
 import org.fenixedu.ulisboa.specifications.domain.RegistrationObservations;
 import org.fenixedu.ulisboa.specifications.domain.ULisboaPortalConfiguration;
 import org.fenixedu.ulisboa.specifications.domain.ULisboaSpecificationsRoot;
@@ -207,6 +213,7 @@ public class FenixeduUlisboaSpecificationsInitializer implements ServletContextL
         RegistrationDataByExecutionYearExtendedInformation.setupDeleteListener();
 
         ULisboaAuthenticationRedirector.registerRedirectionHandler(new BlueRecordRedirector());
+        migrateSharingDataWithCGDAnswers();
 
         initTreasuryNextReferenceCode();
 
@@ -216,6 +223,21 @@ public class FenixeduUlisboaSpecificationsInitializer implements ServletContextL
         registerDeletionListenerOnQualification();
         registerDeletionListenerOnUnit();
 
+    }
+
+    @Atomic
+    static private void migrateSharingDataWithCGDAnswers() {
+        for (final Party party : Bennu.getInstance().getPartysSet()) {
+            if (party.isPerson()) {
+                final Person person = (Person) party;
+                final PersonUlisboaSpecifications spec = person.getPersonUlisboaSpecifications();
+                if (spec != null && spec.getSharingDataWithCGDAnswered()) {
+                    final DataShareAuthorization auth =
+                            PersonServices.setAuthorizeSharingDataWithCGD(person, spec.getAuthorizeSharingDataWithCGD());
+                    auth.setSince(spec.getVersioningCreationDate());
+                }
+            }
+        }
     }
 
     private void registerDeletionListenerOnUnit() {

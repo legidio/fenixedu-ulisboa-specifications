@@ -19,6 +19,7 @@ import org.fenixedu.academic.domain.candidacy.CandidacySituationType;
 import org.fenixedu.academic.domain.candidacy.CandidacySummaryFile;
 import org.fenixedu.academic.domain.candidacy.RegisteredCandidacySituation;
 import org.fenixedu.academic.domain.candidacy.StudentCandidacy;
+import org.fenixedu.academic.domain.person.services.PersonServices;
 import org.fenixedu.academic.domain.serviceRequests.ServiceRequestType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -28,7 +29,6 @@ import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.BennuSpringController;
 import org.fenixedu.ulisboa.specifications.domain.FirstYearRegistrationGlobalConfiguration;
-import org.fenixedu.ulisboa.specifications.domain.PersonUlisboaSpecifications;
 import org.fenixedu.ulisboa.specifications.domain.serviceRequests.ServiceRequestSlot;
 import org.fenixedu.ulisboa.specifications.domain.serviceRequests.ServiceRequestSlotEntry;
 import org.fenixedu.ulisboa.specifications.domain.serviceRequests.ULisboaServiceRequest;
@@ -115,9 +115,8 @@ public class FirstTimeCandidacyFinalizationController extends FirstTimeCandidacy
 
         Registration registration = FirstTimeCandidacyController.getCandidacy().getRegistration();
         Student student = registration.getStudent();
-        PersonUlisboaSpecifications personSpecifications = student.getPerson().getPersonUlisboaSpecifications();
 
-        if (personSpecifications != null && !personSpecifications.getAuthorizeSharingDataWithCGD()) {
+        if (PersonServices.getAuthorizeSharingDataWithCGD(registration.getPerson())) {
             addWarningMessage(BundleUtil.getString(BUNDLE, "label.firstTimeCandidacy.finished.noUniversityCard"), model);
         } else {
             addWarningMessage(BundleUtil.getString(BUNDLE, "label.firstTimeCandidacy.finished.deliverDocumentByHand"), model);

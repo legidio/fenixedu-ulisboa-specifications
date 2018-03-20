@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.person.services.PersonServices;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.predicate.AccessControl;
 import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.BennuSpringController;
 import org.fenixedu.ulisboa.specifications.domain.FirstYearRegistrationGlobalConfiguration;
-import org.fenixedu.ulisboa.specifications.domain.PersonUlisboaSpecifications;
 import org.fenixedu.ulisboa.specifications.domain.services.student.StudentServices;
 import org.fenixedu.ulisboa.specifications.domain.student.access.StudentAccessServices;
 import org.fenixedu.ulisboa.specifications.ui.firstTimeCandidacy.FirstTimeCandidacyAbstractController;
@@ -57,10 +57,7 @@ public class CgdDataAuthorizationController extends FirstTimeCandidacyAbstractCo
 
     protected String nextScreen(final ExecutionYear executionYear, final Model model, final RedirectAttributes redirectAttributes,
             final boolean wsCallSuccess) {
-        PersonUlisboaSpecifications personUlisboaSpecifications =
-                PersonUlisboaSpecifications.findOrCreate(AccessControl.getPerson());
-        if (personUlisboaSpecifications != null && personUlisboaSpecifications.getAuthorizeSharingDataWithCGD()
-                && wsCallSuccess) {
+        if (PersonServices.getAuthorizeSharingDataWithCGD(AccessControl.getPerson()) && wsCallSuccess) {
             return redirect(urlWithExecutionYear(FirstTimeCandidacyFinalizationController.WITHOUT_MODEL_URL, executionYear),
                     model, redirectAttributes);
         }
@@ -150,8 +147,7 @@ public class CgdDataAuthorizationController extends FirstTimeCandidacyAbstractCo
 
     @Atomic
     protected void authorizeSharingDataWithCGD(final boolean authorize) {
-        PersonUlisboaSpecifications.findOrCreate(AccessControl.getPerson()).setAuthorizeSharingDataWithCGD(authorize);
-        PersonUlisboaSpecifications.findOrCreate(AccessControl.getPerson()).setSharingDataWithCGDAnswered(true);
+        PersonServices.setAuthorizeSharingDataWithCGD(AccessControl.getPerson(), authorize);
     }
 
     protected static final String _SHOW_MODEL_43_URI = "/showmodelo43download";
@@ -242,22 +238,23 @@ public class CgdDataAuthorizationController extends FirstTimeCandidacyAbstractCo
     public boolean isFormIsFilled(final ExecutionYear executionYear, final Student student) {
         final Registration firstTimeRegistration = findFirstTimeRegistration(executionYear);
         if (firstTimeRegistration == null) {
+            // this is the registration we want to send; if we don't find it, let's assume nothing is to be done
             return true;
         }
 
-        if (firstTimeRegistration.getPerson().getPersonUlisboaSpecifications() != null
-                && firstTimeRegistration.getPerson().getPersonUlisboaSpecifications().isSharingDataWithCGDAnswered()) {
+        final Person person = firstTimeRegistration.getPerson();
+        if (PersonServices.isSharingDataWithCGDAnswered(person)) {
             return true;
         }
 
-        return hasCgdCard(firstTimeRegistration.getPerson());
+        return hasCgdCard(person);
     }
 
-    private boolean hasCgdCard(final Person person) {
-        return !person.getCgdCardsSet().isEmpty();
+    static private boolean hasCgdCard(final Person person) {
+        return person != null && !person.getCgdCardsSet().isEmpty();
     }
 
-    private Registration findFirstTimeRegistration(final ExecutionYear executionYear) {
+    protected Registration findFirstTimeRegistration(final ExecutionYear executionYear) {
         final List<Registration> registrations = StudentServices.findActiveFirstTimeRegistrationsOrWithEnrolments(executionYear,
                 AccessControl.getPerson().getStudent());
         return registrations.stream().filter(r -> r.getRegistrationYear() == executionYear).findFirst().orElse(null);

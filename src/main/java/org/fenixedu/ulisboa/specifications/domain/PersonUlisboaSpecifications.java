@@ -50,10 +50,6 @@ public class PersonUlisboaSpecifications extends PersonUlisboaSpecifications_Bas
         }
     }
 
-    public boolean isSharingDataWithCGDAnswered() {
-        return getSharingDataWithCGDAnswered();
-    }
-
     public void delete() {
         setPerson(null);
 
